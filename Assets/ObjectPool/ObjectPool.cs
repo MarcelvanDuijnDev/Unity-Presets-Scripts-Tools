@@ -1,0 +1,120 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ObjectPool : MonoBehaviour
+{
+
+    [SerializeField] private ObjectPool_Pool[] _ObjectPools;
+    private List<Transform> _Parents = new List<Transform>();
+
+    private void Awake()
+    {
+        GameObject emptyobject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        Destroy(emptyobject.GetComponent<MeshRenderer>());
+        Destroy(emptyobject.GetComponent<BoxCollider>());
+
+        for (int i = 0; i < _ObjectPools.Length; i++)
+        {
+            //Create parent
+            GameObject poolparent = Instantiate(emptyobject, transform.position, Quaternion.identity);
+            Destroy(poolparent.GetComponent<MeshRenderer>());
+            Destroy(poolparent.GetComponent<BoxCollider>());
+
+            //Set parent
+            poolparent.transform.parent = transform;
+            poolparent.transform.name = "Pool_" + _ObjectPools[i]._Name;
+            _Parents.Add(poolparent.transform);
+
+            //Create objects
+            for (int o = 0; o < _ObjectPools[i]._Amount; o++)
+            {
+                GameObject obj = (GameObject)Instantiate(_ObjectPools[i]._Prefab);
+                obj.transform.parent = poolparent.transform;
+                obj.transform.position = new Vector2(9999, 9999);
+                obj.SetActive(false);
+                _ObjectPools[i]._Objects.Add(obj);
+            }
+        }
+    }
+
+    public GameObject GetObject(string objname)
+    {
+        int id = FindObjectPoolID(objname);
+        return GetObject(id);
+    }
+
+    public GameObject GetObject(GameObject obj)
+    {
+        int id = FindObjectPoolID(obj);
+        return GetObject(id);
+    }
+
+    public GameObject GetObject(int id)
+    {
+        GameObject freeObject = null;
+        bool checkfreeobj = false;
+        for (int i = 0; i < _ObjectPools[id]._Objects.Count; i++)
+        {
+            if (!_ObjectPools[id]._Objects[i].activeInHierarchy)
+            {
+                _ObjectPools[id]._Objects[i].transform.position = new Vector3(0, 0, 0);
+                _ObjectPools[id]._Objects[i].SetActive(true);
+                freeObject = _ObjectPools[id]._Objects[i];
+                checkfreeobj = true;
+                break;
+            }
+        }
+
+        if (!checkfreeobj)
+        {
+            _ObjectPools[id]._Objects.Clear();
+            freeObject = (GameObject)Instantiate(_ObjectPools[id]._Prefab);
+            freeObject.transform.parent = _Parents[id];
+            _ObjectPools[id]._Objects.Add(freeObject);
+        }
+
+        return freeObject;
+    }
+
+
+    public List<GameObject> GetAllObjects(GameObject objtype)
+    {
+        int id = FindObjectPoolID(objtype);
+        return _ObjectPools[id]._Objects;
+    }
+
+    private int FindObjectPoolID(GameObject obj)
+    {
+        int id = 0;
+        for (int i = 0; i < _ObjectPools.Length; i++)
+        {
+            if (obj == _ObjectPools[i]._Prefab)
+            {
+                id = i;
+            }
+        }
+        return id;
+    }
+    private int FindObjectPoolID(string objname)
+    {
+        int id = 0;
+        for (int i = 0; i < _ObjectPools.Length; i++)
+        {
+            if(objname == _ObjectPools[i]._Name)
+            {
+                id = i;
+            }
+        }
+        return id;
+    }
+}
+
+[System.Serializable]
+public class ObjectPool_Pool
+{
+    public string _Name;
+    public GameObject _Prefab;
+    public int _Amount;
+    [HideInInspector] public List<GameObject> _Objects;
+}
