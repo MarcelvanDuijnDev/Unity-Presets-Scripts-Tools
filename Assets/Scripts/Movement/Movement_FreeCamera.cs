@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FreeCamera : MonoBehaviour
+public class Movement_FreeCamera : MonoBehaviour
 {
     [SerializeField] private float _Speed;
     [SerializeField] private float _SprintSpeed;
