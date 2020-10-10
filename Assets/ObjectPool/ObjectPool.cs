@@ -36,6 +36,7 @@ public class ObjectPool : MonoBehaviour
                 _ObjectPools[i]._Objects.Add(obj);
             }
         }
+        Destroy(emptyobject);
     }
 
     public GameObject GetObject(string objname)
