@@ -16,5 +16,6 @@ Trello: https://trello.com/b/lfyU2css/unitypresets
 - RayCast_3D.cs
 - SaveLoad_JSON.cs
 - ScriptebleGameObject.cs
+- StringFormatExamples.cs
 
 **Being worked on:**
