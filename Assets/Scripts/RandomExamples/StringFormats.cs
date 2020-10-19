@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class StringFormatExample : MonoBehaviour
+public class StringFormats : MonoBehaviour
 {
     private enum FormatOptions {Time };
     [SerializeField] private FormatOptions _FormatOption;
