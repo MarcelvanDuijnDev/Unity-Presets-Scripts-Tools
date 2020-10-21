@@ -7,8 +7,8 @@ public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 {
     private enum UIEffectOptions { Grow }
     [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;
-    [SerializeField] private Vector2 _MinMaxSize = Vector2.zero;
-    [SerializeField] private float _IncreaseSpeed = 0;
+    [SerializeField] private Vector2 _MinMaxSize = new Vector2(1,1.2f);
+    [SerializeField] private float _IncreaseSpeed = 1;
 
     private Vector3 _OriginalSize;
     private bool _MouseOver;
