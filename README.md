@@ -27,7 +27,7 @@ Trello: https://trello.com/b/lfyU2css/unitypresets
 
 ## Random Examples
 - [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/ScriptebleGameObject.cs)
-- [StringFormatExamples.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
+- [StringFormats.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
