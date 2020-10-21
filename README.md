@@ -6,30 +6,28 @@ Feel free to use/copy files from this project._
 
 Trello: https://trello.com/b/lfyU2css/unitypresets
 
-**Working Scripts:**
-
 ## Movement 
-- [Movement_CC.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/Movement)
-- [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/Movement)
+- [Movement_CC.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC.cs)
+- [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
 
 ## Weapons / Shooting
-- [Bullet.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/BulletScript)
+- [Bullet.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/BulletScript/Bullet.cs)
 
 ## Editor
-- [EditorWindowExample.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Editor)
+- [EditorWindowExample.cs]()
 
 ## Saving / Loading Data
-- [SaveLoad_JSON.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/SaveLoadHandler)
+- [SaveLoad_JSON.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/SaveLoadHandler/SaveLoad_JSON.cs)
 
 ## Random useful
-- [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/Useful)
-- [ObjectPool.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/ObjectPool)
-- [ObjectPoolSimple.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/ObjectPool)
+- [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/DoEvent.cs)
+- [ObjectPool.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPool.cs)
+- [ObjectPoolSimple.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPoolSimple.cs)
+- [UIEffects.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/UIEffects.cs)
 
 ## Random Examples
-- [RayCast_3D.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/RandomExamples)
-- [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/RandomExamples)
-- [StringFormatExamples.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/RandomExamples)
+- [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/ScriptebleGameObject.cs)
+- [StringFormatExamples.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
