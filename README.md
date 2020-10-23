@@ -7,6 +7,7 @@ Feel free to use/copy files from this project._
 Trello: https://trello.com/b/lfyU2css/unitypresets
 
 ## Movement 
+- [Movement_Camera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_Camera.cs)
 - [Movement_CC.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC.cs)
 - [Movement_CC_TopDown.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_TopDown.cs)
 - [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
