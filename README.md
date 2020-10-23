@@ -21,6 +21,7 @@ Trello: https://trello.com/b/lfyU2css/unitypresets
 
 ## Random useful
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/DoEvent.cs)
+- [LightEffects.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/LightEffects.cs)
 - [LoadScenes.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/LoadScenes.cs)
 - [ObjectPool.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPool.cs)
 - [ObjectPoolSimple.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPoolSimple.cs)
