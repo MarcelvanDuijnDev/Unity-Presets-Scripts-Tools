@@ -40327,7 +40327,7 @@ MonoBehaviour:
   _SprintSpeed: 8
   _JumpSpeed: 5
   _Gravity: 20
-  _CameraSensitivity: 90
+  _CameraSensitivity: 1
   _Head: {fileID: 1966674400}
 --- !u!143 &1346075512
 CharacterController:
