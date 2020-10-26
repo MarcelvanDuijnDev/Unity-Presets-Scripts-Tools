@@ -1,18 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
-public class Movemenct_CC : MonoBehaviour
+[RequireComponent(typeof(CharacterController))]
+public class Movement_CC : MonoBehaviour
 {
-
     //Movement
-    [SerializeField] private float _NormalSpeed = 0, _SprintSpeed = 0;
-    [SerializeField] private float _JumpSpeed = 0;
-    [SerializeField] private float _Gravity = 0;
+    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;
+    [SerializeField] private float _JumpSpeed = 5;
+    [SerializeField] private float _Gravity = 20;
     private Vector3 _MoveDirection = Vector3.zero;
     //Look around
-    public float _CameraSensitivity = 0;
+    public float _CameraSensitivity = 1;
     [SerializeField] private Transform _Head = null;
     private float _RotationX = 90.0f;
     private float _RotationY = 0.0f;
@@ -30,15 +29,15 @@ public class Movemenct_CC : MonoBehaviour
 
     void Update()
     {
+        //Look around
         if (!_LockRotation)
         {
-            //Look around
             _RotationX += Input.GetAxis("Mouse X") * _CameraSensitivity;
             _RotationY += Input.GetAxis("Mouse Y") * _CameraSensitivity;
             _RotationY = Mathf.Clamp(_RotationY, -90, 90);
 
-            transform.localRotation = Quaternion.AngleAxis(_RotationX, Vector3.up * Time.deltaTime);
-            _Head.transform.localRotation = Quaternion.AngleAxis(_RotationY, Vector3.left * Time.deltaTime);
+            transform.localRotation = Quaternion.AngleAxis(_RotationX, Vector3.up);
+            _Head.transform.localRotation = Quaternion.AngleAxis(_RotationY, Vector3.left);
         }
 
         //Movement
