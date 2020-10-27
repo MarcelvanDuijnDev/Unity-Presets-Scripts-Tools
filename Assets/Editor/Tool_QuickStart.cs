@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 public class Tool_QuickStart : EditorWindow
 {
@@ -31,6 +32,26 @@ public class Tool_QuickStart : EditorWindow
 "StringFormats",
 "Tool_CreateHexagonGrid",
 "UIEffects" };
+    private string[] _ScriptCode = new string[]
+    {
+        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Bullet : MonoBehaviour\n{\n    [SerializeField] private float _Speed;\n    [SerializeField] private float _Damage;\n\n    void FixedUpdate()\n    {\n        transform.Translate(Vector3.forward * _Speed * Time.deltaTime);\n    }\n\n    private void OnTriggerEnter(Collider other)\n    {\n        if (other.tag == \"ExampleTag\")\n        {\n            //DoDamage\n            gameObject.SetActive(false);\n        }\n    }\n}\n",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+    };
 
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
@@ -86,6 +107,12 @@ public class Tool_QuickStart : EditorWindow
         }
         else
         {
+            //Refresh
+            if (GUILayout.Button("Refresh"))
+            {
+                SearchScripts();
+            }
+
             for (int i = 0; i < _ScriptNames.Length; i++)
             {
                 if (_ScriptExist[i])
@@ -96,10 +123,12 @@ public class Tool_QuickStart : EditorWindow
 
                 GUILayout.Label(_ScriptNames[i] + ".cs", EditorStyles.boldLabel);
 
+                EditorGUI.BeginDisabledGroup(_ScriptExist[i]);
                 if (GUILayout.Button("Add", GUILayout.Width(50)))
                 {
-                    //Add Script
+                    AddScript(i);
                 }
+                EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
             }
         }
@@ -136,6 +165,19 @@ public class Tool_QuickStart : EditorWindow
             string[] foundscript = AssetDatabase.FindAssets(name, null);
             if (foundscript.Length > 0)
                 _ScriptExist[i] = true;
+        }
+    }
+
+    void AddScript(int id)
+    {
+        SearchScripts();
+        if (!_ScriptExist[id])
+        {
+            using (StreamWriter sw = new StreamWriter(string.Format(Application.dataPath + "/" + _ScriptNames[id] + ".cs",
+                                               new object[] { _ScriptNames[id].Replace(" ", "") })))
+            {
+                sw.Write(_ScriptCode[id]);
+            }
         }
     }
 }
