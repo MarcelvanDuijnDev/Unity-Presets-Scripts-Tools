@@ -6,7 +6,6 @@ using System.IO;
 
 public class Tool_QuickStart : EditorWindow
 {
-
     private int _MenuID; // QuickStart/Scripts
     private int _DimensionID; // 2D/3D
     private int _Type2DID; // 
@@ -90,18 +89,61 @@ public class Tool_QuickStart : EditorWindow
             {
                 switch (_Type2DID)
                 {
-                    case 0:
-                        ScriptStatus("Test1");
-                        ScriptStatus("Movement_CC");
+                    case 0: //Platformer
+                        GUILayout.Label("essential", EditorStyles.boldLabel);
+                        ScriptStatus("Bullet");
+                        GUILayout.Label("Extra", EditorStyles.boldLabel);
+                        ScriptStatus("UIEffects");
+                        ScriptStatus("DoEvent");
+                        ScriptStatus("LoadScenes");
                         break;
-                    case 1:
-                        ScriptStatus("Testtest1");
+                    case 1: //TopDown
+
                         break;
                 }
             }
             else
             {
+                switch (_Type3DID)
+                {
+                    case 0: //FPS
+                        GUILayout.Label("essential", EditorStyles.boldLabel);
+                        ScriptStatus("Bullet");
+                        ScriptStatus("Movement_CC");
+                        ScriptStatus("ObjectPool");
+                        GUILayout.Label("Extra", EditorStyles.boldLabel);
+                        ScriptStatus("UIEffects");
+                        ScriptStatus("DoEvent");
+                        ScriptStatus("OnCollision");
+                        ScriptStatus("LoadScenes");
+                        break;
+                    case 1: //ThirdPerson
+                        GUILayout.Label("essential", EditorStyles.boldLabel);
+                        ScriptStatus("Bullet");
+                        ScriptStatus("Movement_CC");
+                        ScriptStatus("Movement_Camera");
+                        ScriptStatus("ObjectPool");
+                        GUILayout.Label("Extra", EditorStyles.boldLabel);
+                        ScriptStatus("UIEffects");
+                        ScriptStatus("DoEvent");
+                        ScriptStatus("OnCollision");
+                        ScriptStatus("LoadScenes");
+                        break;
+                    case 2: //TopDown
+                        GUILayout.Label("essential", EditorStyles.boldLabel);
+                        ScriptStatus("Bullet");
+                        ScriptStatus("Movement_CC_TopDown");
+                        ScriptStatus("ObjectPool");
+                        GUILayout.Label("Extra", EditorStyles.boldLabel);
+                        ScriptStatus("UIEffects");
+                        ScriptStatus("DoEvent");
+                        ScriptStatus("OnCollision");
+                        ScriptStatus("LoadScenes");
+                        break;
+                    case 3: //Platformer
 
+                        break;
+                }
             }
         }
         else
@@ -136,8 +178,6 @@ public class Tool_QuickStart : EditorWindow
 
     void ScriptStatus(string name)
     {
-        EditorGUILayout.BeginHorizontal("Box");
-
         int scriptid = 0;
         for (int i = 0; i < _ScriptNames.Length; i++)
         {
@@ -149,10 +189,18 @@ public class Tool_QuickStart : EditorWindow
         }
 
         if (_ScriptExist[scriptid])
-        { GUI.backgroundColor = new Color(0, 1, 0); } else
+        { GUI.backgroundColor = new Color(0, 1, 0); }
+        else
             GUI.backgroundColor = new Color(1, 0, 0);
-        GUILayout.Label(name + ".cs");
 
+        EditorGUILayout.BeginHorizontal("Box");
+        GUILayout.Label(name + ".cs");
+        EditorGUI.BeginDisabledGroup(_ScriptExist[scriptid]);
+        if (GUILayout.Button("Add", GUILayout.Width(50)))
+        {
+            AddScript(scriptid);
+        }
+        EditorGUI.EndDisabledGroup();
 
         EditorGUILayout.EndHorizontal();
     }
