@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor;
 using System.IO;
 using UnityEditor.PackageManager.UI;
+using System;
 
 public class Tool_QuickStart : EditorWindow
 {
@@ -225,10 +226,29 @@ public class Tool_QuickStart : EditorWindow
     {
         for (int i = 0; i < _ScriptNames.Length; i++)
         {
-            string[] foundscript = AssetDatabase.FindAssets(name, null);
-            if (foundscript.Length > 0)
-                _ScriptExist[i] = true;
+            string[] search_results = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
+            for (int o = 0; o < search_results.Length; o++)
+            {
+                if (search_results[o].Contains(_ScriptNames[i]))
+                {
+                    _ScriptExist[i] = true;
+                }
+            }
         }
+    }
+
+    bool ScriptExist(string name)
+    {
+        int scriptid = 0;
+        for (int i = 0; i < _ScriptNames.Length; i++)
+        {
+            if (name == _ScriptNames[i])
+            {
+                scriptid = i;
+                continue;
+            }
+        }
+        return _ScriptExist[scriptid];
     }
 
     void AddScript(int id)
@@ -262,16 +282,24 @@ public class Tool_QuickStart : EditorWindow
             player.name = "Player";
             player.transform.position = new Vector3(0, 2, 0);
 
+            if(ScriptExist("Health"))
+            {
+                string UniType = "Health";
+                Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+                player.AddComponent(UnityType);
+                Debug.Log("Exist");
+            }
+
             GameObject cameraObj = GameObject.Find("Main Camera");
 
             switch (_Type3DID)
             {
-                case 0:
+                case 0: //FPS
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
                     cameraObj.transform.parent = player.transform;
                     cameraObj.transform.localPosition = new Vector3(0, 0.65f, 0);
                     break;
-                case 1:
+                case 1: //ThirdPerson
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
                     GameObject rotationPoint = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     rotationPoint.name = "rotationPoint";
@@ -280,12 +308,12 @@ public class Tool_QuickStart : EditorWindow
                     cameraObj.transform.localPosition = new Vector3(1, 0.65f, -1.5f);
                     rotationPoint.transform.parent = player.transform;
                     break;
-                case 2:
+                case 2: //TopDown
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
                     cameraObj.transform.position = new Vector3(0, 10, -1.5f);
                     cameraObj.transform.eulerAngles = new Vector3(80, 0, 0);
                     break;
-                case 3:
+                case 3: //Platformer
                     groundCube.transform.localScale = new Vector3(25, 1, 1);
                     break;
             }
