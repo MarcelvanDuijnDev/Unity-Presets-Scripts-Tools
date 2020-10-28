@@ -5,13 +5,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor;
 using System.IO;
+using UnityEditor.PackageManager.UI;
 
 public class Tool_QuickStart : EditorWindow
 {
     private int _MenuID; // QuickStart/Scripts
     private int _DimensionID; // 2D/3D
-    private int _Type2DID; // 
-    private int _Type3DID; // 
+    private int _Type2DID; // Platformer/TopDown
+    private int _Type3DID; // FPS/ThirdPerson/TopDown/Platformer
 
     private bool[] _ScriptExist = new bool[17];
     private string[] _ScriptNames = new string[] { // 17 Scripts
@@ -53,6 +54,8 @@ public class Tool_QuickStart : EditorWindow
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n    [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f, 1f, 1.1f);\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MinDefaultMaxSize.z)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.y, _OriginalSize.z, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinDefaultMaxSize.x)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.x)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n"
     };
 
+    private bool _CreateNewScene = true;
+
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
     {
@@ -81,14 +84,24 @@ public class Tool_QuickStart : EditorWindow
             }
 
             //Refresh
-            if (GUILayout.Button("Refresh"))
+            if (GUI.Button(new Rect(0,position.height - 25, position.width,25), "Refresh"))
             {
                 SearchScripts();
             }
+
+            //Settings
+            EditorGUILayout.BeginHorizontal("box");
+            if (_CreateNewScene)
+                GUI.backgroundColor = new Color(0, 1, 0);
+            else
+                GUI.backgroundColor = new Color(1, 0, 0);
+            if (GUILayout.Button("NewScene"))
+                _CreateNewScene = !_CreateNewScene;
+            EditorGUILayout.EndHorizontal();
+
+            GUI.backgroundColor = Color.white;
             if (GUILayout.Button("Create"))
-            {
                 CreateTemplate();
-            }
 
             //Info
             if (_DimensionID == 0)
@@ -156,25 +169,22 @@ public class Tool_QuickStart : EditorWindow
         {
             //Refresh
             if (GUILayout.Button("Refresh"))
-            {
                 SearchScripts();
-            }
 
             for (int i = 0; i < _ScriptNames.Length; i++)
             {
+                //Set color
                 if (_ScriptExist[i])
-                { GUI.backgroundColor = new Color(0, 1, 0); }
+                    GUI.backgroundColor = new Color(0, 1, 0);
                 else
                     GUI.backgroundColor = new Color(1, 0, 0);
+
+                //Script
                 EditorGUILayout.BeginHorizontal("Box");
-
                 GUILayout.Label(_ScriptNames[i] + ".cs", EditorStyles.boldLabel);
-
                 EditorGUI.BeginDisabledGroup(_ScriptExist[i]);
                 if (GUILayout.Button("Add", GUILayout.Width(50)))
-                {
                     AddScript(i);
-                }
                 EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
             }
