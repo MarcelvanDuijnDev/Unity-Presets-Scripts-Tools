@@ -313,6 +313,20 @@ public class Tool_QuickStart : EditorWindow
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
                     cameraObj.transform.position = new Vector3(0, 10, -1.5f);
                     cameraObj.transform.eulerAngles = new Vector3(80, 0, 0);
+
+                    if (ScriptExist("Movement_CC_TopDown"))
+                    {
+                        string UniType = "Movement_CC_TopDown";
+                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+                        player.AddComponent(UnityType);
+                    }
+
+                    if (ScriptExist("Movement_Camera"))
+                    {
+                        string UniType = "Movement_Camera";
+                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+                        cameraObj.AddComponent(UnityType);
+                    }
                     break;
                 case 3: //Platformer
                     groundCube.transform.localScale = new Vector3(25, 1, 1);
