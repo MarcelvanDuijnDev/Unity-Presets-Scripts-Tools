@@ -27,6 +27,7 @@ Trello: https://trello.com/b/lfyU2css/unitypresets
 ## Useful
 - [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/AudioHandler.cs)
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/DoEvent.cs)
+- [Health.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/Health.cs)
 - [LightEffects.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/LightEffects.cs)
 - [LoadScenes.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/LoadScenes.cs)
 - [ObjectPool.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPool.cs)
