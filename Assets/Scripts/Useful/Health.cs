@@ -16,7 +16,7 @@ public class Health : MonoBehaviour
     public void DoDamage(float damageamount)
     {
         _CurrentHealth -= damageamount;
-        if(_CurrentHealth < 0)
+        if(_CurrentHealth <= 0)
         {
             _CurrentHealth = 0;
             gameObject.SetActive(false);
