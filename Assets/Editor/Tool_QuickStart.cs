@@ -12,7 +12,7 @@ public class Tool_QuickStart : EditorWindow
 {
     private int _MenuID; // QuickStart/Scripts
     private int _DimensionID; // 2D/3D
-    private int _Type2DID; // Platformer/TopDown
+    private int _Type2DID; // Platformer/TopDown/VisualNovel
     private int _Type3DID; // FPS/ThirdPerson/TopDown/Platformer
 
     private bool[] _ScriptExist = new bool[18];
@@ -57,7 +57,9 @@ public class Tool_QuickStart : EditorWindow
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n    [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f, 1f, 1.1f);\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MinDefaultMaxSize.z)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.y, _OriginalSize.z, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinDefaultMaxSize.x)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.x)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n"
     };
 
-    private bool _CreateNewScene = true;
+    private int _CreateSceneOptions = 0;
+
+    private Vector2 _ScrollPos;
 
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
@@ -79,7 +81,7 @@ public class Tool_QuickStart : EditorWindow
             switch (_DimensionID)
             {
                 case 0:
-                    _Type2DID = GUILayout.Toolbar(_Type2DID, new string[] { "Platformer", "TopDown" });
+                    _Type2DID = GUILayout.Toolbar(_Type2DID, new string[] { "Platformer", "TopDown", "VisualNovel" });
                     break;
                 case 1:
                     _Type3DID = GUILayout.Toolbar(_Type3DID, new string[] { "FPS", "ThirdPerson", "TopDown", "Platformer" });
@@ -87,47 +89,40 @@ public class Tool_QuickStart : EditorWindow
             }
 
             //Refresh
-            if (GUI.Button(new Rect(0,position.height - 25, position.width,25), "Refresh"))
+            if (GUI.Button(new Rect(0,position.height - 20, position.width,20), "Refresh"))
             {
                 SearchScripts();
             }
 
-            //Settings
-            EditorGUILayout.BeginHorizontal("box");
-            if (_CreateNewScene)
-                GUI.backgroundColor = new Color(0, 1, 0);
-            else
-                GUI.backgroundColor = new Color(1, 0, 0);
-            if (GUILayout.Button("NewScene"))
-                _CreateNewScene = !_CreateNewScene;
-            EditorGUILayout.EndHorizontal();
-
-            GUI.backgroundColor = Color.white;
-            if (GUILayout.Button("Create"))
-                CreateTemplate();
-
             //Info
+            _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
             if (_DimensionID == 0)
             {
                 switch (_Type2DID)
                 {
                     case 0: //Platformer
-                        GUILayout.Label("essential", EditorStyles.boldLabel);
-                        ScriptStatus("Bullet");
+                        GUILayout.Label("Essential", EditorStyles.boldLabel);
+                        ScriptStatus("Movement_2DPlatformer");
+                        ScriptStatus("Health");
                         GUILayout.Label("Extra", EditorStyles.boldLabel);
+                        ScriptStatus("Bullet");
                         ScriptStatus("UIEffects");
                         ScriptStatus("DoEvent");
                         ScriptStatus("LoadScenes");
 
                         GUI.backgroundColor = Color.white;
-                        EditorGUILayout.BeginHorizontal();
-                        if (GUILayout.Button("Add Essential"))
+                        EditorGUILayout.BeginHorizontal("box");
+                        GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                        if (GUILayout.Button("Essential"))
                             AddScriptsMultiple(new string[] { "Bullet" });
-                        if (GUILayout.Button("Add All"))
+                        if (GUILayout.Button("All"))
                             AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
                         EditorGUILayout.EndHorizontal();
                         break;
                     case 1: //TopDown
+
+                        break;
+                    case 2: //VisualNovel
 
                         break;
                 }
@@ -137,8 +132,8 @@ public class Tool_QuickStart : EditorWindow
                 switch (_Type3DID)
                 {
                     case 0: //FPS
-                        GUILayout.Label("essential", EditorStyles.boldLabel);
-                        ScriptStatus("Bullet");
+                        GUILayout.Label("Essential", EditorStyles.boldLabel);
+                        ScriptStatus("Health");
                         ScriptStatus("Movement_CC");
                         ScriptStatus("ObjectPool");
                         GUILayout.Label("Extra", EditorStyles.boldLabel);
@@ -148,7 +143,7 @@ public class Tool_QuickStart : EditorWindow
                         ScriptStatus("LoadScenes");
                         break;
                     case 1: //ThirdPerson
-                        GUILayout.Label("essential", EditorStyles.boldLabel);
+                        GUILayout.Label("Essential", EditorStyles.boldLabel);
                         ScriptStatus("Bullet");
                         ScriptStatus("Movement_CC");
                         ScriptStatus("Movement_Camera");
@@ -160,7 +155,7 @@ public class Tool_QuickStart : EditorWindow
                         ScriptStatus("LoadScenes");
                         break;
                     case 2: //TopDown
-                        GUILayout.Label("essential", EditorStyles.boldLabel);
+                        GUILayout.Label("Essential", EditorStyles.boldLabel);
                         ScriptStatus("Bullet");
                         ScriptStatus("Movement_CC_TopDown");
                         ScriptStatus("ObjectPool");
@@ -175,6 +170,13 @@ public class Tool_QuickStart : EditorWindow
                         break;
                 }
             }
+
+            //Create
+            GUI.backgroundColor = Color.white;
+            _CreateSceneOptions = GUILayout.Toolbar(_CreateSceneOptions, new string[] { "New scene", "This scene" });
+            if (GUILayout.Button("Create"))
+                CreateTemplate();
+            EditorGUILayout.EndScrollView();
         }
         else
         {
@@ -182,6 +184,7 @@ public class Tool_QuickStart : EditorWindow
             if (GUILayout.Button("Refresh"))
                 SearchScripts();
 
+            _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
             for (int i = 0; i < _ScriptNames.Length; i++)
             {
                 //Set color
@@ -199,13 +202,14 @@ public class Tool_QuickStart : EditorWindow
                 EditorGUI.EndDisabledGroup();
                 EditorGUILayout.EndHorizontal();
             }
+            EditorGUILayout.EndScrollView();
         }
 
     }
 
     void ScriptStatus(string name)
     {
-        int scriptid = 0;
+        int scriptid = 999;
         for (int i = 0; i < _ScriptNames.Length; i++)
         {
             if (name == _ScriptNames[i])
@@ -215,21 +219,32 @@ public class Tool_QuickStart : EditorWindow
             }
         }
 
-        if (_ScriptExist[scriptid])
-        { GUI.backgroundColor = new Color(0, 1, 0); }
-        else
-            GUI.backgroundColor = new Color(1, 0, 0);
-
-        EditorGUILayout.BeginHorizontal("Box");
-        GUILayout.Label(name + ".cs");
-        EditorGUI.BeginDisabledGroup(_ScriptExist[scriptid]);
-        if (GUILayout.Button("Add", GUILayout.Width(50)))
+        if (scriptid != 999)
         {
-            AddScript(scriptid);
-        }
-        EditorGUI.EndDisabledGroup();
+            if (_ScriptExist[scriptid])
+            { GUI.backgroundColor = new Color(0, 1, 0); }
+            else
+                GUI.backgroundColor = new Color(1, 0, 0);
 
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal("Box");
+            GUILayout.Label(name + ".cs");
+            EditorGUI.BeginDisabledGroup(_ScriptExist[scriptid]);
+            if (GUILayout.Button("Add", GUILayout.Width(50)))
+            {
+                AddScript(scriptid);
+            }
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+        }else
+        {
+            GUI.backgroundColor = Color.black;
+            EditorGUILayout.BeginHorizontal("Box");
+            GUILayout.Label(name + ".cs");
+            EditorGUI.BeginDisabledGroup(true);
+            if (GUILayout.Button("Add", GUILayout.Width(50))){ }
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+        }
     }
 
     void SearchScripts()
@@ -290,7 +305,10 @@ public class Tool_QuickStart : EditorWindow
 
     void CreateTemplate()
     {
-        Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+        if (_CreateSceneOptions == 0)
+        {
+            Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+        }
         CreateObjects();
     }
     void CreateObjects()
@@ -321,6 +339,15 @@ public class Tool_QuickStart : EditorWindow
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
                     cameraObj.transform.parent = player.transform;
                     cameraObj.transform.localPosition = new Vector3(0, 0.65f, 0);
+
+                    GameObject objpool = new GameObject();
+                    if (ScriptExist("ObjectPool"))
+                    {
+                        string UniType = "ObjectPool";
+                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+                        objpool.AddComponent(UnityType);
+                        objpool.name = "ObjectPool";
+                    }
                     break;
                 case 1: //ThirdPerson
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
@@ -336,11 +363,13 @@ public class Tool_QuickStart : EditorWindow
                     cameraObj.transform.position = new Vector3(0, 10, -1.5f);
                     cameraObj.transform.eulerAngles = new Vector3(80, 0, 0);
 
+
                     if (ScriptExist("Movement_CC_TopDown"))
                     {
                         string UniType = "Movement_CC_TopDown";
                         Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
                         player.AddComponent(UnityType);
+                        player.GetComponent(UnityType).SendMessage("SetCamera",cameraObj);
                     }
 
                     if (ScriptExist("Movement_Camera"))
@@ -348,6 +377,7 @@ public class Tool_QuickStart : EditorWindow
                         string UniType = "Movement_Camera";
                         Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
                         cameraObj.AddComponent(UnityType);
+                        cameraObj.GetComponent(UnityType).SendMessage("SetTarget",player);
                     }
                     break;
                 case 3: //Platformer
