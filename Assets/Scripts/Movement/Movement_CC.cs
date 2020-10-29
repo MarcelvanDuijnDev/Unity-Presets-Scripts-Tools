@@ -25,6 +25,8 @@ public class Movement_CC : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         _CC = GetComponent<CharacterController>();
+        if (_Head == null)
+            _Head = transform.GetChild(0).transform;
     }
 
     void Update()

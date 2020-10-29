@@ -348,6 +348,13 @@ public class Tool_QuickStart : EditorWindow
                         objpool.AddComponent(UnityType);
                         objpool.name = "ObjectPool";
                     }
+
+                    if (ScriptExist("Movement_CC"))
+                    {
+                        string UniType = "Movement_CC";
+                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+                        player.AddComponent(UnityType);
+                    }
                     break;
                 case 1: //ThirdPerson
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
@@ -357,6 +364,14 @@ public class Tool_QuickStart : EditorWindow
                     cameraObj.transform.parent = rotationPoint.transform;
                     cameraObj.transform.localPosition = new Vector3(1, 0.65f, -1.5f);
                     rotationPoint.transform.parent = player.transform;
+
+
+                    if (ScriptExist("Movement_CC"))
+                    {
+                        string UniType = "Movement_CC";
+                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+                        player.AddComponent(UnityType);
+                    }
                     break;
                 case 2: //TopDown
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
