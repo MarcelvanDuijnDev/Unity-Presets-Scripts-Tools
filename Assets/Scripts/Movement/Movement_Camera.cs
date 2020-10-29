@@ -41,4 +41,9 @@ public class Movement_Camera : MonoBehaviour
                 break;
         }
     }
+
+    public void SetTarget(GameObject targetobj)
+    {
+        _Target = targetobj.transform;
+    }
 }
