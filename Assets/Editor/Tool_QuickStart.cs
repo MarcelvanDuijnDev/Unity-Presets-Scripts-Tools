@@ -234,17 +234,17 @@ public class Tool_QuickStart : EditorWindow
 
     void SearchScripts()
     {
+        bool[] checkexist = new bool[_ScriptNames.Length];
         for (int i = 0; i < _ScriptNames.Length; i++)
         {
             string[] search_results = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
             for (int o = 0; o < search_results.Length; o++)
             {
                 if (search_results[o].Contains(_ScriptNames[i]))
-                {
-                    _ScriptExist[i] = true;
-                }
+                    checkexist[i] = true;
             }
         }
+        _ScriptExist = checkexist;
     }
 
     bool ScriptExist(string name)
