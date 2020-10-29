@@ -369,7 +369,7 @@ public class Tool_QuickStart : EditorWindow
                         string UniType = "Movement_CC_TopDown";
                         Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
                         player.AddComponent(UnityType);
-                        player.GetComponent(UnityType).SendMessage("SetCamera",cameraObj);
+                        player.GetComponent(UnityType).SendMessage("SetCamera",cameraObj.GetComponent<Camera>());
                     }
 
                     if (ScriptExist("Movement_Camera"))
