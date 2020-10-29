@@ -118,6 +118,14 @@ public class Tool_QuickStart : EditorWindow
                         ScriptStatus("UIEffects");
                         ScriptStatus("DoEvent");
                         ScriptStatus("LoadScenes");
+
+                        GUI.backgroundColor = Color.white;
+                        EditorGUILayout.BeginHorizontal();
+                        if (GUILayout.Button("Add Essential"))
+                            AddScriptsMultiple(new string[] { "Bullet" });
+                        if (GUILayout.Button("Add All"))
+                            AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                        EditorGUILayout.EndHorizontal();
                         break;
                     case 1: //TopDown
 
@@ -253,6 +261,19 @@ public class Tool_QuickStart : EditorWindow
         return _ScriptExist[scriptid];
     }
 
+    void AddScriptsMultiple(string[] ids)
+    {
+        for (int i = 0; i < ids.Length; i++)
+        {
+            for (int o = 0; o < _ScriptNames.Length; o++)
+            {
+                if (ids[i] == _ScriptNames[o])
+                {
+                    AddScript(o);
+                }
+            }
+        }
+    }
     void AddScript(int id)
     {
         SearchScripts();
@@ -264,6 +285,7 @@ public class Tool_QuickStart : EditorWindow
                 sw.Write(_ScriptCode[id]);
             }
         }
+        SearchScripts();
     }
 
     void CreateTemplate()
@@ -370,22 +392,25 @@ public class Tool_QuickStart : EditorWindow
                 Info
 ========================================
 
-                [Script ID]
+             [Script ID]
 
-0: Bullet.cs                    10: ObjectPoolSimple.cs
-1: DoEvent.cs                   11: OnCollision.cs
-2: EditorWindowExample.cs       12: SaveLoad_JSON.cs
-3: LightEffects.cs              13: ScriptebleGameObject.cs
-4: LoadScenes.cs                14: StringFormats.cs
-5: Movement_CC.cs               15: Tool_CreateHexagonGrid.cs
-6: Movement_CC_TopDown.cs       16: UIEffects.cs
-7: Movement_Camera.cs           17: 
-8: Movement_FreeCamera.cs       18: 
-9: ObjectPool.cs                19: 
-
-
-
-
-
+0: Bullet.cs                    
+1: DoEvent.cs                   
+2: EditorWindowExample.cs       
+3: Health.cs
+4: LightEffects.cs              
+5: LoadScenes.cs                
+6: Movement_CC.cs               
+7: Movement_CC_TopDown.cs       
+8: Movement_Camera.cs           
+9: Movement_FreeCamera.cs       
+10: ObjectPool.cs                
+11: ObjectPoolSimple.cs
+12: OnCollision.cs
+13: SaveLoad_JSON.cs
+14: ScriptebleGameObject.cs
+15: StringFormats.cs
+16: Tool_CreateHexagonGrid.cs
+17: UIEffects.cs
 
 */
