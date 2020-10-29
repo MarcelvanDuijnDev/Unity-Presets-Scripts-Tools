@@ -55,4 +55,9 @@ public class Movement_CC_TopDown : MonoBehaviour
             transform.LookAt(new Vector3(pointToLook.x, transform.position.y, pointToLook.z));
         }
     }
+
+    public void SetCamera(Camera cameraobj)
+    {
+        _Camera = cameraobj;
+    }
 }
