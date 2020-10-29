@@ -4,8 +4,6 @@ _This project contains scripts/art/prefabs that can be used for unity projects.
 The files are made by me and do not contain copyrighted material.
 Feel free to use/copy files from this project._
 
-Trello: https://trello.com/b/lfyU2css/unitypresets
-
 ## Movement 
 - [Movement_Camera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_Camera.cs)
 - [Movement_CC.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC.cs)
