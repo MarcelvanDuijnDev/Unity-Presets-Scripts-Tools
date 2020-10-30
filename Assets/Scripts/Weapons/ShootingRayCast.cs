@@ -12,16 +12,16 @@ public class ShootingRayCast : MonoBehaviour
 
     [Header("Semi")]
     [SerializeField] private int _SemiAutomaticBulletAmount = 3;
-    [SerializeField] private float _SemiShootSpeed = 0.5f;
+    [SerializeField] private float _SemiShootSpeed = 0.2f;
     [Header("Automatic")]
-    [SerializeField] private float _SecondsBetweenShots = 2;
-
+    [SerializeField] private float _SecondsBetweenShots = 0.5f;
 
     private enum ShootModes {SingleShot, SemiAutomatic, Automatic }
     [SerializeField] private ShootModes _ShootMode;
 
     private bool _CheckSingleShot;
     private float _Timer;
+    private bool _LockShooting;
 
     void Update()
     {
@@ -35,7 +35,7 @@ public class ShootingRayCast : MonoBehaviour
                     _CheckSingleShot = true;
                     break;
                 case ShootModes.SemiAutomatic:
-                    if (!_CheckSingleShot)
+                    if (!_CheckSingleShot && !_LockShooting)
                         StartCoroutine(SemiShot());
                     _CheckSingleShot = true;
                     break;
@@ -57,11 +57,13 @@ public class ShootingRayCast : MonoBehaviour
 
     IEnumerator SemiShot()
     {
+        _LockShooting = true;
         for (int i = 0; i < _SemiAutomaticBulletAmount; i++)
         {
             Shoot();
             yield return new WaitForSeconds(_SemiShootSpeed);
         }
+        _LockShooting = false;
     }
 
 
