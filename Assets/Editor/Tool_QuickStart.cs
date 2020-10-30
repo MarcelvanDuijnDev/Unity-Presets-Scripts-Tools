@@ -88,12 +88,6 @@ public class Tool_QuickStart : EditorWindow
                     break;
             }
 
-            //Refresh
-            if (GUI.Button(new Rect(0,position.height - 20, position.width,20), "Refresh"))
-            {
-                SearchScripts();
-            }
-
             //Info
             _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
             if (_DimensionID == 0)
@@ -171,12 +165,15 @@ public class Tool_QuickStart : EditorWindow
                 }
             }
 
-            //Create
+            //Create/Refresh
             GUI.backgroundColor = Color.white;
             _CreateSceneOptions = GUILayout.Toolbar(_CreateSceneOptions, new string[] { "New scene", "This scene" });
+            EditorGUILayout.EndScrollView();
             if (GUILayout.Button("Create"))
                 CreateTemplate();
-            EditorGUILayout.EndScrollView();
+            if (GUILayout.Button("Refresh"))
+                CreateTemplate();
+
         }
         else
         {
@@ -377,7 +374,6 @@ public class Tool_QuickStart : EditorWindow
                     groundCube.transform.localScale = new Vector3(25, 1, 25);
                     cameraObj.transform.position = new Vector3(0, 10, -1.5f);
                     cameraObj.transform.eulerAngles = new Vector3(80, 0, 0);
-
 
                     if (ScriptExist("Movement_CC_TopDown"))
                     {
