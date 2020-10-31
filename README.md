@@ -12,6 +12,7 @@ Feel free to use/copy files from this project._
 
 ## Weapons / Shooting
 - [Bullet.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/BulletScript/Bullet.cs)
+- [Shooting.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Weapons/Shooting.cs)
 - [ShootingRayCast.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Weapons/ShootingRayCast.cs)
 
 ## Editor
