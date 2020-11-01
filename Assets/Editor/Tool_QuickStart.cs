@@ -72,138 +72,188 @@ public class Tool_QuickStart : EditorWindow
         //Menu Type
         _MenuID = GUILayout.Toolbar(_MenuID, new string[] { "QuickStart", "Scripts" });
 
-        if (_MenuID == 0)
-        {
-            //Dimension
-            _DimensionID = GUILayout.Toolbar(_DimensionID, new string[] { "2D", "3D" });
-
-            //Type 2D/3D
-            switch (_DimensionID)
-            {
-                case 0:
-                    _Type2DID = GUILayout.Toolbar(_Type2DID, new string[] { "Platformer", "TopDown", "VisualNovel" });
-                    break;
-                case 1:
-                    _Type3DID = GUILayout.Toolbar(_Type3DID, new string[] { "FPS", "ThirdPerson", "TopDown", "Platformer" });
-                    break;
-            }
-
-            //Info
-            _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
-            if (_DimensionID == 0)
-            {
-                switch (_Type2DID)
-                {
-                    case 0: //Platformer
-                        GUILayout.Label("Essential", EditorStyles.boldLabel);
-                        ScriptStatus("Movement_2DPlatformer");
-                        ScriptStatus("Health");
-                        GUILayout.Label("Extra", EditorStyles.boldLabel);
-                        ScriptStatus("Bullet");
-                        ScriptStatus("UIEffects");
-                        ScriptStatus("DoEvent");
-                        ScriptStatus("LoadScenes");
-
-                        GUI.backgroundColor = Color.white;
-                        EditorGUILayout.BeginHorizontal("box");
-                        GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
-                        if (GUILayout.Button("Essential"))
-                            AddScriptsMultiple(new string[] { "Bullet" });
-                        if (GUILayout.Button("All"))
-                            AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
-                        EditorGUILayout.EndHorizontal();
-                        break;
-                    case 1: //TopDown
-
-                        break;
-                    case 2: //VisualNovel
-
-                        break;
-                }
-            }
-            else
-            {
-                switch (_Type3DID)
-                {
-                    case 0: //FPS
-                        GUILayout.Label("Essential", EditorStyles.boldLabel);
-                        ScriptStatus("Health");
-                        ScriptStatus("Movement_CC");
-                        ScriptStatus("ObjectPool");
-                        GUILayout.Label("Extra", EditorStyles.boldLabel);
-                        ScriptStatus("UIEffects");
-                        ScriptStatus("DoEvent");
-                        ScriptStatus("OnCollision");
-                        ScriptStatus("LoadScenes");
-                        break;
-                    case 1: //ThirdPerson
-                        GUILayout.Label("Essential", EditorStyles.boldLabel);
-                        ScriptStatus("Bullet");
-                        ScriptStatus("Movement_CC");
-                        ScriptStatus("Movement_Camera");
-                        ScriptStatus("ObjectPool");
-                        GUILayout.Label("Extra", EditorStyles.boldLabel);
-                        ScriptStatus("UIEffects");
-                        ScriptStatus("DoEvent");
-                        ScriptStatus("OnCollision");
-                        ScriptStatus("LoadScenes");
-                        break;
-                    case 2: //TopDown
-                        GUILayout.Label("Essential", EditorStyles.boldLabel);
-                        ScriptStatus("Bullet");
-                        ScriptStatus("Movement_CC_TopDown");
-                        ScriptStatus("ObjectPool");
-                        GUILayout.Label("Extra", EditorStyles.boldLabel);
-                        ScriptStatus("UIEffects");
-                        ScriptStatus("DoEvent");
-                        ScriptStatus("OnCollision");
-                        ScriptStatus("LoadScenes");
-                        break;
-                    case 3: //Platformer
-
-                        break;
-                }
-            }
-
-            //Create/Refresh
-            GUI.backgroundColor = Color.white;
-            _CreateSceneOptions = GUILayout.Toolbar(_CreateSceneOptions, new string[] { "New scene", "This scene" });
-            EditorGUILayout.EndScrollView();
-            if (GUILayout.Button("Create"))
-                CreateTemplate();
-            if (GUILayout.Button("Refresh"))
-                CreateTemplate();
-
-        }
+        if (_MenuID == 0) //QuickStart
+            Menu_QuickStart();
         else
-        {
-            //Refresh
-            if (GUILayout.Button("Refresh"))
-                SearchScripts();
-
-            _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
-            for (int i = 0; i < _ScriptNames.Length; i++)
-            {
-                //Set color
-                if (_ScriptExist[i])
-                    GUI.backgroundColor = new Color(0, 1, 0);
-                else
-                    GUI.backgroundColor = new Color(1, 0, 0);
-
-                //Script
-                EditorGUILayout.BeginHorizontal("Box");
-                GUILayout.Label(_ScriptNames[i] + ".cs", EditorStyles.boldLabel);
-                EditorGUI.BeginDisabledGroup(_ScriptExist[i]);
-                if (GUILayout.Button("Add", GUILayout.Width(50)))
-                    AddScript(i);
-                EditorGUI.EndDisabledGroup();
-                EditorGUILayout.EndHorizontal();
-            }
-            EditorGUILayout.EndScrollView();
-        }
+            Menu_Scripts();
 
     }
 
+
+    //Menu QuickStart
+    void Menu_QuickStart()
+    {
+        //Dimension
+        _DimensionID = GUILayout.Toolbar(_DimensionID, new string[] { "2D", "3D" });
+
+        //Type 2D/3D
+        switch (_DimensionID)
+        {
+            case 0:
+                _Type2DID = GUILayout.Toolbar(_Type2DID, new string[] { "Platformer", "TopDown", "VisualNovel" });
+                break;
+            case 1:
+                _Type3DID = GUILayout.Toolbar(_Type3DID, new string[] { "FPS", "ThirdPerson", "TopDown", "Platformer" });
+                break;
+        }
+
+        //Info
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
+
+        if (_DimensionID == 0)
+            Menu_QuickStart2D();
+        else
+            Menu_QuickStart3D();
+
+        //Create/Refresh
+        GUI.backgroundColor = Color.white;
+        GUILayout.Label("Build Options", EditorStyles.boldLabel);
+        _CreateSceneOptions = GUILayout.Toolbar(_CreateSceneOptions, new string[] { "New scene", "This scene" });
+        EditorGUILayout.EndScrollView();
+        if (GUILayout.Button("Create"))
+            CreateTemplate();
+        if (GUILayout.Button("Refresh"))
+            SearchScripts();
+    }
+    void Menu_QuickStart2D()
+    {
+        switch (_Type2DID)
+        {
+            case 0: //Platformer
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Movement_2DPlatformer");
+                ScriptStatus("Health");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("Bullet");
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("LoadScenes");
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Bullet" });
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                EditorGUILayout.EndHorizontal();
+                break;
+            case 1: //TopDown
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Movement_2DPlatformer");
+                ScriptStatus("Health");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("Bullet");
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("LoadScenes");
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Bullet" });
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                EditorGUILayout.EndHorizontal();
+                break;
+            case 2: //VisualNovel
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Movement_2DPlatformer");
+                ScriptStatus("Health");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("Bullet");
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("LoadScenes");
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Bullet" });
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                EditorGUILayout.EndHorizontal();
+                break;
+        }
+    }
+    void Menu_QuickStart3D()
+    {
+        switch (_Type3DID)
+        {
+            case 0: //FPS
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Health");
+                ScriptStatus("Movement_CC");
+                ScriptStatus("ObjectPool");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("OnCollision");
+                ScriptStatus("LoadScenes");
+                break;
+            case 1: //ThirdPerson
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Bullet");
+                ScriptStatus("Movement_CC");
+                ScriptStatus("Movement_Camera");
+                ScriptStatus("ObjectPool");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("OnCollision");
+                ScriptStatus("LoadScenes");
+                break;
+            case 2: //TopDown
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Bullet");
+                ScriptStatus("Movement_CC_TopDown");
+                ScriptStatus("ObjectPool");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("OnCollision");
+                ScriptStatus("LoadScenes");
+                break;
+            case 3: //Platformer
+
+                break;
+        }
+    }
+
+    //Menu Scripts
+    void Menu_Scripts()
+    {
+        //Refresh
+        if (GUILayout.Button("Refresh"))
+            SearchScripts();
+
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
+        for (int i = 0; i < _ScriptNames.Length; i++)
+        {
+            //Set color
+            if (_ScriptExist[i])
+                GUI.backgroundColor = new Color(0, 1, 0);
+            else
+                GUI.backgroundColor = new Color(1, 0, 0);
+
+            //Script
+            EditorGUILayout.BeginHorizontal("Box");
+            GUILayout.Label(_ScriptNames[i] + ".cs", EditorStyles.boldLabel);
+            EditorGUI.BeginDisabledGroup(_ScriptExist[i]);
+            if (GUILayout.Button("Add", GUILayout.Width(50)))
+                AddScript(i);
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+        }
+        EditorGUILayout.EndScrollView();
+    }
+
+
+
+
+    //Search Scripts
     void ScriptStatus(string name)
     {
         int scriptid = 999;
@@ -243,7 +293,6 @@ public class Tool_QuickStart : EditorWindow
             EditorGUILayout.EndHorizontal();
         }
     }
-
     void SearchScripts()
     {
         bool[] checkexist = new bool[_ScriptNames.Length];
@@ -258,7 +307,6 @@ public class Tool_QuickStart : EditorWindow
         }
         _ScriptExist = checkexist;
     }
-
     bool ScriptExist(string name)
     {
         int scriptid = 0;
@@ -273,6 +321,7 @@ public class Tool_QuickStart : EditorWindow
         return _ScriptExist[scriptid];
     }
 
+    //Add Scripts
     void AddScriptsMultiple(string[] ids)
     {
         for (int i = 0; i < ids.Length; i++)
@@ -300,6 +349,7 @@ public class Tool_QuickStart : EditorWindow
         SearchScripts();
     }
 
+    //Create scene
     void CreateTemplate()
     {
         if (_CreateSceneOptions == 0)
@@ -321,78 +371,21 @@ public class Tool_QuickStart : EditorWindow
             player.name = "Player";
             player.transform.position = new Vector3(0, 2, 0);
 
-            if(ScriptExist("Health"))
-            {
-                string UniType = "Health";
-                Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
-                player.AddComponent(UnityType);
-            }
-
             GameObject cameraObj = GameObject.Find("Main Camera");
 
             switch (_Type3DID)
             {
                 case 0: //FPS
-                    groundCube.transform.localScale = new Vector3(25, 1, 25);
-                    cameraObj.transform.parent = player.transform;
-                    cameraObj.transform.localPosition = new Vector3(0, 0.65f, 0);
-
-                    GameObject objpool = new GameObject();
-                    if (ScriptExist("ObjectPool"))
-                    {
-                        string UniType = "ObjectPool";
-                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
-                        objpool.AddComponent(UnityType);
-                        objpool.name = "ObjectPool";
-                    }
-
-                    if (ScriptExist("Movement_CC"))
-                    {
-                        string UniType = "Movement_CC";
-                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
-                        player.AddComponent(UnityType);
-                    }
+                    CreateObjects_3D_FPS(player, groundCube, cameraObj);
                     break;
                 case 1: //ThirdPerson
-                    groundCube.transform.localScale = new Vector3(25, 1, 25);
-                    GameObject rotationPoint = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    rotationPoint.name = "rotationPoint";
-                    rotationPoint.transform.position = new Vector3(0, 2, 0);
-                    cameraObj.transform.parent = rotationPoint.transform;
-                    cameraObj.transform.localPosition = new Vector3(1, 0.65f, -1.5f);
-                    rotationPoint.transform.parent = player.transform;
-
-
-                    if (ScriptExist("Movement_CC"))
-                    {
-                        string UniType = "Movement_CC";
-                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
-                        player.AddComponent(UnityType);
-                    }
+                    CreateObjects_3D_ThirdPerson(player, groundCube, cameraObj);
                     break;
                 case 2: //TopDown
-                    groundCube.transform.localScale = new Vector3(25, 1, 25);
-                    cameraObj.transform.position = new Vector3(0, 10, -1.5f);
-                    cameraObj.transform.eulerAngles = new Vector3(80, 0, 0);
-
-                    if (ScriptExist("Movement_CC_TopDown"))
-                    {
-                        string UniType = "Movement_CC_TopDown";
-                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
-                        player.AddComponent(UnityType);
-                        player.GetComponent(UnityType).SendMessage("SetCamera",cameraObj.GetComponent<Camera>());
-                    }
-
-                    if (ScriptExist("Movement_Camera"))
-                    {
-                        string UniType = "Movement_Camera";
-                        Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
-                        cameraObj.AddComponent(UnityType);
-                        cameraObj.GetComponent(UnityType).SendMessage("SetTarget",player);
-                    }
+                    CreateObjects_3D_TopDown(player, groundCube, cameraObj);
                     break;
                 case 3: //Platformer
-                    groundCube.transform.localScale = new Vector3(25, 1, 1);
+                    CreateObjects_3D_Platformer(player, groundCube, cameraObj);
                     break;
             }
         }
@@ -425,6 +418,96 @@ public class Tool_QuickStart : EditorWindow
             }
         }
     }
+
+    void CreateObjects_3D_FPS(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
+    {
+        //Setup Level
+        groundobj.transform.localScale = new Vector3(25, 1, 25);
+        cameraobj.transform.parent = playerobj.transform;
+        cameraobj.transform.localPosition = new Vector3(0, 0.65f, 0);
+
+        GameObject objpool = new GameObject();
+
+        //Setup Scripts
+        if (ScriptExist("Health"))
+        {
+            string UniType = "Health";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+        if (ScriptExist("ObjectPool"))
+        {
+            string UniType = "ObjectPool";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            objpool.AddComponent(UnityType);
+            objpool.name = "ObjectPool";
+        }
+        if (ScriptExist("Movement_CC"))
+        {
+            string UniType = "Movement_CC";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+    }
+    void CreateObjects_3D_ThirdPerson(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
+    {
+        //Setup Level
+        groundobj.transform.localScale = new Vector3(25, 1, 25);
+        GameObject rotationPoint = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        rotationPoint.name = "rotationPoint";
+        rotationPoint.transform.position = new Vector3(0, 2, 0);
+        cameraobj.transform.parent = rotationPoint.transform;
+        cameraobj.transform.localPosition = new Vector3(1, 0.65f, -1.5f);
+        rotationPoint.transform.parent = playerobj.transform;
+
+        //Setup Scripts
+        if (ScriptExist("Health"))
+        {
+            string UniType = "Health";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+        if (ScriptExist("Movement_CC"))
+        {
+            string UniType = "Movement_CC";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+    }
+    void CreateObjects_3D_TopDown(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
+    {
+        //Setup Level
+        groundobj.transform.localScale = new Vector3(25, 1, 25);
+        cameraobj.transform.position = new Vector3(0, 10, -1.5f);
+        cameraobj.transform.eulerAngles = new Vector3(80, 0, 0);
+
+        //Setup Scripts
+        if (ScriptExist("Health"))
+        {
+            string UniType = "Health";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+        if (ScriptExist("Movement_CC_TopDown"))
+        {
+            string UniType = "Movement_CC_TopDown";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+            playerobj.GetComponent(UnityType).SendMessage("SetCamera", cameraobj.GetComponent<Camera>());
+        }
+        if (ScriptExist("Movement_Camera"))
+        {
+            string UniType = "Movement_Camera";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            cameraobj.AddComponent(UnityType);
+            cameraobj.GetComponent(UnityType).SendMessage("SetTarget", playerobj);
+        }
+    }
+    void CreateObjects_3D_Platformer(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
+    {
+        groundobj.transform.localScale = new Vector3(25, 1, 1);
+
+    }
 }
 
 
@@ -453,5 +536,6 @@ public class Tool_QuickStart : EditorWindow
 15: StringFormats.cs
 16: Tool_CreateHexagonGrid.cs
 17: UIEffects.cs
+
 
 */
