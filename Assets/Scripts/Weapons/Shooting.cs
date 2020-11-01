@@ -65,7 +65,6 @@ public class Shooting : MonoBehaviour
         _LockShooting = false;
     }
 
-
     void Shoot()
     {
        GameObject bullet = _ObjectPool.GetObject(_BulletPrefab);

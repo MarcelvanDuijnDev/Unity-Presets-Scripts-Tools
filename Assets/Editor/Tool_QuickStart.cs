@@ -15,7 +15,7 @@ public class Tool_QuickStart : EditorWindow
     private int _Type2DID; // Platformer/TopDown/VisualNovel
     private int _Type3DID; // FPS/ThirdPerson/TopDown/Platformer
 
-    private bool[] _ScriptExist = new bool[18];
+    private bool[] _ScriptExist = new bool[20];
     private string[] _ScriptNames = new string[] { // 17 Scripts
 "Bullet",
 "DoEvent",
@@ -32,6 +32,8 @@ public class Tool_QuickStart : EditorWindow
 "OnCollision",
 "SaveLoad_JSON",
 "ScriptebleGameObject",
+"Shooting",
+"ShootingRayCast",
 "StringFormats",
 "Tool_CreateHexagonGrid",
 "UIEffects" };
@@ -52,14 +54,17 @@ public class Tool_QuickStart : EditorWindow
         "using System;\nusing System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.Events;\n\npublic class OnCollision : MonoBehaviour\n{\n    private enum Options { OnTriggerEnter, OnTriggerExit, OnTriggerStay, OnCollisionEnter, OnCollisionExit, OnCollisionStay };\n    [SerializeField] private LayerMask _LayerMask = ~0;\n    [SerializeField] private Options _Option;\n    [SerializeField] private string _Tag;\n    [SerializeField] private UnityEvent _Event;\n\n    private bool _HasTag;\n\n    private void Start()\n    {\n        if (_Tag != \"\" || _Tag != null)\n            _HasTag = true;\n}\n\n    private void Action(Collider other)\n{\n        if (_HasTag)\n            if (other.CompareTag(_Tag) && other.gameObject.layer == _LayerMask)\n                _Event.Invoke();\n    }\n    private void Action(Collision other)\n{\n        if (_HasTag)\n            if (other.gameObject.CompareTag(_Tag) && other.gameObject.layer == _LayerMask)\n                _Event.Invoke();\n    }\n\n    private void OnTriggerEnter(Collider other)\n{\n        if (_Option == Options.OnTriggerEnter)\n            Action(other);\n    }\n    private void OnTriggerExit(Collider other)\n{\n        if (_Option == Options.OnTriggerExit)\n            Action(other);\n    }\n    private void OnTriggerStay(Collider other)\n{\n        if (_Option == Options.OnTriggerStay)\n            Action(other);\n    }\n    void OnCollisionEnter(Collision other)\n{\n        if (_Option == Options.OnCollisionEnter)\n            Action(other);\n    }\n    void OnCollisionExit(Collision other)\n{\n        if (_Option == Options.OnCollisionExit)\n            Action(other);\n    }\n    void OnCollisionStay(Collision other)\n{\n        if (_Option == Options.OnCollisionStay)\n            Action(other);\n    }\n}\n",
         "using System;\nusing System.Collections.Generic;\nusing System.IO;\nusing UnityEngine;\nusing Random = UnityEngine.Random;\n\npublic class SaveLoad_JSON : MonoBehaviour\n{\n    private SaveData _SaveData = new SaveData();\n\n    void Start()\n    {\n        LoadData();\n    }\n\n    public void SaveData()\n    {\n        string jsonData = JsonUtility.ToJson(_SaveData, true);\n        File.WriteAllText(Application.persistentDataPath + \"/SaveData.json\", jsonData);\n    }\n    public void LoadData()\n    {\n        try\n        {\n            string dataAsJson = File.ReadAllText(Application.persistentDataPath + \"/SaveData.json\");\n            _SaveData = JsonUtility.FromJson<SaveData>(dataAsJson);\n        }\n        catch\n        {\n            SaveData();\n        }\n    }\n    public SaveData GetSaveData()\n    {\n        return _SaveData;\n    }\n    public void CreateNewSave()\n    {\n        ExampleData newsave = new ExampleData();\n        newsave.randomfloat = Random.Range(0, 100);\n        _SaveData.saveData.Add(newsave);\n    }\n}\n\n[System.Serializable]\npublic class SaveData\n{\n    public List<ExampleData> saveData = new List<ExampleData>();\n}\n[System.Serializable]\npublic class ExampleData\n{\n    public float randomfloat = 0;\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[CreateAssetMenu(fileName = \"Example\", menuName = \"SO/ExampleSO\", order = 1)]\npublic class ScriptebleGameObject : ScriptableObject\n{\n    public string examplestring;\n    public int exampleint;\n}\n",
+        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Shooting : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] ObjectPool _ObjectPool;\n    [SerializeField] private GameObject _BulletPrefab;\n    [SerializeField] private GameObject _ShootPoint;\n\n    [Header(\"Semi\")]\n    [SerializeField] private int _SemiAutomaticBulletAmount = 3;\n    [SerializeField] private float _SemiShootSpeed = 0.2f;\n    [Header(\"Automatic\")]\n    [SerializeField] private float _SecondsBetweenShots = 0.5f;\n\n    private enum ShootModes { SingleShot, SemiAutomatic, Automatic }\n    [SerializeField] private ShootModes _ShootMode;\n\n    private bool _CheckSingleShot;\n    private float _Timer;\n    private bool _LockShooting;\n\n    void Update()\n    {\n        if (Input.GetMouseButton(0))\n        {\n            switch (_ShootMode)\n            {\n                case ShootModes.SingleShot:\n                    if (!_CheckSingleShot)\n                        Shoot();\n                    _CheckSingleShot = true;\n                    break;\n                case ShootModes.SemiAutomatic:\n                    if (!_CheckSingleShot && !_LockShooting)\n                        StartCoroutine(SemiShot());\n                    _CheckSingleShot = true;\n                    break;\n                case ShootModes.Automatic:\n                    _Timer += 1 * Time.deltaTime;\n                    if (_Timer >= _SecondsBetweenShots)\n                    {\n                        Shoot();\n                        _Timer = 0;\n                    }\n                    break;\n            }\n        }\n        if (Input.GetMouseButtonUp(0))\n        {\n            _CheckSingleShot = false;\n        }\n    }\n\n    IEnumerator SemiShot()\n    {\n        _LockShooting = true;\n        for (int i = 0; i < _SemiAutomaticBulletAmount; i++)\n        {\n            Shoot();\n            yield return new WaitForSeconds(_SemiShootSpeed);\n        }\n        _LockShooting = false;\n    }\n\n    void Shoot()\n    {\n        GameObject bullet = _ObjectPool.GetObject(_BulletPrefab);\n        bullet.SetActive(true);\n        bullet.transform.position = _ShootPoint.transform.position;\n        bullet.transform.rotation = _ShootPoint.transform.rotation;\n    }\n}\n",
+        "using System.Collections;\nusing System.Collections.Generic;\nusing System.Threading;\nusing UnityEngine;\n\npublic class ShootingRayCast : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private float _Damage = 20;\n    [SerializeField] private float _ShootDistance = 50;\n    [SerializeField] private string _EnemyTag = \"Enemy\";\n\n    [Header(\"Semi\")]\n    [SerializeField] private int _SemiAutomaticBulletAmount = 3;\n    [SerializeField] private float _SemiShootSpeed = 0.2f;\n    [Header(\"Automatic\")]\n    [SerializeField] private float _SecondsBetweenShots = 0.5f;\n\n    private enum ShootModes { SingleShot, SemiAutomatic, Automatic }\n    [SerializeField] private ShootModes _ShootMode;\n\n    private bool _CheckSingleShot;\n    private float _Timer;\n    private bool _LockShooting;\n\n    void Update()\n    {\n        if (Input.GetMouseButton(0))\n        {\n            switch (_ShootMode)\n            {\n                case ShootModes.SingleShot:\n                    if (!_CheckSingleShot)\n                        Shoot();\n                    _CheckSingleShot = true;\n                    break;\n                case ShootModes.SemiAutomatic:\n                   if (!_CheckSingleShot && !_LockShooting)\n                        StartCoroutine(SemiShot());\n                    _CheckSingleShot = true;\n                    break;\n                case ShootModes.Automatic:\n                    _Timer += 1 * Time.deltaTime;\n                    if (_Timer >= _SecondsBetweenShots)\n                    {\n                        Shoot();\n                        _Timer = 0;\n                    }\n                    break;\n            }\n        }\n        if (Input.GetMouseButtonUp(0))\n        {\n            _CheckSingleShot = false;\n        }\n    }\n\n    IEnumerator SemiShot()\n    {\n        _LockShooting = true;\n        for (int i = 0; i < _SemiAutomaticBulletAmount; i++)\n        {\n            Shoot();\n            yield return new WaitForSeconds(_SemiShootSpeed);\n        }\n        _LockShooting = false;\n    }\n\n    void Shoot()\n    {\n        RaycastHit hit;\n        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, _ShootDistance))\n            if (hit.transform.tag == _EnemyTag)\n            {\n                hit.transform.GetComponent<Health>().DoDamage(_Damage);\n            }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing TMPro;\n\npublic class StringFormats : MonoBehaviour\n{\n    private enum FormatOptions { Time };\n    [SerializeField] private FormatOptions _FormatOption;\n    [SerializeField] private TextMeshProUGUI _ExampleText;\n\n    private float _Timer;\n\n    void Update()\n    {\n        _Timer += 1 * Time.deltaTime;\n\n        switch (_FormatOption)\n        {\n            case FormatOptions.Time:\n                _ExampleText.text = string.Format(\"{0:00}:{1:00}:{2:00}\", Mathf.Floor(_Timer / 3600), Mathf.Floor((_Timer / 60) % 60), _Timer % 60);\n                break;\n        }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEditor;\n\npublic class Tool_CreateHexagonGrid : EditorWindow\n{\n    private GameObject _CenterObj;\n    private List<GameObject> _ObjSaved = new List<GameObject>();\n    private int _TotalObjects = 100;\n\n    //Hex\n    private int _HexLengthX = 10, _HexLengthZ = 10;\n    private float _HexSize = 1;\n    private float _DistanceBetween = 1;\n\n    private bool _Center = true;\n    private bool _Invert = false;\n\n\n    [MenuItem(\"Tools/CreateHexagonGrid\")]\n    static void Init()\n    {\n        Tool_CreateHexagonGrid window = (Tool_CreateHexagonGrid)EditorWindow.GetWindow(typeof(Tool_CreateHexagonGrid));\n        window.Show();\n    }\n\n    void OnGUI()\n    {\n\n        GUILayout.BeginVertical(\"Box\");\n        _CenterObj = (GameObject)EditorGUILayout.ObjectField(\"Center Object\", _CenterObj, typeof(GameObject), true);\n        GUILayout.EndVertical();\n\n        GUILayout.BeginVertical(\"Box\");\n        _HexSize = EditorGUILayout.FloatField(\"Size: \", _HexSize);\n        _HexLengthX = EditorGUILayout.IntField(\"Collom: \", _HexLengthX);\n        _HexLengthZ = EditorGUILayout.IntField(\"Row: \", _HexLengthZ);\n\n        GUILayout.BeginHorizontal(\"Box\");\n        if (GUILayout.Button(\"Calculate Total Objects\"))\n            _TotalObjects = _HexLengthX * _HexLengthZ;\n        EditorGUILayout.LabelField(\"Total: \" + _TotalObjects.ToString());\n        GUILayout.EndHorizontal();\n\n        _Center = EditorGUILayout.Toggle(\"Center\", _Center);\n        _Invert = EditorGUILayout.Toggle(\"Invert: \", _Invert);\n        _DistanceBetween = EditorGUILayout.FloatField(\"Distance Between: \", _DistanceBetween);\n        GUILayout.EndVertical();\n\n        GUILayout.BeginVertical(\"Box\");\n        if (GUILayout.Button(\"Create\"))\n        {\n            if (_CenterObj != null)\n            {\n                if (_ObjSaved.Count > 0)\n                {\n                    for (int i = 0; i < _ObjSaved.Count; i++)\n                    {\n                        DestroyImmediate(_ObjSaved[i]);\n                    }\n                    _ObjSaved.Clear();\n                }\n\n                Vector3 objPos = _CenterObj.transform.position;\n                CreateHexagon(new Vector3(_HexLengthX, 0, _HexLengthZ));\n                SetParent();\n            }\n            else\n            {\n                Debug.Log(\"Center Object not selected!\");\n            }\n        }\n\n        if (GUILayout.Button(\"Destroy\"))\n        {\n            if (_CenterObj != null)\n            {\n                for (int i = 0; i < _ObjSaved.Count; i++)\n                {\n                    DestroyImmediate(_ObjSaved[i]);\n                }\n                _ObjSaved.Clear();\n\n\n                int childs = _CenterObj.transform.childCount;\n                for (int i = childs - 1; i >= 0; i--)\n                {\n                    DestroyImmediate(_CenterObj.transform.GetChild(i).gameObject);\n                }\n            }\n            else\n            {\n                Debug.Log(\"Center Object not selected!\");\n            }\n        }\n\n        if (GUILayout.Button(\"Confirm\"))\n        {\n            _ObjSaved.Clear();\n        }\n        GUILayout.EndVertical();\n    }\n\n    void CreateHexagon(Vector3 dimentsions)\n    {\n        Vector3 objPos = _CenterObj.transform.position;\n        if (_Center && !_Invert)\n        {\n            objPos.x -= dimentsions.x * 0.5f * 1.7321f * _HexSize;\n            objPos.z -= dimentsions.z * 0.5f * -1.5f * _HexSize;\n        }\n        if (_Center && _Invert)\n        {\n            objPos.x -= dimentsions.x * 0.5f * 1.7321f * _HexSize;\n            objPos.z += dimentsions.z * 0.5f * -1.5f * _HexSize;\n        }\n\n        for (int xas = 0; xas < dimentsions.x; xas++)\n        {\n            CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas, objPos.y, objPos.z));\n            for (int zas = 1; zas < dimentsions.z; zas++)\n            {\n                float offset = 0;\n                if (zas % 2 == 1)\n                {\n                    offset = 0.86605f * _HexSize * _DistanceBetween;\n                }\n                else\n                {\n                    offset = 0;\n                }\n                if (!_Invert)\n                {\n                    CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas - offset, objPos.y, objPos.z + -1.5f * _HexSize * _DistanceBetween * zas));\n                }\n                else\n                {\n                    CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas - offset, objPos.y, objPos.z + +1.5f * _HexSize * _DistanceBetween * zas));\n                }\n            }\n        }\n    }\n    void CreateHax(Vector3 positions)\n    {\n        Vector3 objPos = _CenterObj.transform.position;\n\n        GameObject gridObj = GameObject.CreatePrimitive(PrimitiveType.Cube);\n        gridObj.transform.position = new Vector3(positions.x, positions.y, positions.z);\n\n        DestroyImmediate(gridObj.GetComponent<BoxCollider>());\n\n        float size = _HexSize;\n        float width = Mathf.Sqrt(3) * size;\n        float height = size * 2f;\n        Mesh mesh = new Mesh();\n        Vector3[] vertices = new Vector3[7];\n\n        for (int i = 0; i < 6; i++)\n        {\n            float angle_deg = 60 * i - 30;\n            float angle_rad = Mathf.Deg2Rad * angle_deg;\n\n            vertices[i + 1] = new Vector3(size * Mathf.Cos(angle_rad), 0f, size * Mathf.Sin(angle_rad));\n        }\n        mesh.vertices = vertices;\n\n        mesh.triangles = new int[]\n        {\n            2,1,0,\n            3,2,0,\n            4,3,0,\n            5,4,0,\n            6,5,0,\n            1,6,0\n        };\n\n        Vector2[] uv = new Vector2[7];\n        for (int i = 0; i < 7; i++)\n        {\n            uv[i] = new Vector2(\n                (vertices[i].x + -width * .5f) * .5f / size,\n                (vertices[i].z + -height * .5f) * .5f / size);\n        }\n\n        mesh.uv = uv;\n        gridObj.GetComponent<MeshFilter>().sharedMesh = mesh;\n\n        _ObjSaved.Add(gridObj);\n    }\n\n    void SetParent()\n    {\n        for (int i = 0; i < _ObjSaved.Count; i++)\n        {\n            _ObjSaved[i].transform.parent = _CenterObj.transform;\n        }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n    [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f, 1f, 1.1f);\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MinDefaultMaxSize.z)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.y, _OriginalSize.z, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinDefaultMaxSize.x)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.x)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n"
     };
 
     private int _CreateSceneOptions = 0;
-
     private Vector2 _ScrollPos;
+
+    private string _Search;
 
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
@@ -72,13 +77,11 @@ public class Tool_QuickStart : EditorWindow
         //Menu Type
         _MenuID = GUILayout.Toolbar(_MenuID, new string[] { "QuickStart", "Scripts" });
 
-        if (_MenuID == 0) //QuickStart
+        if (_MenuID == 0)
             Menu_QuickStart();
         else
             Menu_Scripts();
-
     }
-
 
     //Menu QuickStart
     void Menu_QuickStart()
@@ -250,9 +253,6 @@ public class Tool_QuickStart : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
-
-
-
     //Search Scripts
     void ScriptStatus(string name)
     {
@@ -405,20 +405,19 @@ public class Tool_QuickStart : EditorWindow
             Camera cam = cameraObj.GetComponent<Camera>();
             cam.orthographic = true;
 
-            //Platformer
-            if (_Type2DID == 0)
+            switch(_Type2DID)
             {
-                groundCube.transform.localScale = new Vector3(25, 1, 1);
-            }
-            //TopDown
-            if (_Type2DID == 1)
-            {
-                groundCube.transform.localScale = new Vector3(100, 100, 1);
-                groundCube.transform.position = new Vector3(0, 0, 1);
+                case 0: //Platformer
+                    CreateObjects_2D_Platformer(groundCube, player, cameraObj);
+                    break;
+                case 1: //TopDown
+                    CreateObjects_2D_TopDown(groundCube, player, cameraObj);
+                    break;
             }
         }
     }
 
+    //Create Objects 3D
     void CreateObjects_3D_FPS(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
         //Setup Level
@@ -507,6 +506,17 @@ public class Tool_QuickStart : EditorWindow
     {
         groundobj.transform.localScale = new Vector3(25, 1, 1);
 
+    }
+
+    //Create Object 2D
+    void CreateObjects_2D_Platformer(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
+    {
+        groundobj.transform.localScale = new Vector3(25, 1, 1);
+    }
+    void CreateObjects_2D_TopDown(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
+    {
+        groundobj.transform.localScale = new Vector3(100, 100, 1);
+        groundobj.transform.position = new Vector3(0, 0, 1);
     }
 }
 

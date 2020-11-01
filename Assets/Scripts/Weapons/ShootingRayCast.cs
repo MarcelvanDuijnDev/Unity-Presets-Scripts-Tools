@@ -66,7 +66,6 @@ public class ShootingRayCast : MonoBehaviour
         _LockShooting = false;
     }
 
-
     void Shoot()
     {
         RaycastHit hit;
