@@ -39,6 +39,9 @@ Feel free to use/copy files from this project._
 - [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/ScriptebleGameObject.cs)
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
+## License & Copyright
+Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/LICENSE)
+
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
 [Twitter](https://twitter.com/MarcelvanDuijn_)
