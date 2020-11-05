@@ -26,6 +26,9 @@ Feel free to use/copy files from this project._
 ## Saving / Loading Data
 - [SaveLoad_JSON.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/SaveLoadHandler/SaveLoad_JSON.cs)
 
+## Networking
+- [ReadTwitchChat.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Networking/ReadTwitchChat.cs)
+
 ## Useful
 - [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/AudioHandler.cs)
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/DoEvent.cs)
