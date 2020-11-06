@@ -25,13 +25,18 @@ public class SaveLoad_XML : MonoBehaviour
 
     public void LoadData()
     {
-        XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));
-
-        using (FileStream stream = new FileStream(Application.persistentDataPath + "/SaveData.xml", FileMode.Open))
+        try
         {
-            var test = serializer.Deserialize(stream);
+            XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));
 
-            Debug.Log(test);
+            using (FileStream stream = new FileStream(Application.persistentDataPath + "/SaveData.xml", FileMode.Open))
+            {
+                _SaveData = serializer.Deserialize(stream) as XML_SaveData;
+            }
+        }
+        catch
+        {
+            SaveData();
         }
     }
 
