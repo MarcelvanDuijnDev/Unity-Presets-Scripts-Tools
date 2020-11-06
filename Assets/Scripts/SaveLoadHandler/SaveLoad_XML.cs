@@ -17,7 +17,7 @@ public class SaveLoad_XML : MonoBehaviour
     {
         XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));
 
-        using (FileStream stream = new FileStream(_SaveData, FileMode.Create))
+        using (FileStream stream = new FileStream(Application.persistentDataPath + "/SaveData.xml", FileMode.Create))
         {
             serializer.Serialize(stream, _SaveData);
         }
@@ -25,22 +25,32 @@ public class SaveLoad_XML : MonoBehaviour
 
     public void LoadData()
     {
-
         XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));
 
-        using (FileStream stream = new FileStream(fileName, FileMode.Open))
+        using (FileStream stream = new FileStream(Application.persistentDataPath + "/SaveData.xml", FileMode.Open))
         {
             var test = serializer.Deserialize(stream);
 
             Debug.Log(test);
         }
     }
+
+    public XML_SaveData GetSaveData()
+    {
+        return _SaveData;
+    }
+    public void CreateNewSave()
+    {
+        XML_ExampleData newsave = new XML_ExampleData();
+        newsave.exampleValue = 10;
+        _SaveData.saveData.Add(newsave);
+    }
 }
 
 [System.Serializable]
 public class XML_SaveData
 {
-    public List<Json_ExampleData> saveData = new List<Json_ExampleData>();
+    public List<XML_ExampleData> saveData = new List<XML_ExampleData>();
 }
 [System.Serializable]
 public class XML_ExampleData
