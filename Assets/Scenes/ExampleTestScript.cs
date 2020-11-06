@@ -10,7 +10,7 @@ public class ExampleTestScript : MonoBehaviour
 
     [Header("ObjectPool")] [SerializeField] private ObjectPool _ObjectPool;
     [Header("LoadSave_JSON")] [SerializeField] private SaveLoad_JSON _SaveLoadJSON;
-    [SerializeField] private SaveData _SaveDataExample = new SaveData();
+    [SerializeField] private Json_SaveData _SaveDataExample = new Json_SaveData();
     [Header("Showinfo")]
     [SerializeField] private TextMeshProUGUI _InfoText;
     [SerializeField] private TextMeshProUGUI _InfoText2;
@@ -44,7 +44,7 @@ public class ExampleTestScript : MonoBehaviour
                     _InfoText2.text = "Savedata Loaded " + System.DateTime.Now + "\n";
                     for (int i = 0; i < _SaveDataExample.saveData.Count; i++)
                     {
-                        _InfoText2.text += _SaveDataExample.saveData[i].randomfloat.ToString() + " \n";
+                        _InfoText2.text += _SaveDataExample.saveData[i].exampleValue.ToString() + " \n";
                     }
                 }
                 if(Input.GetKeyDown(KeyCode.N))
