@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SaveLoad_JSON : MonoBehaviour
 {
-    private SaveData _SaveData = new SaveData();
+    private Json_SaveData _SaveData = new Json_SaveData();
 
     void Start()
     {
@@ -22,32 +22,32 @@ public class SaveLoad_JSON : MonoBehaviour
         try
         {
             string dataAsJson = File.ReadAllText(Application.persistentDataPath + "/SaveData.json");
-            _SaveData = JsonUtility.FromJson<SaveData>(dataAsJson);
+            _SaveData = JsonUtility.FromJson<Json_SaveData>(dataAsJson);
         }
         catch
         {
             SaveData();
         }
     }
-    public SaveData GetSaveData()
+    public Json_SaveData GetSaveData()
     {
         return _SaveData;
     }
     public void CreateNewSave()
     {
-        ExampleData newsave = new ExampleData();
+        Json_ExampleData newsave = new Json_ExampleData();
         newsave.exampleValue = 10;
         _SaveData.saveData.Add(newsave);
     }
 }
 
 [System.Serializable]
-public class SaveData
+public class Json_SaveData
 {
-    public List <ExampleData> saveData = new List<ExampleData>();
+    public List <Json_ExampleData> saveData = new List<Json_ExampleData>();
 }
 [System.Serializable]
-public class ExampleData
+public class Json_ExampleData
 {
     public float exampleValue = 0;
 }
