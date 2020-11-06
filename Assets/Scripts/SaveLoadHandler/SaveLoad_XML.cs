@@ -6,38 +6,44 @@ using System.IO;
 
 public class SaveLoad_XML : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private XML_SaveData _SaveData = new XML_SaveData();
+
     void Start()
     {
-        
+        LoadData();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SaveData()
     {
-        
-    }
+        XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));
 
-    public void Save()
-    {
-        XmlSerializer serializer = new XmlSerializer(typeof(Foo));
-
-        using (FileStream stream = new FileStream(fileName, FileMode.Create))
+        using (FileStream stream = new FileStream(_SaveData, FileMode.Create))
         {
-            serializer.Serialize(stream, foo);
+            serializer.Serialize(stream, _SaveData);
         }
     }
 
-    public void Load()
+    public void LoadData()
     {
 
-        XmlSerializer serializer = new XmlSerializer(typeof(Foo));
+        XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));
 
         using (FileStream stream = new FileStream(fileName, FileMode.Open))
         {
-            var foo = serializer.Deserialize(stream);
+            var test = serializer.Deserialize(stream);
 
-            Debug.Log(foo);
+            Debug.Log(test);
         }
     }
+}
+
+[System.Serializable]
+public class XML_SaveData
+{
+    public List<Json_ExampleData> saveData = new List<Json_ExampleData>();
+}
+[System.Serializable]
+public class XML_ExampleData
+{
+    public float exampleValue = 0;
 }
