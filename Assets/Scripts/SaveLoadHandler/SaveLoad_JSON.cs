@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class SaveLoad_JSON : MonoBehaviour
 {
@@ -37,7 +36,7 @@ public class SaveLoad_JSON : MonoBehaviour
     public void CreateNewSave()
     {
         ExampleData newsave = new ExampleData();
-        newsave.randomfloat = Random.Range(0,100);
+        newsave.exampleValue = 10;
         _SaveData.saveData.Add(newsave);
     }
 }
@@ -50,5 +49,5 @@ public class SaveData
 [System.Serializable]
 public class ExampleData
 {
-    public float randomfloat = 0;
+    public float exampleValue = 0;
 }
