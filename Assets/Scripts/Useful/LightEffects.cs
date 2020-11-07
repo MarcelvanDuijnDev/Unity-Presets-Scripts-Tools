@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LightEffects : MonoBehaviour
 {
-    private enum LightEffectOptions { Flickering };
+    public enum LightEffectOptions { Flickering, Off, On };
 
     [Header("Settings")]
     [SerializeField] private LightEffectOptions _LightEffectOption = LightEffectOptions.Flickering;
@@ -45,6 +45,18 @@ public class LightEffects : MonoBehaviour
                 _LastSum += newVal;
                 _Light.intensity = _LastSum / (float)_LightFlickerQ.Count;
                 break;
+            case LightEffectOptions.Off:
+                _Light.intensity = 0;
+                break;
+            case LightEffectOptions.On:
+                _Light.intensity = _LightIntensity = _MinMaxIncrease.x;
+                break;
         }
+
+    }
+
+    public void SetEffect(LightEffectOptions options)
+    {
+        _LightEffectOption = options;
     }
 }
