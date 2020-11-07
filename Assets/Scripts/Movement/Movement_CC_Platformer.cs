@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement_Platformer : MonoBehaviour
+[RequireComponent(typeof(CharacterController))]
+public class Movement_CC_Platformer : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;
     [SerializeField] private float _JumpSpeed = 5;
     [SerializeField] private float _Gravity = 20;
+    [SerializeField] private bool _ZMovementActive = false;
     
     private Vector3 _MoveDirection = Vector3.zero;
     private float _Speed;
@@ -25,7 +27,11 @@ public class Movement_Platformer : MonoBehaviour
         //Movement
         if (_CC.isGrounded)
         {
-            _MoveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, 0);
+            float verticalmovement = 0;
+            if (_ZMovementActive)
+                verticalmovement = Input.GetAxis("Vertical");
+
+            _MoveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, verticalmovement);
             _MoveDirection = transform.TransformDirection(_MoveDirection);
             _MoveDirection *= _Speed;
             if (Input.GetButton("Jump"))

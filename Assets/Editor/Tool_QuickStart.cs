@@ -505,7 +505,12 @@ public class Tool_QuickStart : EditorWindow
     void CreateObjects_3D_Platformer(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
         groundobj.transform.localScale = new Vector3(25, 1, 1);
-
+        if (ScriptExist("Movement_CC_TopDown"))
+        {
+            string UniType = "Movement_CC_Platformer";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
     }
 
     //Create Object 2D
