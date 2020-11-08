@@ -22,8 +22,6 @@ public class Movement_CC_Platformer : MonoBehaviour
 
     void Update()
     {
-
-
         //Movement
         if (_CC.isGrounded)
         {

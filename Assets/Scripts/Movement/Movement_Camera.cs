@@ -42,8 +42,13 @@ public class Movement_Camera : MonoBehaviour
         }
     }
 
-    public void SetTarget(GameObject targetobj)
+    public void Set_CameraTarget(GameObject targetobj)
     {
         _Target = targetobj.transform;
+    }
+
+    public void Set_OffSet(Vector3 offset)
+    {
+        _OffsetPosition = offset;
     }
 }
