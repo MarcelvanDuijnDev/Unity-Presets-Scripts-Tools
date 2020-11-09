@@ -15,7 +15,7 @@ public class Tool_QuickStart : EditorWindow
     private int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     private int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
 
-    private bool[] _ScriptExist = new bool[22];
+    private bool[] _ScriptExist = new bool[23];
     private string[] _ScriptNames = new string[] { // 17 Scripts
 "Bullet",
 "DoEvent",
@@ -24,6 +24,7 @@ public class Tool_QuickStart : EditorWindow
 "LightEffects",
 "LoadScenes",
 "Movement_CC",
+"Movement_CC_Platformer",
 "Movement_CC_TopDown",
 "Movement_Camera",
 "Movement_FreeCamera",
@@ -47,6 +48,7 @@ public class Tool_QuickStart : EditorWindow
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class LightEffects : MonoBehaviour\n{\n    private enum LightEffectOptions { Flickering };\n\n    [Header(\"Settings\")]\n    [SerializeField] private LightEffectOptions _LightEffectOption = LightEffectOptions.Flickering;\n    [SerializeField] private Vector2 _MinMaxIncrease = new Vector2(0.8f, 1.2f);\n    [Range(0.01f, 100)] [SerializeField] private float _EffectStrength = 50;\n\n    Queue<float> _LightFlickerQ;\n    private float _LastSum = 0;\n    private Light _Light;\n    private float _LightIntensity = 0;\n\n    public void Reset()\n    {\n        if (_LightEffectOption == LightEffectOptions.Flickering)\n        {\n            _LightFlickerQ.Clear();\n            _LastSum = 0;\n        }\n    }\n\n    void Start()\n    {\n        _Light = GetComponent<Light>();\n        _LightIntensity = _Light.intensity;\n        _LightFlickerQ = new Queue<float>(Mathf.RoundToInt(_EffectStrength));\n    }\n\n    void Update()\n    {\n        switch (_LightEffectOption)\n        {\n            case LightEffectOptions.Flickering:\n                while (_LightFlickerQ.Count >= _EffectStrength)\n                    _LastSum -= _LightFlickerQ.Dequeue();\n\n                float newVal = Random.Range(_LightIntensity * _MinMaxIncrease.x, _LightIntensity * _MinMaxIncrease.y);\n                _LightFlickerQ.Enqueue(newVal);\n\n               _LastSum += newVal;\n                _Light.intensity = _LastSum / (float)_LightFlickerQ.Count;\n                break;\n        }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.SceneManagement;\n\npublic class LoadScenes : MonoBehaviour\n{\n    public void Action_LoadScene(int sceneid)\n    {\n        SceneManager.LoadScene(sceneid);\n    }\n    public void Action_LoadScene(string scenename)\n    {\n        SceneManager.LoadScene(scenename);\n   }\n\n    public void Action_ReloadScene()\n    {\n        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);\n    }\n\n    public void Action_QuitApplication()\n    {\n        Application.Quit();\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(CharacterController))]\npublic class Movement_CC : MonoBehaviour\n{\n    //Movement\n    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 5;\n    [SerializeField] private float _Gravity = 20;\n    private Vector3 _MoveDirection = Vector3.zero;\n    //Look around\n    public float _CameraSensitivity = 1;\n    [SerializeField] private Transform _Head = null;\n    private float _RotationX = 90.0f;\n    private float _RotationY = 0.0f;\n    private float _Speed;\n\n    private CharacterController _CC;\n    private bool _LockRotation;\n\n    void Start()\n    {\n        Cursor.lockState = CursorLockMode.Locked;\n        Cursor.visible = false;\n        _CC = GetComponent<CharacterController>();\n    }\n\n    void Update()\n    {\n        //Look around\n        if (!_LockRotation)\n        {\n            _RotationX += Input.GetAxis(\"Mouse X\") * _CameraSensitivity;\n            _RotationY += Input.GetAxis(\"Mouse Y\") * _CameraSensitivity;\n            _RotationY = Mathf.Clamp(_RotationY, -90, 90);\n\n            transform.localRotation = Quaternion.AngleAxis(_RotationX, Vector3.up);\n            _Head.transform.localRotation = Quaternion.AngleAxis(_RotationY, Vector3.left);\n        }\n\n        //Movement\n        if (_CC.isGrounded)\n        {\n            _MoveDirection = new Vector3(Input.GetAxis(\"Horizontal\"), 0, Input.GetAxis(\"Vertical\"));\n            _MoveDirection = transform.TransformDirection(_MoveDirection);\n            _MoveDirection *= _Speed;\n            if (Input.GetButton(\"Jump\"))\n                _MoveDirection.y = _JumpSpeed;\n        }\n\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        //Apply Movement\n        _MoveDirection.y -= _Gravity * Time.deltaTime;\n        _CC.Move(_MoveDirection * Time.deltaTime);\n    }\n\n    public void LockRotation(bool state)\n    {\n        _LockRotation = state;\n    }\n}\n",
+        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(CharacterController))]\npublic class Movement_CC_Platformer : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 5;\n    [SerializeField] private float _Gravity = 20;\n    [SerializeField] private bool _ZMovementActive = false;\n\n    private Vector3 _MoveDirection = Vector3.zero;\n    private float _Speed;\n    private CharacterController _CC;\n\n    void Start()\n    {\n        _CC = GetComponent<CharacterController>();\n    }\n\n    void Update()\n    {\n        //Movement\n        if (_CC.isGrounded)\n        {\n            float verticalmovement = 0;\n            if (_ZMovementActive)\n                verticalmovement = Input.GetAxis(\"Vertical\");\n\n            _MoveDirection = new Vector3(Input.GetAxis(\"Horizontal\"), 0, verticalmovement);\n            _MoveDirection = transform.TransformDirection(_MoveDirection);\n            _MoveDirection *= _Speed;\n            if (Input.GetButton(\"Jump\"))\n                _MoveDirection.y = _JumpSpeed;\n        }\n\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        //Apply Movement\n        _MoveDirection.y -= _Gravity * Time.deltaTime;\n        _CC.Move(_MoveDirection * Time.deltaTime);\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(CharacterController))]\npublic class Movement_CC_TopDown : MonoBehaviour\n{\n    //Movement\n    [Header(\"Settings Camera\")]\n    [SerializeField] private Camera _Camera;\n    [Header(\"Settings\")]\n    [SerializeField] private float _NormalSpeed = 5;\n    [SerializeField] private float _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 5;\n    [SerializeField] private float _Gravity = 20;\n    [SerializeField] private bool _MovementRelativeToRotation = false;\n\n    private float _Speed = 0;\n    private Vector3 _MoveDirection = Vector3.zero;\n    private CharacterController _CC;\n\n    void Start()\n    {\n        _CC = GetComponent<CharacterController>();\n    }\n\n    void Update()\n    {\n        //Movement\n        if (_CC.isGrounded)\n        {\n            _MoveDirection = new Vector3(Input.GetAxis(\"Horizontal\"), 0, Input.GetAxis(\"Vertical\"));\n            if (_MovementRelativeToRotation)\n                _MoveDirection = transform.TransformDirection(_MoveDirection);\n            _MoveDirection *= _Speed;\n            if (Input.GetButton(\"Jump\"))\n                _MoveDirection.y = _JumpSpeed;\n        }\n\n        _MoveDirection.y -= _Gravity * Time.deltaTime;\n        _CC.Move(_MoveDirection * Time.deltaTime);\n\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        Ray cameraRay = _Camera.ScreenPointToRay(Input.mousePosition);\n        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);\n        float rayLength;\n        if (groundPlane.Raycast(cameraRay, out rayLength))\n        {\n            Vector3 pointToLook = cameraRay.GetPoint(rayLength);\n            transform.LookAt(new Vector3(pointToLook.x, transform.position.y, pointToLook.z));\n        }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Movement_Camera : MonoBehaviour\n{\n    private enum CameraOptionsPos { None, Follow }\n    private enum CameraOptionsRot { None, Follow }\n\n    [Header(\"Options\")]\n    [SerializeField] private CameraOptionsPos _CameraOptionPos = CameraOptionsPos.Follow;\n    [SerializeField] private CameraOptionsRot _CameraOptionRot = CameraOptionsRot.Follow;\n    [Header(\"Settings Position\")]\n    [SerializeField] private Vector3 _OffsetPosition = new Vector3(0, 12, -4);\n    [SerializeField] private bool _UseOffsetYAsDefaultHeight = true;\n    [Header(\"Settings Rotation\")]\n    [SerializeField] private Vector3 _OffsetRotation;\n\n    [Header(\"Other\")]\n    [SerializeField] private Transform _Target;\n\n    void Update()\n    {\n        // Movement\n        switch (_CameraOptionPos)\n        {\n            case CameraOptionsPos.Follow:\n                if (_UseOffsetYAsDefaultHeight)\n                    transform.position = new Vector3(_Target.position.x + _OffsetPosition.x, _OffsetPosition.y, _Target.position.z + _OffsetPosition.z);\n                else\n                    transform.position = new Vector3(_Target.position.x + _OffsetPosition.x, _Target.position.y + _OffsetPosition.y, _Target.position.z + _OffsetPosition.z);\n                break;\n        }\n        // Rotation\n        switch (_CameraOptionRot)\n        {\n            case CameraOptionsRot.Follow:\n                Vector3 rpos = _Target.position - transform.position;\n                Quaternion lookrotation = Quaternion.LookRotation(rpos, Vector3.up);\n                transform.eulerAngles = new Vector3(lookrotation.eulerAngles.x + _OffsetRotation.x, lookrotation.eulerAngles.y + _OffsetRotation.y, lookrotation.eulerAngles.z + _OffsetRotation.z);\n                break;\n        }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Movement_FreeCamera : MonoBehaviour\n{\n    [SerializeField] private float _Speed;\n    [SerializeField] private float _SprintSpeed;\n\n    private float _CurrentSpeed;\n\n    void Start()\n    {\n        Cursor.visible = false;\n        Cursor.lockState = CursorLockMode.Locked;\n    }\n\n    void Update()\n    {\n        if (Input.GetKey(KeyCode.LeftShift))\n            _CurrentSpeed = _SprintSpeed;\n        else\n            _CurrentSpeed = _Speed;\n\n        float xas = Input.GetAxis(\"Horizontal\");\n        float zas = Input.GetAxis(\"Vertical\");\n\n        transform.Translate(new Vector3(xas, 0, zas) * _CurrentSpeed * Time.deltaTime);\n\n        float mousex = Input.GetAxis(\"Mouse X\");\n        float mousey = Input.GetAxis(\"Mouse Y\");\n        transform.eulerAngles += new Vector3(-mousey, mousex, 0);\n    }\n}\n",
@@ -63,27 +65,28 @@ public class Tool_QuickStart : EditorWindow
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n    [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f, 1f, 1.1f);\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MinDefaultMaxSize.z)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.y, _OriginalSize.z, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinDefaultMaxSize.x)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.x)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n"
     };
     private string[] _ScriptTags = new string[] {
-    "shooting",
+    "3d_shooting",
     "events",
     "editortool",
     "health",
     "effects",
     "saveload",
-    "movement",
-    "movement",
-    "movement",
-    "movement",
+    "3d_movement",
+    "3d_movement",
+    "3d_movement",
+    "3d_movement",
+    "3d_movement",
     "objectpool",
     "objectpool",
-    "collision",
+    "3d_collision",
     "saveload",
     "saveload",
     "example",
-    "shooting",
-    "shooting",
+    "3d_shooting",
+    "3d_shooting",
     "example",
     "editortool",
-    "effects"
+    "2d_effects"
     };
 
     private int _CreateSceneOptions = 0;
@@ -246,7 +249,15 @@ public class Tool_QuickStart : EditorWindow
                 ScriptStatus("LoadScenes");
                 break;
             case 3: //Platformer
-
+                GUILayout.Label("Essential", EditorStyles.boldLabel);
+                ScriptStatus("Bullet");
+                ScriptStatus("Movement_CC_Platformer");
+                ScriptStatus("ObjectPool");
+                GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("UIEffects");
+                ScriptStatus("DoEvent");
+                ScriptStatus("OnCollision");
+                ScriptStatus("LoadScenes");
                 break;
         }
     }
