@@ -153,7 +153,7 @@ public class Tool_QuickStart : EditorWindow
         {
             case 0: //Platformer
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Movement_2DPlatformer");
+                ScriptStatus("Movement_2D_Platformer");
                 ScriptStatus("Health");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
                 ScriptStatus("Bullet");
@@ -172,7 +172,7 @@ public class Tool_QuickStart : EditorWindow
                 break;
             case 1: //TopDown
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Movement_2DPlatformer");
+                ScriptStatus("Movement_2D_TopDown");
                 ScriptStatus("Health");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
                 ScriptStatus("Bullet");
@@ -606,8 +606,22 @@ public class Tool_QuickStart : EditorWindow
     }
     void CreateObjects_2D_TopDown(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
-        groundobj.transform.localScale = new Vector3(100, 100, 1);
-        groundobj.transform.position = new Vector3(0, 0, 1);
+        DestroyImmediate(groundobj);
+
+        if (ScriptExist("Movement_2D_TopDown"))
+        {
+            string UniType = "Movement_2D_TopDown";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+        if (ScriptExist("Movement_Camera"))
+        {
+            string UniType = "Movement_Camera";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            cameraobj.AddComponent(UnityType);
+            cameraobj.GetComponent(UnityType).SendMessage("Set_CameraTarget", playerobj);
+            cameraobj.GetComponent(UnityType).SendMessage("Set_OffSet", new Vector3(0, 3, -10));
+        }
     }
 }
 
