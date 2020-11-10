@@ -6,13 +6,13 @@ using UnityEngine;
 public class Movement_2D_Platformer : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;
+    [SerializeField] private float _NormalSpeed = 5;
+    [SerializeField] private float _SprintSpeed = 8;
     [SerializeField] private float _JumpSpeed = 300;
     [SerializeField] private float _GroundCheck = 0.6f;
     [Header("Set ground layer")]
     [SerializeField] private LayerMask _GroundMask;
 
-    private Vector2 _MoveDirection = Vector2.zero;
     private float _Speed = 0;
     private Rigidbody2D _RB;
 
