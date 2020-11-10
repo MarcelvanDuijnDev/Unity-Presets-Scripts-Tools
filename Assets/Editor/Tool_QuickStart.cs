@@ -444,10 +444,14 @@ public class Tool_QuickStart : EditorWindow
         if (_DimensionID == 0)
         {
             GameObject groundCube = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            DestroyImmediate(groundCube.GetComponent<MeshCollider>());
+            groundCube.AddComponent<BoxCollider2D>();
             groundCube.name = "Ground";
             groundCube.transform.position = new Vector3(0, 0, 0);
 
             GameObject player = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            DestroyImmediate(player.GetComponent<MeshCollider>());
+            player.AddComponent<BoxCollider2D>();
             player.name = "Player";
             player.transform.position = new Vector3(0, 2, 0);
 
@@ -458,16 +462,16 @@ public class Tool_QuickStart : EditorWindow
             switch(_Type2DID)
             {
                 case 0: //Platformer
-                    CreateObjects_2D_Platformer(groundCube, player, cameraObj);
+                    CreateObjects_2D_Platformer(player, groundCube, cameraObj);
                     break;
                 case 1: //TopDown
-                    CreateObjects_2D_TopDown(groundCube, player, cameraObj);
+                    CreateObjects_2D_TopDown(player, groundCube, cameraObj);
                     break;
             }
         }
     }
 
-    //Create Objects 3D
+    //Create Objects 3D / Set scripts
     void CreateObjects_3D_FPS(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
         //Setup Level
@@ -580,10 +584,25 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //Create Object 2D
+    //Create Object 2D / Set scripts
     void CreateObjects_2D_Platformer(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
         groundobj.transform.localScale = new Vector3(25, 1, 1);
+
+        if (ScriptExist("Movement_2D_Platformer"))
+        {
+            string UniType = "Movement_2D_Platformer";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            playerobj.AddComponent(UnityType);
+        }
+        if (ScriptExist("Movement_Camera"))
+        {
+            string UniType = "Movement_Camera";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            cameraobj.AddComponent(UnityType);
+            cameraobj.GetComponent(UnityType).SendMessage("Set_CameraTarget", playerobj);
+            cameraobj.GetComponent(UnityType).SendMessage("Set_OffSet", new Vector3(0, 3, -10));
+        }
     }
     void CreateObjects_2D_TopDown(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
