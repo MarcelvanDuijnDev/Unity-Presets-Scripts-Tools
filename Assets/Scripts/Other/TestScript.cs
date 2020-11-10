@@ -5,13 +5,10 @@ using MVD;
 
 public class TestScript : MonoBehaviour
 {
-    void Start()
-    {
-        Debug.Log(mvd.Test());
-    }
 
     void Update()
     {
+        mvd.Movement_FreeCamera(5, 10, transform);
         
     }
 }
