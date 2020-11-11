@@ -405,7 +405,7 @@ public class Tool_QuickStart : EditorWindow
                 sw.Write(_ScriptCode[id]);
             }
         }
-        //AssetDatabase.Refresh();
+        AssetDatabase.Refresh();
         SearchScripts();
     }
 
