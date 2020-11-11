@@ -18,8 +18,8 @@ Feel free to use/copy files from this project._
 * [Networking](#networking)
 * [Useful](#useful)
 * [Examples](#examples)
-* [License & Copyright](#license--copyright)
 * [Other](#other)
+* [License & Copyright](#license--copyright)
   
 # Movement 
 - [Movement_2D_Platformer.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_2D_Platformer.cs)
