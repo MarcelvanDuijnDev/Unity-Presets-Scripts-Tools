@@ -15,7 +15,7 @@ public class Tool_QuickStart : EditorWindow
     private int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     private int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
 
-    private bool[] _ScriptExist = new bool[23];
+    private bool[] _ScriptExist = new bool[25];
     private string[] _ScriptNames = new string[] { // 17 Scripts
 "Bullet",
 "DoEvent",
@@ -23,6 +23,8 @@ public class Tool_QuickStart : EditorWindow
 "Health",
 "LightEffects",
 "LoadScenes",
+"Movement_2D_Platformer",
+"Movement_2D_TopDown",
 "Movement_CC",
 "Movement_CC_Platformer",
 "Movement_CC_TopDown",
@@ -47,6 +49,8 @@ public class Tool_QuickStart : EditorWindow
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Health : MonoBehaviour\n{\n    [SerializeField] private float _MaxHealth = 100;\n\n    private float _CurrentHealth;\n\n    private void OnEnable()\n    {\n        _CurrentHealth = _MaxHealth;\n    }\n\n    public void DoDamage(float damageamount)\n    {\n        _CurrentHealth -= damageamount;\n        if (_CurrentHealth <= 0)\n        {\n            _CurrentHealth = 0;\n            gameObject.SetActive(false);\n        }\n    }\n\n    public float GetCurrentHealth()\n    {\n        return _CurrentHealth;\n    }\n    public float GetMaxHealth()\n    {\n        return GetMaxHealth();\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class LightEffects : MonoBehaviour\n{\n    private enum LightEffectOptions { Flickering };\n\n    [Header(\"Settings\")]\n    [SerializeField] private LightEffectOptions _LightEffectOption = LightEffectOptions.Flickering;\n    [SerializeField] private Vector2 _MinMaxIncrease = new Vector2(0.8f, 1.2f);\n    [Range(0.01f, 100)] [SerializeField] private float _EffectStrength = 50;\n\n    Queue<float> _LightFlickerQ;\n    private float _LastSum = 0;\n    private Light _Light;\n    private float _LightIntensity = 0;\n\n    public void Reset()\n    {\n        if (_LightEffectOption == LightEffectOptions.Flickering)\n        {\n            _LightFlickerQ.Clear();\n            _LastSum = 0;\n        }\n    }\n\n    void Start()\n    {\n        _Light = GetComponent<Light>();\n        _LightIntensity = _Light.intensity;\n        _LightFlickerQ = new Queue<float>(Mathf.RoundToInt(_EffectStrength));\n    }\n\n    void Update()\n    {\n        switch (_LightEffectOption)\n        {\n            case LightEffectOptions.Flickering:\n                while (_LightFlickerQ.Count >= _EffectStrength)\n                    _LastSum -= _LightFlickerQ.Dequeue();\n\n                float newVal = Random.Range(_LightIntensity * _MinMaxIncrease.x, _LightIntensity * _MinMaxIncrease.y);\n                _LightFlickerQ.Enqueue(newVal);\n\n               _LastSum += newVal;\n                _Light.intensity = _LastSum / (float)_LightFlickerQ.Count;\n                break;\n        }\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.SceneManagement;\n\npublic class LoadScenes : MonoBehaviour\n{\n    public void Action_LoadScene(int sceneid)\n    {\n        SceneManager.LoadScene(sceneid);\n    }\n    public void Action_LoadScene(string scenename)\n    {\n        SceneManager.LoadScene(scenename);\n   }\n\n    public void Action_ReloadScene()\n    {\n        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);\n    }\n\n    public void Action_QuitApplication()\n    {\n        Application.Quit();\n    }\n}\n",
+        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(Rigidbody2D))]\npublic class Movement_2D_Platformer : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private float _NormalSpeed = 5;\n    [SerializeField] private float _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 300;\n    [SerializeField] private float _GroundCheck = 0.6f;\n    [Header(\"Set ground layer\")]\n    [SerializeField] private LayerMask _GroundMask;\n\n    private float _Speed = 0;\n    private Rigidbody2D _RB;\n\n    void Start()\n    {\n        //Get Rigidbody / Lock z rotation\n        _RB = GetComponent<Rigidbody2D>();\n        _RB.constraints = RigidbodyConstraints2D.FreezeRotation;\n    }\n\n    void Update()\n    {\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        //Jumping\n        if (Input.GetButtonDown(\"Jump\") && IsGrounded())\n            _RB.AddForce(new Vector2(0, _JumpSpeed));\n\n        //Apply Movement\n        _RB.velocity = new Vector2(Input.GetAxis(\"Horizontal\") * _Speed, _RB.velocity.y);\n    }\n\n    bool IsGrounded()\n    {\n        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, _GroundCheck, _GroundMask);\n        if (hit.collider != null)\n        {\n            return true;\n        }\n        return false;\n    }\n}\n",
+        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(Rigidbody2D))]\npublic class Movement_2D_TopDown : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private float _NormalSpeed = 5;\n    [SerializeField] private float _SprintSpeed = 8;\n\n    private float _Speed = 0;\n    private Rigidbody2D _RB;\n\n    void Start()\n    {\n        //Get Rigidbody / Lock z rotation\n        _RB = GetComponent<Rigidbody2D>();\n        _RB.constraints = RigidbodyConstraints2D.FreezeRotation;\n        _RB.gravityScale = 0;\n    }\n\n    void Update()\n    {\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        //Apply Movement\n        _RB.velocity = new Vector2(Input.GetAxis(\"Horizontal\") * _Speed, Input.GetAxis(\"Vertical\") * _Speed);\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(CharacterController))]\npublic class Movement_CC : MonoBehaviour\n{\n    //Movement\n    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 5;\n    [SerializeField] private float _Gravity = 20;\n    private Vector3 _MoveDirection = Vector3.zero;\n    //Look around\n    public float _CameraSensitivity = 1;\n    [SerializeField] private Transform _Head = null;\n    private float _RotationX = 90.0f;\n    private float _RotationY = 0.0f;\n    private float _Speed;\n\n    private CharacterController _CC;\n    private bool _LockRotation;\n\n    void Start()\n    {\n        Cursor.lockState = CursorLockMode.Locked;\n        Cursor.visible = false;\n        _CC = GetComponent<CharacterController>();\n    }\n\n    void Update()\n    {\n        //Look around\n        if (!_LockRotation)\n        {\n            _RotationX += Input.GetAxis(\"Mouse X\") * _CameraSensitivity;\n            _RotationY += Input.GetAxis(\"Mouse Y\") * _CameraSensitivity;\n            _RotationY = Mathf.Clamp(_RotationY, -90, 90);\n\n            transform.localRotation = Quaternion.AngleAxis(_RotationX, Vector3.up);\n            _Head.transform.localRotation = Quaternion.AngleAxis(_RotationY, Vector3.left);\n        }\n\n        //Movement\n        if (_CC.isGrounded)\n        {\n            _MoveDirection = new Vector3(Input.GetAxis(\"Horizontal\"), 0, Input.GetAxis(\"Vertical\"));\n            _MoveDirection = transform.TransformDirection(_MoveDirection);\n            _MoveDirection *= _Speed;\n            if (Input.GetButton(\"Jump\"))\n                _MoveDirection.y = _JumpSpeed;\n        }\n\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        //Apply Movement\n        _MoveDirection.y -= _Gravity * Time.deltaTime;\n        _CC.Move(_MoveDirection * Time.deltaTime);\n    }\n\n    public void LockRotation(bool state)\n    {\n        _LockRotation = state;\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(CharacterController))]\npublic class Movement_CC_Platformer : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 5;\n    [SerializeField] private float _Gravity = 20;\n    [SerializeField] private bool _ZMovementActive = false;\n\n    private Vector3 _MoveDirection = Vector3.zero;\n    private float _Speed;\n    private CharacterController _CC;\n\n    void Start()\n    {\n        _CC = GetComponent<CharacterController>();\n    }\n\n    void Update()\n    {\n        //Movement\n        if (_CC.isGrounded)\n        {\n            float verticalmovement = 0;\n            if (_ZMovementActive)\n                verticalmovement = Input.GetAxis(\"Vertical\");\n\n            _MoveDirection = new Vector3(Input.GetAxis(\"Horizontal\"), 0, verticalmovement);\n            _MoveDirection = transform.TransformDirection(_MoveDirection);\n            _MoveDirection *= _Speed;\n            if (Input.GetButton(\"Jump\"))\n                _MoveDirection.y = _JumpSpeed;\n        }\n\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        //Apply Movement\n        _MoveDirection.y -= _Gravity * Time.deltaTime;\n        _CC.Move(_MoveDirection * Time.deltaTime);\n    }\n}\n",
         "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\n[RequireComponent(typeof(CharacterController))]\npublic class Movement_CC_TopDown : MonoBehaviour\n{\n    //Movement\n    [Header(\"Settings Camera\")]\n    [SerializeField] private Camera _Camera;\n    [Header(\"Settings\")]\n    [SerializeField] private float _NormalSpeed = 5;\n    [SerializeField] private float _SprintSpeed = 8;\n    [SerializeField] private float _JumpSpeed = 5;\n    [SerializeField] private float _Gravity = 20;\n    [SerializeField] private bool _MovementRelativeToRotation = false;\n\n    private float _Speed = 0;\n    private Vector3 _MoveDirection = Vector3.zero;\n    private CharacterController _CC;\n\n    void Start()\n    {\n        _CC = GetComponent<CharacterController>();\n    }\n\n    void Update()\n    {\n        //Movement\n        if (_CC.isGrounded)\n        {\n            _MoveDirection = new Vector3(Input.GetAxis(\"Horizontal\"), 0, Input.GetAxis(\"Vertical\"));\n            if (_MovementRelativeToRotation)\n                _MoveDirection = transform.TransformDirection(_MoveDirection);\n            _MoveDirection *= _Speed;\n            if (Input.GetButton(\"Jump\"))\n                _MoveDirection.y = _JumpSpeed;\n        }\n\n        _MoveDirection.y -= _Gravity * Time.deltaTime;\n        _CC.Move(_MoveDirection * Time.deltaTime);\n\n        //Sprint\n        if (Input.GetKey(KeyCode.LeftShift))\n            _Speed = _SprintSpeed;\n        else\n            _Speed = _NormalSpeed;\n\n        Ray cameraRay = _Camera.ScreenPointToRay(Input.mousePosition);\n        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);\n        float rayLength;\n        if (groundPlane.Raycast(cameraRay, out rayLength))\n        {\n            Vector3 pointToLook = cameraRay.GetPoint(rayLength);\n            transform.LookAt(new Vector3(pointToLook.x, transform.position.y, pointToLook.z));\n        }\n    }\n}\n",
@@ -71,6 +75,8 @@ public class Tool_QuickStart : EditorWindow
     "health",
     "effects",
     "saveload",
+    "2d_movement",
+    "2d_movement",
     "3d_movement",
     "3d_movement",
     "3d_movement",
@@ -154,58 +160,48 @@ public class Tool_QuickStart : EditorWindow
             case 0: //Platformer
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
                 ScriptStatus("Movement_2D_Platformer");
-                ScriptStatus("Health");
+                ScriptStatus("Movement_Camera");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("Bullet");
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("LoadScenes");
+                //
 
                 GUI.backgroundColor = Color.white;
                 EditorGUILayout.BeginHorizontal("box");
                 GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
                 if (GUILayout.Button("Essential"))
-                    AddScriptsMultiple(new string[] { "Bullet" });
+                    AddScriptsMultiple(new string[] { "Movement_2D_Platformer", "Movement_Camera" });
                 if (GUILayout.Button("All"))
-                    AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                    AddScriptsMultiple(new string[] { "" });
                 EditorGUILayout.EndHorizontal();
                 break;
             case 1: //TopDown
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
                 ScriptStatus("Movement_2D_TopDown");
-                ScriptStatus("Health");
+                ScriptStatus("Movement_Camera");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("Bullet");
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("LoadScenes");
+                //
 
                 GUI.backgroundColor = Color.white;
                 EditorGUILayout.BeginHorizontal("box");
                 GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
                 if (GUILayout.Button("Essential"))
-                    AddScriptsMultiple(new string[] { "Bullet" });
+                    AddScriptsMultiple(new string[] { "Movement_2D_Platformer", "Movement_Camera" });
                 if (GUILayout.Button("All"))
-                    AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                    AddScriptsMultiple(new string[] { "" });
                 EditorGUILayout.EndHorizontal();
                 break;
             case 2: //VisualNovel
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Movement_2DPlatformer");
-                ScriptStatus("Health");
+                ScriptStatus("VisualNovelHandler");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("Bullet");
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("LoadScenes");
+                //
 
                 GUI.backgroundColor = Color.white;
                 EditorGUILayout.BeginHorizontal("box");
                 GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
                 if (GUILayout.Button("Essential"))
-                    AddScriptsMultiple(new string[] { "Bullet" });
+                    AddScriptsMultiple(new string[] { "" });
                 if (GUILayout.Button("All"))
-                    AddScriptsMultiple(new string[] { "Bullet", "UIEffects", "DoEvent", "LoadScenes" });
+                    AddScriptsMultiple(new string[] { "" });
                 EditorGUILayout.EndHorizontal();
                 break;
         }
@@ -216,48 +212,64 @@ public class Tool_QuickStart : EditorWindow
         {
             case 0: //FPS
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Health");
                 ScriptStatus("Movement_CC");
-                ScriptStatus("ObjectPool");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("OnCollision");
-                ScriptStatus("LoadScenes");
+                //
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Movement_CC"});
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "" });
+                EditorGUILayout.EndHorizontal();
                 break;
             case 1: //ThirdPerson
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Bullet");
                 ScriptStatus("Movement_CC");
                 ScriptStatus("Movement_Camera");
-                ScriptStatus("ObjectPool");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("OnCollision");
-                ScriptStatus("LoadScenes");
+                //
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Movement_CC", "Movement_Camera" });
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "" });
+                EditorGUILayout.EndHorizontal();
                 break;
             case 2: //TopDown
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Bullet");
                 ScriptStatus("Movement_CC_TopDown");
-                ScriptStatus("ObjectPool");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("OnCollision");
-                ScriptStatus("LoadScenes");
+                //
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Movement_CC_TopDown" });
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "" });
+                EditorGUILayout.EndHorizontal();
                 break;
             case 3: //Platformer
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Bullet");
                 ScriptStatus("Movement_CC_Platformer");
-                ScriptStatus("ObjectPool");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                ScriptStatus("UIEffects");
-                ScriptStatus("DoEvent");
-                ScriptStatus("OnCollision");
-                ScriptStatus("LoadScenes");
+                //
+
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.BeginHorizontal("box");
+                GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
+                if (GUILayout.Button("Essential"))
+                    AddScriptsMultiple(new string[] { "Movement_CC_Platformer" });
+                if (GUILayout.Button("All"))
+                    AddScriptsMultiple(new string[] { "" });
+                EditorGUILayout.EndHorizontal();
                 break;
         }
     }
