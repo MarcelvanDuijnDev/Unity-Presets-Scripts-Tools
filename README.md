@@ -19,6 +19,7 @@ Feel free to use/copy files from this project._
 * [Useful](#useful)
 * [Examples](#examples)
 * [License & Copyright](#license--copyright)
+* [Other](#other)
   
 # Movement 
 - [Movement_2D_Platformer.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_2D_Platformer.cs)
@@ -61,6 +62,9 @@ Feel free to use/copy files from this project._
 # Examples
 - [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/ScriptebleGameObject.cs)
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
+
+# Other
+- [MVD_Namespace](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
 
 # License & Copyright
 Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/LICENSE)
