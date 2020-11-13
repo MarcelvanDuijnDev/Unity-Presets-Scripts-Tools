@@ -29,8 +29,6 @@ public class Tool_ScriptToString : EditorWindow
         if (GUILayout.Button("Convert"))
         {
             _ScriptOutput = ConvertScriptToString();
-
-
         }
     }
 
@@ -41,7 +39,6 @@ public class Tool_ScriptToString : EditorWindow
 
         //Split / add to array
         List<string> textedit = new List<string>();
-
 
         for (int i = 0; i < _ScriptInput.Length; i++)
         {
@@ -66,7 +63,6 @@ public class Tool_ScriptToString : EditorWindow
                 if (textedit[i] + textedit[i + 1] == "//" || textedit[i] + textedit[i + 1] == "/*")
                     commentcheck = true;
             }
-
 
             //Comment /* + */
             if (commentcheck)
@@ -119,8 +115,6 @@ public class Tool_ScriptToString : EditorWindow
             }
 
             scriptasstring += textedit[i];
-
-
 
             //Endings check
             if (i + 1 < textedit.Count)
