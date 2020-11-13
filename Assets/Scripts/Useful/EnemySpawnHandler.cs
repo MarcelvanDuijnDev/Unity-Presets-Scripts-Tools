@@ -24,6 +24,9 @@ public class EnemySpawnHandler : MonoBehaviour
     [SerializeField] private bool _RandomEnemy;
     [SerializeField] private bool _RandomSpawn;
 
+    [Header("Settings - Waves")]
+    [SerializeField] private int _WaveAmount;
+
     private float _Timer = 0;
 
     void Update()
@@ -59,7 +62,10 @@ public class EnemySpawnHandler : MonoBehaviour
             _Timer = 0;
         }
     }
+    private void Waves()
+    {
 
+    }
 
     public void Spawn(int enemyid, int spawnid)
     {
