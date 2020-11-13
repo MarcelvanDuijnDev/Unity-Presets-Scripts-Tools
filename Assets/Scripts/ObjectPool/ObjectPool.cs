@@ -39,15 +39,20 @@ public class ObjectPool : MonoBehaviour
         Destroy(emptyobject);
     }
 
+    //GetObject
     public GameObject GetObject(string objname)
     {
-        int id = FindObjectPoolID(objname);
+        int id = FindObjectPoolID(objname, false);
         return GetObject(id);
     }
-
     public GameObject GetObject(GameObject obj)
     {
         int id = FindObjectPoolID(obj);
+        return GetObject(id);
+    }
+    public GameObject GetObjectPrefabName(string prefabname)
+    {
+        int id = FindObjectPoolID(prefabname, true);
         return GetObject(id);
     }
 
@@ -55,29 +60,30 @@ public class ObjectPool : MonoBehaviour
     {
         GameObject freeObject = null;
         bool checkfreeobj = false;
+
         for (int i = 0; i < _ObjectPools[id]._Objects.Count; i++)
         {
             if (!_ObjectPools[id]._Objects[i].activeInHierarchy)
             {
-                _ObjectPools[id]._Objects[i].transform.position = new Vector3(0, 0, 0);
+                _ObjectPools[id]._Objects[i].transform.position = new Vector3(999, 999, 999);
                 _ObjectPools[id]._Objects[i].SetActive(true);
                 freeObject = _ObjectPools[id]._Objects[i];
-                checkfreeobj = true;
-                break;
+                return freeObject;
             }
         }
 
         if (!checkfreeobj)
         {
             _ObjectPools[id]._Objects.Clear();
-            freeObject = (GameObject)Instantiate(_ObjectPools[id]._Prefab);
+            freeObject = (GameObject)Instantiate(_ObjectPools[id]._Prefab, new Vector3(999,999,999), Quaternion.identity);
             freeObject.transform.parent = _Parents[id];
             _ObjectPools[id]._Objects.Add(freeObject);
+            return freeObject;
         }
 
-        return freeObject;
+        Debug.Log("No Object Found");
+        return null;
     }
-
 
     public List<GameObject> GetAllObjects(GameObject objtype)
     {
@@ -97,17 +103,23 @@ public class ObjectPool : MonoBehaviour
         }
         return id;
     }
-    private int FindObjectPoolID(string objname)
+    private int FindObjectPoolID(string objname, bool isprefab)
     {
-        int id = 0;
         for (int i = 0; i < _ObjectPools.Length; i++)
         {
-            if(objname == _ObjectPools[i]._Name)
-            {
-                id = i;
-            }
+            if (isprefab)
+                if (objname == _ObjectPools[i]._Prefab.name)
+                {
+                    return i;
+                }
+                else
+            if (objname == _ObjectPools[i]._Name)
+                {
+                    return i;
+                }
         }
-        return id;
+        Debug.Log(objname + " Not Found");
+        return 0;
     }
 }
 
