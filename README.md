@@ -31,7 +31,7 @@ Feel free to use/copy files from this project._
 - [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
 
 # Weapons / Shooting
-- [Bullet.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/BulletScript/Bullet.cs)
+- [Bullet.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Weapons/Bullet.cs)
 - [Shooting.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Weapons/Shooting.cs)
 - [ShootingRayCast.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Weapons/ShootingRayCast.cs)
 
