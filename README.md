@@ -65,7 +65,7 @@ Feel free to use/copy files from this project._
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
 # Other
-- [MVD_Namespace](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
+- [MVD_Namespace.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
 
 # License & Copyright
 Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/LICENSE)
