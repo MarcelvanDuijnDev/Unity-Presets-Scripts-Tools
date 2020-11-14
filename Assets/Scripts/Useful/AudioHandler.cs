@@ -7,20 +7,16 @@ using UnityEngine.Audio;
 public class AudioHandler : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private bool _DontDestroyOnLoad;
-    [SerializeField] private bool _RefreshSettingsOnUpdate;
-    [SerializeField] private AudioMixerGroup _AudioMixer;
+    [SerializeField] private bool _RefreshSettingsOnUpdate = false;
+    [SerializeField] private AudioMixerGroup _AudioMixer = null;
 
     [Header("Audio")]
-    [SerializeField] private List<AudioHandler_Sound> _Sound;
+    [SerializeField] private List<AudioHandler_Sound> _Sound = new List<AudioHandler_Sound>();
 
     private string _CurrentScene;
 
     void Start()
     {
-        if (_DontDestroyOnLoad)
-            DontDestroyOnLoad(this.gameObject);
-
         //PlayOnStart
         for (int i = 0; i < _Sound.Count; i++)
         {
@@ -82,16 +78,24 @@ public class AudioHandler : MonoBehaviour
             //FadeOut
             if (_Sound[i].AudioEffects.FadingOut)
             {
-                if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadeOutDone)
+                if (_Sound[i].AudioEffects.FadeOutAfterTime > -0.1f)
                 {
-                    if (_Sound[i].Settings.AudioSource.volume > 0)
+                    _Sound[i].AudioEffects.FadeOutAfterTime -= 1 * Time.deltaTime;
+                }
+                else
+                {
+                    if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadeOutDone)
                     {
-                        _Sound[i].Settings.AudioSource.volume -= _Sound[i].AudioEffects.FadeOutSpeed * Time.deltaTime;
-                    }
-                    else
-                    {
-                        _Sound[i].AudioEffects.FadeOutDone = true;
-                        _Sound[i].Settings.AudioSource.volume = 0;
+                        if (_Sound[i].Settings.AudioSource.volume > 0)
+                        {
+                            _Sound[i].Settings.AudioSource.volume -= _Sound[i].AudioEffects.FadeOutSpeed * Time.deltaTime;
+                        }
+                        else
+                        {
+                            _Sound[i].AudioEffects.FadeOutDone = true;
+                            _Sound[i].Settings.AudioSource.volume = 0;
+                            _Sound[i].Settings.AudioSource.Stop();
+                        }
                     }
                 }
             }
@@ -110,12 +114,13 @@ public class AudioHandler : MonoBehaviour
                     if (_Sound[i].AudioControl.StartAudioOnScene[o] == _CurrentScene)
                     {
                         //FadeIn
-                        if (_Sound[i].AudioEffects.FadeIn && !_Sound[i].AudioEffects.FadingIn)
+                        if (_Sound[i].AudioEffects.FadeIn)
                         {
                             _Sound[i].AudioEffects.FadingOut = false;
                             _Sound[i].AudioEffects.FadeInDone = false;
                             _Sound[i].AudioEffects.FadingIn = true;
                         }
+                        _Sound[i].Settings.AudioSource.Play();
                     }
                 }
                 for (int o = 0; o < _Sound[i].AudioControl.StopAudioOnScene.Count; o++)
@@ -129,6 +134,8 @@ public class AudioHandler : MonoBehaviour
                             _Sound[i].AudioEffects.FadeOutDone = false;
                             _Sound[i].AudioEffects.FadingOut = true;
                         }
+                        else
+                            _Sound[i].Settings.AudioSource.Stop();
                     }
                 }
             }
@@ -137,7 +144,6 @@ public class AudioHandler : MonoBehaviour
 
     public void PlayTrack(string trackname)
     {
-        string track = "";
         for (int i = 0; i < _Sound.Count; i++)
         {
             if (_Sound[i].AudioTrackName == trackname)
@@ -159,6 +165,15 @@ public class AudioHandler : MonoBehaviour
             if (!_Sound[i].AudioEffects.FadeIn || _Sound[i].AudioEffects.FadeIn && _Sound[i].AudioEffects.FadeInDone)
                 _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
             _Sound[i].Settings.AudioSource.loop = _Sound[i].AudioSettings.Loop;
+        }
+    }
+
+    public void SetAudioSource(string trackname, AudioSource audiosource)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+                _Sound[i].Settings.AudioSource = audiosource;
         }
     }
 }
@@ -214,6 +229,7 @@ public class AudioHandler_Effects
     [HideInInspector] public bool FadingIn;
     [Header("FadeOut")]
     public bool FadeOut;
+    public float FadeOutAfterTime;
     public float FadeOutDuration;
     [HideInInspector] public float FadeOutSpeed;
     [HideInInspector] public bool FadeOutDone;
