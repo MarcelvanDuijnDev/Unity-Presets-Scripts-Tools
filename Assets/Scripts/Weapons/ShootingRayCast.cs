@@ -17,7 +17,7 @@ public class ShootingRayCast : MonoBehaviour
     [SerializeField] private float _SecondsBetweenShots = 0.5f;
 
     private enum ShootModes {SingleShot, SemiAutomatic, Automatic }
-    [SerializeField] private ShootModes _ShootMode;
+    [SerializeField] private ShootModes _ShootMode = ShootModes.SingleShot;
 
     private bool _CheckSingleShot;
     private float _Timer;

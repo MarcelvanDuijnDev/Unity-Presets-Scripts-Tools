@@ -7,9 +7,9 @@ public class OnCollision : MonoBehaviour
 {
     private enum Options {OnTriggerEnter, OnTriggerExit, OnTriggerStay, OnCollisionEnter, OnCollisionExit, OnCollisionStay};
     [SerializeField] private LayerMask _LayerMask = ~0;
-    [SerializeField] private Options _Option;
-    [SerializeField] private string _Tag;
-    [SerializeField] private UnityEvent _Event;
+    [SerializeField] private Options _Option = Options.OnTriggerEnter;
+    [SerializeField] private string _Tag = "";
+    [SerializeField] private UnityEvent _Event = null;
 
     private bool _HasTag;
 

@@ -5,11 +5,11 @@ using UnityEngine;
 public class Turret : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private Vector2 _MinMaxRange;
-    [SerializeField] private float _SecondsBetweenShots;
-    [SerializeField] private float _Damage;
-    [SerializeField] private GameObject _ShootPart;
-    [SerializeField] private string _Tag;
+    [SerializeField] private Vector2 _MinMaxRange = Vector2.zero;
+    [SerializeField] private float _SecondsBetweenShots = 2;
+    [SerializeField] private float _Damage = 25;
+    [SerializeField] private GameObject _ShootPart = null;
+    [SerializeField] private string _Tag = "Enemy";
     
     private float _Timer;
     private GameObject _Target;

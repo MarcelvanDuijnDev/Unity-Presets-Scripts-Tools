@@ -11,7 +11,7 @@ public class Movement_2D_Platformer : MonoBehaviour
     [SerializeField] private float _JumpSpeed = 300;
     [SerializeField] private float _GroundCheck = 0.6f;
     [Header("Set ground layer")]
-    [SerializeField] private LayerMask _GroundMask;
+    [SerializeField] private LayerMask _GroundMask = ~1;
 
     private float _Speed = 0;
     private Rigidbody2D _RB;

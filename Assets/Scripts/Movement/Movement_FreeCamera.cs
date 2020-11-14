@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Movement_FreeCamera : MonoBehaviour
 {
-    [SerializeField] private float _Speed;
-    [SerializeField] private float _SprintSpeed;
+    [SerializeField] private float _Speed = 5;
+    [SerializeField] private float _SprintSpeed = 8;
 
     private float _CurrentSpeed;
 

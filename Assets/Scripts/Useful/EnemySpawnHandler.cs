@@ -8,26 +8,26 @@ public class EnemySpawnHandler : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private Options _Option = Options.Endless;
-    [SerializeField] private int _Seed;
-    [SerializeField] private bool _SetRandomSeed;
+    [SerializeField] private int _Seed = 0;
+    [SerializeField] private bool _SetRandomSeed = true;
 
     [Header("Object Pool")]
-    [SerializeField] private ObjectPool _ObjectPool;
+    [SerializeField] private ObjectPool _ObjectPool = null;
 
     [Header("Enemies")]
-    [SerializeField] private EnemySpawnHandler_Enemy[] _Enemies;
+    [SerializeField] private EnemySpawnHandler_Enemy[] _Enemies = null;
 
     [Header("SpawnLocations")]
-    [SerializeField] private Transform[] _SpawnLocations;
+    [SerializeField] private Transform[] _SpawnLocations = null;
 
     [Header("Settings - Endless")]
-    [SerializeField] private float _SpawnRate; // Seconds between spawning
-    [SerializeField] private float _SpawnRateEncrease; // Decrease time between spawning per sec
-    [SerializeField] private bool _RandomEnemy;
-    [SerializeField] private bool _RandomSpawn;
+    [SerializeField] private float _SpawnRate = 5; // Seconds between spawning
+    [SerializeField] private float _SpawnRateEncrease = 0.05f; // Decrease time between spawning per sec
+    [SerializeField] private bool _RandomEnemy = true;
+    [SerializeField] private bool _RandomSpawn = true;
 
     [Header("Settings - Waves")]
-    [SerializeField] private EnemySpawnHandler_WaveSettings _Waves;
+    [SerializeField] private EnemySpawnHandler_WaveSettings _Waves = null;
 
     private float _Timer = 0;
     private int _CurrentWave = 0;
@@ -54,7 +54,9 @@ public class EnemySpawnHandler : MonoBehaviour
 
     void Update()
     {
-        switch(_Option)
+        _Timer += 1 * Time.deltaTime;
+
+        switch (_Option)
         {
             case Options.Endless:
                 Update_Endless();
@@ -68,7 +70,6 @@ public class EnemySpawnHandler : MonoBehaviour
     //Update
     private void Update_Endless()
     {
-        _Timer += 1 * Time.deltaTime;
         if (_Timer >= _SpawnRate)
         {
             int randomenemyid = 0;
@@ -80,11 +81,10 @@ public class EnemySpawnHandler : MonoBehaviour
             Spawn(randomenemyid, randomspawnid);
             _Timer = 0;
         }
+        _SpawnRate -= _SpawnRateEncrease * Time.deltaTime;
     }
     private void Update_Waves()
     {
-        _Timer += 1 * Time.deltaTime;
-
         if (_CurrentWave < _Waves.WaveAmount)
         {
             if (_CheckWave != _CurrentWave)

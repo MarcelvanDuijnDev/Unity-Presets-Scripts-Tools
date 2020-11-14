@@ -6,8 +6,8 @@ using UnityEngine.AI;
 public class BasicNavMeshAI : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private Transform _Target;
-    [SerializeField] private float _Speed;
+    [SerializeField] private Transform _Target = null;
+    [SerializeField] private float _Speed = 2;
 
     private NavMeshAgent _Agent;
 

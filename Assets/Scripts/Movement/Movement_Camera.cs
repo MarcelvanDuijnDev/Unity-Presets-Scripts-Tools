@@ -14,12 +14,12 @@ public class Movement_Camera : MonoBehaviour
     [SerializeField] private Vector3 _OffsetPosition = new Vector3(0,12,-4);
     [SerializeField] private bool _UseOffsetYAsDefaultHeight = true;
     [Header("Settings - Rotation")]
-    [SerializeField] private Vector3 _OffsetRotation;
+    [SerializeField] private Vector3 _OffsetRotation = Vector3.zero;
     [Header("Settings")]
     [SerializeField] private float _Speed = 1000;
 
     [Header("Other")]
-    [SerializeField] private Transform _Target;
+    [SerializeField] private Transform _Target = null;
 
     private Vector3 _TargetPosition;
     private float _ScreenShakeDuration;

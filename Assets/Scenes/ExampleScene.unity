@@ -16933,7 +16933,7 @@ MonoBehaviour:
     WaveOption: 2
     EnemyIncreaseAmount: 0.1
     Waves: []
-    WaveAmount: 10
+    WaveAmount: 3
     EnemyAmount: 10
     TimeBetweenWaves: 5
 --- !u!114 &574663547
@@ -28548,6 +28548,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 3280146398481018073, guid: 21b8d18f67419ae4eb9312e5ca5cf897, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3359482341726012927, guid: 21b8d18f67419ae4eb9312e5ca5cf897, type: 3}
       propertyPath: m_Height
       value: 1.5
@@ -33548,7 +33552,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!4 &1073734413
 Transform:
@@ -33596,7 +33600,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b66a88bcd37bd4445871ea7349167760, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

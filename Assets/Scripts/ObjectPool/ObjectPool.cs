@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
-
-    [SerializeField] private ObjectPool_Pool[] _ObjectPools;
+    [SerializeField] private ObjectPool_Pool[] _ObjectPools = null;
     private List<Transform> _Parents = new List<Transform>();
 
     private void Awake()

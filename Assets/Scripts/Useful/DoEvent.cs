@@ -6,10 +6,10 @@ using UnityEngine.SceneManagement;
 
 public class DoEvent : MonoBehaviour
 {
-    [SerializeField] private UnityEvent _Event;
-    [SerializeField] private bool _OnStart;
-    [SerializeField] private bool _OnUpdate;
-    [SerializeField] private bool _OnButtonPressed;
+    [SerializeField] private UnityEvent _Event = null;
+    [SerializeField] private bool _OnStart = false;
+    [SerializeField] private bool _OnUpdate = false;
+    [SerializeField] private bool _OnButtonPressed = false;
 
     void Start()
     {

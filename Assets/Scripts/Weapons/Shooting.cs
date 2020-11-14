@@ -5,9 +5,9 @@ using UnityEngine;
 public class Shooting : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] ObjectPool _ObjectPool;
-    [SerializeField] private GameObject _BulletPrefab;
-    [SerializeField] private GameObject _ShootPoint;
+    [SerializeField] ObjectPool _ObjectPool = null;
+    [SerializeField] private GameObject _BulletPrefab = null;
+    [SerializeField] private GameObject _ShootPoint = null;
 
     [Header("Semi")]
     [SerializeField] private int _SemiAutomaticBulletAmount = 3;
@@ -16,7 +16,7 @@ public class Shooting : MonoBehaviour
     [SerializeField] private float _SecondsBetweenShots = 0.5f;
 
     private enum ShootModes { SingleShot, SemiAutomatic, Automatic }
-    [SerializeField] private ShootModes _ShootMode;
+    [SerializeField] private ShootModes _ShootMode = ShootModes.SingleShot;
 
     private bool _CheckSingleShot;
     private float _Timer;

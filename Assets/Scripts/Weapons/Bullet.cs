@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] private float _Speed;
-    [SerializeField] private float _Damage;
+    [SerializeField] private float _Speed = 5;
+    [SerializeField] private float _Damage = 25;
 
     void FixedUpdate()
     {
@@ -16,7 +16,7 @@ public class Bullet : MonoBehaviour
     {
         if(other.tag == "ExampleTag")
         {
-            //DoDamage
+            other.GetComponent<Health>().DoDamage(_Damage);
             gameObject.SetActive(false);
         }
     }

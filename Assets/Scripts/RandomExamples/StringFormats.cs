@@ -6,8 +6,8 @@ using TMPro;
 public class StringFormats : MonoBehaviour
 {
     private enum FormatOptions {Time };
-    [SerializeField] private FormatOptions _FormatOption;
-    [SerializeField] private TextMeshProUGUI _ExampleText;
+    [SerializeField] private FormatOptions _FormatOption = FormatOptions.Time;
+    [SerializeField] private TextMeshProUGUI _ExampleText = null;
 
     private float _Timer;
 
