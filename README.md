@@ -12,6 +12,7 @@ Feel free to use/copy files from this project._
 
 ### Content:
 * [Movement](#movement)
+* [AI](#ai)
 * [Weapons / Shooting](#weapons--shooting)
 * [Editor](#editor)
 * [Saving / Loading Data](#saving--loading-data)
@@ -29,6 +30,9 @@ Feel free to use/copy files from this project._
 - [Movement_CC_Platformer.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_Platformer.cs)
 - [Movement_CC_TopDown.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_TopDown.cs)
 - [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
+
+# AI
+- [BasicNavMeshAI.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/AI/BasicNavMeshAI.cs)
 
 # Weapons / Shooting
 - [Bullet.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Weapons/Bullet.cs)
