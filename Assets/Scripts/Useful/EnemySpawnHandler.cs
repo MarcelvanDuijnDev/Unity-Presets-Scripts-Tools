@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class EnemySpawnHandler : MonoBehaviour
 {
-    private enum Options {Endless, Waves, Endless_Waves }
+    private enum Options {Endless, Waves}
 
     [Header("Settings")]
     [SerializeField] private Options _Option = Options.Endless;
+    [SerializeField] private int _Seed;
+    [SerializeField] private bool _SetRandomSeed;
 
     [Header("Object Pool")]
     [SerializeField] private ObjectPool _ObjectPool;
@@ -25,30 +27,40 @@ public class EnemySpawnHandler : MonoBehaviour
     [SerializeField] private bool _RandomSpawn;
 
     [Header("Settings - Waves")]
-    [SerializeField] private int _WaveAmount;
+    [SerializeField] private EnemySpawnHandler_WaveSettings _Waves;
 
     private float _Timer = 0;
+    private int _CurrentWave = -1;
+    private int _CheckWave = 999;
+    private float _TimerBetweenWaves = 0;
+    private float _SpawnSpeed = 0;
+
+    private void Start()
+    {
+        if (_SetRandomSeed)
+            Random.InitState(Random.Range(0, 10000));
+        else
+            Random.InitState(_Seed);
+        GenerateWaves();
+    }
 
     void Update()
     {
-
         _Timer += 1 * Time.deltaTime;
 
         switch(_Option)
         {
             case Options.Endless:
-                Endless();
+                Update_Endless();
                 break;
             case Options.Waves:
-
-                break;
-            case Options.Endless_Waves:
-
+                Update_Waves();
                 break;
         }
     }
 
-    private void Endless()
+    //Update
+    private void Update_Endless()
     {
         if (_Timer >= _SpawnRate)
         {
@@ -62,15 +74,98 @@ public class EnemySpawnHandler : MonoBehaviour
             _Timer = 0;
         }
     }
-    private void Waves()
+    private void Update_Waves()
     {
+        if(_CheckWave != _CurrentWave)
+        {
+            //Get info / time between
+            _TimerBetweenWaves += 1 * Time.deltaTime;
+            if(_TimerBetweenWaves >= _Waves.TimeBetweenWaves)
+            {
+                _TimerBetweenWaves = 0;
+                _CurrentWave++;
+                _CheckWave = _CurrentWave;
+                _SpawnSpeed = _Waves.Waves[_CurrentWave].SpawnDuration / _Waves.Waves[_CurrentWave].TotalEnemies;
+            }
+        }
+        else
+        {
+            //Spawn
+            if (_Waves.Waves[_CurrentWave].TotalEnemies > 0)
+            {
+                if (_Timer > _SpawnSpeed)
+                {
+                    bool spawncheck = false;
+                    while (!spawncheck)
+                    {
+                        int spawnid = Random.Range(0, _Enemies.Length);
+                        if (_Waves.Waves[_CurrentWave].EnemyID[spawnid] >= 0)
+                        {
+                            Spawn(spawnid, Random.Range(0, _SpawnLocations.Length));
+                            _Waves.Waves[_CheckWave].EnemyID[spawnid]--;
+                            _Waves.Waves[_CurrentWave].TotalEnemies--;
+                            spawncheck = true;
+                        }
+                    }
+                    _Timer = 0;
+                }
+            }
+            else
+            {
+                _CurrentWave++;
+            }
+        }
+    }
 
+    //Generate Waves
+    private void GenerateWaves()
+    {
+        int enemytypes = _Enemies.Length;
+        for (int i = 0; i < _Waves.WaveAmount; i++)
+        {
+            EnemySpawnHandler_Wave newwave = new EnemySpawnHandler_Wave();
+            int enemyamount = Mathf.RoundToInt(_Waves.EnemyAmount * ((_Waves.EnemyIncreaseAmount * i) + 1));
+
+            //Set enemy amount
+            newwave.EnemyID = new int[enemytypes];
+            int checkenemyamount = 0;
+            newwave.TotalEnemies = enemyamount;
+
+            while (checkenemyamount < enemyamount)
+            {
+                for (int j = 0; j < enemytypes; j++)
+                {
+                    if (_Enemies[j].StartWave <= i)
+                    {
+                        int addamount = 0;
+                        if (enemyamount < 2)
+                            addamount = Random.Range(0, enemyamount);
+                        else
+                            addamount = Random.Range(0, Mathf.RoundToInt(enemyamount*0.5f));
+
+                        if (enemyamount > checkenemyamount + addamount)
+                        {
+                            newwave.EnemyID[j] += addamount;
+                            checkenemyamount += addamount;
+                        }
+                        else
+                        {
+                            newwave.EnemyID[j] += enemyamount - checkenemyamount;
+                            checkenemyamount = enemyamount;
+                            continue;
+                        }
+                    }
+                }
+            }
+            _Waves.Waves.Add(newwave);
+        }
     }
 
     public void Spawn(int enemyid, int spawnid)
     {
-        GameObject obj = _ObjectPool.GetObjectPrefabName(_Enemies[enemyid].EnemyPrefab.name);
+        GameObject obj = _ObjectPool.GetObjectPrefabName(_Enemies[enemyid].EnemyPrefab.name, false);
         obj.transform.position = _SpawnLocations[spawnid].position;
+        obj.SetActive(true);
     }
 }
 
@@ -82,4 +177,33 @@ public class EnemySpawnHandler_Enemy
 
     [Header("Settings")]
     public int StartWave;
+}
+
+[System.Serializable]
+public class EnemySpawnHandler_WaveSettings
+{
+    public enum WaveOptions {Endless, Manual, Generate}
+    public WaveOptions WaveOption;
+
+    [Header("Endless")]
+    public float EnemyIncreaseAmount;
+
+    [Header("Manual")]
+    public List<EnemySpawnHandler_Wave> Waves;
+
+    [Header("Generate")]
+    public int WaveAmount;
+    public int EnemyAmount;
+
+    [Header("Other")]
+    public float TimeBetweenWaves;
+}
+
+[System.Serializable]
+public class EnemySpawnHandler_Wave
+{
+    public int[] EnemyID;
+    public float SpawnDuration = 5;
+
+    [HideInInspector] public int TotalEnemies;
 }

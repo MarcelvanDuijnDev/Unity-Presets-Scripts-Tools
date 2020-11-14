@@ -67,7 +67,7 @@ public class Shooting : MonoBehaviour
 
     void Shoot()
     {
-       GameObject bullet = _ObjectPool.GetObject(_BulletPrefab);
+       GameObject bullet = _ObjectPool.GetObject(_BulletPrefab, true);
         bullet.SetActive(true);
         bullet.transform.position = _ShootPoint.transform.position;
         bullet.transform.rotation = _ShootPoint.transform.rotation;

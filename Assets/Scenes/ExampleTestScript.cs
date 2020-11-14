@@ -27,7 +27,7 @@ public class ExampleTestScript : MonoBehaviour
                 _InfoText.text = "Press spacebar to spawn a object from the objectpool";
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    GameObject spawnedObject = _ObjectPool.GetObject("Object1");
+                    GameObject spawnedObject = _ObjectPool.GetObject("Object1", true);
                     spawnedObject.transform.position = new Vector3(0, 0, 0);
                 }
                 break;

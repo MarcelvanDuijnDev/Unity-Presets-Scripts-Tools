@@ -40,23 +40,23 @@ public class ObjectPool : MonoBehaviour
     }
 
     //GetObject
-    public GameObject GetObject(string objname)
+    public GameObject GetObject(string objname, bool setactive)
     {
         int id = FindObjectPoolID(objname, false);
-        return GetObject(id);
+        return GetObject(id, setactive);
     }
-    public GameObject GetObject(GameObject obj)
+    public GameObject GetObject(GameObject obj, bool setactive)
     {
         int id = FindObjectPoolID(obj);
-        return GetObject(id);
+        return GetObject(id, setactive);
     }
-    public GameObject GetObjectPrefabName(string prefabname)
+    public GameObject GetObjectPrefabName(string prefabname, bool setactive)
     {
         int id = FindObjectPoolID(prefabname, true);
-        return GetObject(id);
+        return GetObject(id, setactive);
     }
 
-    public GameObject GetObject(int id)
+    public GameObject GetObject(int id, bool setactive)
     {
         GameObject freeObject = null;
         bool checkfreeobj = false;
@@ -66,7 +66,7 @@ public class ObjectPool : MonoBehaviour
             if (!_ObjectPools[id]._Objects[i].activeInHierarchy)
             {
                 _ObjectPools[id]._Objects[i].transform.position = new Vector3(999, 999, 999);
-                _ObjectPools[id]._Objects[i].SetActive(true);
+                _ObjectPools[id]._Objects[i].SetActive(setactive);
                 freeObject = _ObjectPools[id]._Objects[i];
                 return freeObject;
             }
@@ -77,6 +77,7 @@ public class ObjectPool : MonoBehaviour
             _ObjectPools[id]._Objects.Clear();
             freeObject = (GameObject)Instantiate(_ObjectPools[id]._Prefab, new Vector3(999,999,999), Quaternion.identity);
             freeObject.transform.parent = _Parents[id];
+            freeObject.SetActive(setactive);
             _ObjectPools[id]._Objects.Add(freeObject);
             return freeObject;
         }
