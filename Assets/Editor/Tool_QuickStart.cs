@@ -637,33 +637,3 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 }
-
-
-/*
-========================================
-                Info
-========================================
-
-             [Script ID]
-
-0: Bullet.cs                    
-1: DoEvent.cs                   
-2: EditorWindowExample.cs       
-3: Health.cs
-4: LightEffects.cs              
-5: LoadScenes.cs                
-6: Movement_CC.cs               
-7: Movement_CC_TopDown.cs       
-8: Movement_Camera.cs           
-9: Movement_FreeCamera.cs       
-10: ObjectPool.cs                
-11: ObjectPoolSimple.cs
-12: OnCollision.cs
-13: SaveLoad_JSON.cs
-14: ScriptebleGameObject.cs
-15: StringFormats.cs
-16: Tool_CreateHexagonGrid.cs
-17: UIEffects.cs
-
-
-*/
