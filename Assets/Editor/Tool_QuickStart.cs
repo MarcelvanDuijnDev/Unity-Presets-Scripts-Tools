@@ -162,7 +162,6 @@ public class Tool_QuickStart : EditorWindow
                 ScriptStatus("Movement_2D_Platformer");
                 ScriptStatus("Movement_Camera");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                //
 
                 GUI.backgroundColor = Color.white;
                 EditorGUILayout.BeginHorizontal("box");
@@ -178,7 +177,6 @@ public class Tool_QuickStart : EditorWindow
                 ScriptStatus("Movement_2D_TopDown");
                 ScriptStatus("Movement_Camera");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                //
 
                 GUI.backgroundColor = Color.white;
                 EditorGUILayout.BeginHorizontal("box");
@@ -193,7 +191,6 @@ public class Tool_QuickStart : EditorWindow
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
                 ScriptStatus("VisualNovelHandler");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
-                //
 
                 GUI.backgroundColor = Color.white;
                 EditorGUILayout.BeginHorizontal("box");
