@@ -5,8 +5,8 @@ using TMPro;
 
 public class StringFormats : MonoBehaviour
 {
-    private enum FormatOptions {Time };
-    [SerializeField] private FormatOptions _FormatOption = FormatOptions.Time;
+    private enum FormatOptions {DigitalTime };
+    [SerializeField] private FormatOptions _FormatOption = FormatOptions.DigitalTime;
     [SerializeField] private TextMeshProUGUI _ExampleText = null;
 
     private float _Timer;
@@ -17,7 +17,7 @@ public class StringFormats : MonoBehaviour
 
         switch (_FormatOption)
         {
-            case FormatOptions.Time:
+            case FormatOptions.DigitalTime:
                 _ExampleText.text = string.Format("{0:00}:{1:00}:{2:00}", Mathf.Floor(_Timer / 3600), Mathf.Floor((_Timer / 60) % 60), _Timer % 60);
                 break;
         }
