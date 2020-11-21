@@ -22,7 +22,7 @@ public class Tool_ScriptToString : EditorWindow
         _ScriptInput = EditorGUILayout.TextField("", _ScriptInput);
 
         //Output
-        GUILayout.Label("Paste script here: ", EditorStyles.boldLabel);
+        GUILayout.Label("Converted to string: ", EditorStyles.boldLabel);
         EditorGUILayout.TextField("", _ScriptOutput);
 
         //Convert
