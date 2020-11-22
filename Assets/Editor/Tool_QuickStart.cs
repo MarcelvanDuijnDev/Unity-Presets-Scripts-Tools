@@ -238,6 +238,7 @@ public class Tool_QuickStart : EditorWindow
             case 0: //FPS
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
                 ScriptStatus("Movement_CC");
+                ScriptStatus("Health");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
                 //
 
@@ -255,6 +256,7 @@ public class Tool_QuickStart : EditorWindow
                 ScriptStatus("Movement_CC");
                 ScriptStatus("Movement_Camera");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("Health");
                 //
 
                 GUI.backgroundColor = Color.white;
@@ -270,6 +272,7 @@ public class Tool_QuickStart : EditorWindow
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
                 ScriptStatus("Movement_CC_TopDown");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("Health");
                 //
 
                 GUI.backgroundColor = Color.white;
@@ -285,6 +288,7 @@ public class Tool_QuickStart : EditorWindow
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
                 ScriptStatus("Movement_CC_Platformer");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
+                ScriptStatus("Health");
                 //
 
                 GUI.backgroundColor = Color.white;
