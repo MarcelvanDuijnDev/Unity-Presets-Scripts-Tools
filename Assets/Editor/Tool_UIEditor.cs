@@ -53,7 +53,9 @@ class Tool_UIEditor : EditorWindow
         GameObject canvasobj = new GameObject();
         canvasobj.name = "TestCanvas";
         canvasobj.AddComponent<Canvas>();
-        canvasobj.AddComponent<CanvasScaler>();
+        CanvasScaler canvasscale = canvasobj.AddComponent<CanvasScaler>();
+        canvasscale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasscale.referenceResolution = new Vector2(1920,1080);
         canvasobj.AddComponent<GraphicRaycaster>();
 
         GameObject eventsystemobj = new GameObject();
@@ -64,14 +66,15 @@ class Tool_UIEditor : EditorWindow
         Canvas canvascomponent = canvasobj.GetComponent<Canvas>();
         canvascomponent.renderMode = RenderMode.ScreenSpaceCamera;
 
-        GameObject button_start = Create_Button("Button_Start", "Start", new Vector2(40,45.5f), new Vector2(200,30), 10);
 
 
-
-        button_start.transform.parent = canvasobj.transform;
+        //Add Buttons
+        GameObject button_start = Create_Button(canvasobj ,"Button_Start", "Start", new Vector2(40,450), new Vector2(700,100), 30, "bottomleft");
+        GameObject button_options = Create_Button(canvasobj ,"Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, "bottomleft");
+        GameObject button_quit = Create_Button(canvasobj ,"Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, "bottomleft");
     }
 
-    GameObject Create_Button(string name, string buttontext, Vector2 pos, Vector2 size, float textoffset)
+    GameObject Create_Button(GameObject canvas ,string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, string anchorpos)
     {
         GameObject buttontemplate = new GameObject();
         DestroyImmediate(buttontemplate.GetComponent<Transform>());
@@ -80,9 +83,56 @@ class Tool_UIEditor : EditorWindow
         buttontransform.sizeDelta = size;
 
         buttontransform.anchoredPosition = pos;
-        buttontransform.pivot = new Vector2(0,0);
-        buttontransform.anchorMin = new Vector2(0,0);
-        buttontransform.anchorMax = new Vector2(0,0);
+
+        switch (anchorpos)
+        {
+            case "topleft":
+                buttontransform.anchorMin = new Vector2(0, 1);
+                buttontransform.anchorMax = new Vector2(0, 1);
+                buttontransform.pivot = new Vector2(0, 1);
+                break;
+            case "topmiddle":
+                buttontransform.anchorMin = new Vector2(0.5f, 1);
+                buttontransform.anchorMax = new Vector2(0.5f, 1);
+                buttontransform.pivot = new Vector2(0.5f, 1);
+                break;
+            case "topright":
+                buttontransform.anchorMin = new Vector2(1, 1);
+                buttontransform.anchorMax = new Vector2(1, 1);
+                buttontransform.pivot = new Vector2(1, 1);
+                break;
+            case "rightmiddle":
+                buttontransform.anchorMin = new Vector2(1, 0.5f);
+                buttontransform.anchorMax = new Vector2(1, 0.5f);
+                buttontransform.pivot = new Vector2(1, 0.5f);
+                break;
+            case "bottomright":
+                buttontransform.anchorMin = new Vector2(1, 0);
+                buttontransform.anchorMax = new Vector2(1, 0);
+                buttontransform.pivot = new Vector2(1, 0);
+                break;
+            case "bottommiddle":
+                buttontransform.anchorMin = new Vector2(0.5f, 0);
+                buttontransform.anchorMax = new Vector2(0.5f, 0);
+                buttontransform.pivot = new Vector2(0.5f, 0);
+                break;
+            case "bottomleft":
+                buttontransform.anchorMin = new Vector2(0, 0);
+                buttontransform.anchorMax = new Vector2(0, 0);
+                buttontransform.pivot = new Vector2(0, 0);
+                break;
+            case "leftmiddle":
+                buttontransform.anchorMin = new Vector2(0, 0.5f);
+                buttontransform.anchorMax = new Vector2(0, 0.5f);
+                buttontransform.pivot = new Vector2(0, 0.5f);
+                break;
+            case "middle":
+                buttontransform.anchorMin = new Vector2(0.5f, 0.5f);
+                buttontransform.anchorMax = new Vector2(0.5f, 0.5f);
+                buttontransform.pivot = new Vector2(0.5f, 0.5f);
+                break;
+        }
+
 
         buttontemplate.AddComponent<CanvasRenderer>();
         Image buttonimage = buttontemplate.AddComponent<Image>();
@@ -102,7 +152,7 @@ class Tool_UIEditor : EditorWindow
 
         TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
         buttontexttmpro.text = buttontext;
-        buttontexttmpro.fontSize = 15;
+        buttontexttmpro.fontSize = 60;
         buttontexttmpro.alignment = TextAlignmentOptions.MidlineLeft;
         buttontexttmpro.color = Color.black;
 
@@ -111,6 +161,8 @@ class Tool_UIEditor : EditorWindow
 
 
         buttontextemplate.transform.parent = buttontemplate.transform;
+
+        buttontemplate.transform.parent = canvas.transform;
 
         return buttontemplate;
     }
