@@ -50,12 +50,36 @@ class Tool_UIEditor : EditorWindow
 
     void CreateUI_Default()
     {
+        //Add canvas
+        GameObject canvasobj = CreateCanvas();
+
+        //Add setting tabs
+        GameObject tab_display = Create_Tab(canvasobj, "Display");
+        GameObject tab_graphics = Create_Tab(canvasobj, "Graphics");
+        GameObject tab_gameplay = Create_Tab(canvasobj, "Gameplay");
+        GameObject tab_controls = Create_Tab(canvasobj, "Controls");
+        GameObject tab_keybinding = Create_Tab(canvasobj, "Keybinding");
+
+        //Add Buttons
+        GameObject button_start = Create_Button(canvasobj ,"Button_Start", "Start", new Vector2(40,450), new Vector2(700,100), 30, "bottomleft");
+        GameObject button_options = Create_Button(canvasobj ,"Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, "bottomleft");
+        GameObject button_quit = Create_Button(canvasobj ,"Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, "bottomleft");
+    
+    
+    
+    
+    
+        
+    }
+
+    GameObject CreateCanvas()
+    {
         GameObject canvasobj = new GameObject();
         canvasobj.name = "TestCanvas";
         canvasobj.AddComponent<Canvas>();
         CanvasScaler canvasscale = canvasobj.AddComponent<CanvasScaler>();
         canvasscale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        canvasscale.referenceResolution = new Vector2(1920,1080);
+        canvasscale.referenceResolution = new Vector2(1920, 1080);
         canvasobj.AddComponent<GraphicRaycaster>();
 
         if (GameObject.Find("EventSystem") == null)
@@ -68,16 +92,10 @@ class Tool_UIEditor : EditorWindow
 
         Canvas canvascomponent = canvasobj.GetComponent<Canvas>();
         canvascomponent.renderMode = RenderMode.ScreenSpaceCamera;
-
-
-
-        //Add Buttons
-        GameObject button_start = Create_Button(canvasobj ,"Button_Start", "Start", new Vector2(40,450), new Vector2(700,100), 30, "bottomleft");
-        GameObject button_options = Create_Button(canvasobj ,"Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, "bottomleft");
-        GameObject button_quit = Create_Button(canvasobj ,"Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, "bottomleft");
+        
+        return canvasobj;
     }
-
-    GameObject Create_Button(GameObject canvas ,string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, string anchorpos)
+    GameObject Create_Button(GameObject parentobj ,string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, string anchorpos)
     {
         GameObject buttontemplate = new GameObject();
         RectTransform buttontransform = buttontemplate.AddComponent<RectTransform>();
@@ -163,8 +181,48 @@ class Tool_UIEditor : EditorWindow
 
         buttontextemplate.transform.parent = buttontemplate.transform;
 
-        buttontemplate.transform.parent = canvas.transform;
+        buttontemplate.transform.parent = parentobj.transform;
 
         return buttontemplate;
+    }
+    GameObject Create_Tab(GameObject parentobj, string name)
+    {
+        GameObject tab_new = new GameObject();
+        tab_new.name = name;
+
+
+        switch(name)
+        {
+            case "Display":
+                // Resolution
+                // Fullscreen
+                // Quality
+                // V-Sync
+                // Max fps
+                // Gamma
+                break;
+            case "Graphics":
+                // Antialiasing
+                // Shadows
+                // View distance
+                // Texture quality
+                // Violage distance
+                // Violage density
+                break;
+            case "Gameplay":
+                // Sound effects
+                // Music
+                break;
+            case "Controls":
+
+                break;
+            case "Keybinding":
+
+                break;
+        }
+
+
+        tab_new.transform.parent = parentobj.transform;
+        return tab_new;
     }
 }
