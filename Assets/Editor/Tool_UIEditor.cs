@@ -58,10 +58,13 @@ class Tool_UIEditor : EditorWindow
         canvasscale.referenceResolution = new Vector2(1920,1080);
         canvasobj.AddComponent<GraphicRaycaster>();
 
-        GameObject eventsystemobj = new GameObject();
-        eventsystemobj.name = "EventSytem";
-        eventsystemobj.AddComponent<EventSystem>();
-        eventsystemobj.AddComponent<StandaloneInputModule>();
+        if (GameObject.Find("EventSystem") == null)
+        {
+            GameObject eventsystemobj = new GameObject();
+            eventsystemobj.name = "EventSytem";
+            eventsystemobj.AddComponent<EventSystem>();
+            eventsystemobj.AddComponent<StandaloneInputModule>();
+        }
 
         Canvas canvascomponent = canvasobj.GetComponent<Canvas>();
         canvascomponent.renderMode = RenderMode.ScreenSpaceCamera;
@@ -77,7 +80,6 @@ class Tool_UIEditor : EditorWindow
     GameObject Create_Button(GameObject canvas ,string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, string anchorpos)
     {
         GameObject buttontemplate = new GameObject();
-        DestroyImmediate(buttontemplate.GetComponent<Transform>());
         RectTransform buttontransform = buttontemplate.AddComponent<RectTransform>();
 
         buttontransform.sizeDelta = size;
@@ -143,7 +145,6 @@ class Tool_UIEditor : EditorWindow
         buttontemplate.name = name;
 
         GameObject buttontextemplate = new GameObject();
-        DestroyImmediate(buttontextemplate.GetComponent<Transform>());
         RectTransform buttontextrect = buttontextemplate.AddComponent<RectTransform>();
 
         buttontextrect.anchoredPosition = new Vector2(pos.x + textoffset, pos.y);
