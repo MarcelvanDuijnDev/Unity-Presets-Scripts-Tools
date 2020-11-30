@@ -10,6 +10,7 @@ class Tool_UIEditor : EditorWindow
 {
     int _Options_Type;
     int _Options_Style;
+    GameObject _CreatedCanvas;
 
     [MenuItem("Tools/Tool_UIEditor")]
     public static void ShowWindow()
@@ -30,11 +31,20 @@ class Tool_UIEditor : EditorWindow
             _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default", "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
         }
 
-
-
-
+        GUILayout.BeginHorizontal();
         if (GUILayout.Button("Create"))
             CreateUI();
+        if (GUILayout.Button("Delete"))
+            if(_CreatedCanvas != null)
+            {
+                DestroyImmediate(_CreatedCanvas);
+                _CreatedCanvas = null;
+
+            }
+        GUILayout.EndHorizontal();
+
+        GUILayout.Label("Info:");
+        _CreatedCanvas = (GameObject)EditorGUILayout.ObjectField("Created object", _CreatedCanvas, typeof(GameObject), true);
 
     }
 
@@ -61,15 +71,16 @@ class Tool_UIEditor : EditorWindow
         GameObject tab_keybinding = Create_Tab(canvasobj, "Keybinding");
 
         //Add Buttons
-        GameObject button_start = Create_Button(canvasobj ,"Button_Start", "Start", new Vector2(40,450), new Vector2(700,100), 30, "bottomleft");
-        GameObject button_options = Create_Button(canvasobj ,"Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, "bottomleft");
-        GameObject button_quit = Create_Button(canvasobj ,"Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, "bottomleft");
-    
-    
-    
-    
-    
-        
+        GameObject main = new GameObject();
+        RectTransform mainrect = main.AddComponent<RectTransform>();
+        SetRect(mainrect, "bottomleft");
+        GameObject button_start = Create_Button(main, "Button_Start", "Start", new Vector2(40,450), new Vector2(700,100), 30, 60, "bottomleft");
+        GameObject button_options = Create_Button(main, "Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, 60, "bottomleft");
+        GameObject button_quit = Create_Button(main, "Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, 60, "bottomleft");
+        main.name = "Main";
+        main.transform.parent = canvasobj.transform;
+
+        _CreatedCanvas = canvasobj;
     }
 
     GameObject CreateCanvas()
@@ -95,64 +106,15 @@ class Tool_UIEditor : EditorWindow
         
         return canvasobj;
     }
-    GameObject Create_Button(GameObject parentobj ,string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, string anchorpos)
+    GameObject Create_Button(GameObject parentobj ,string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
     {
         GameObject buttontemplate = new GameObject();
         RectTransform buttontransform = buttontemplate.AddComponent<RectTransform>();
 
         buttontransform.sizeDelta = size;
-
         buttontransform.anchoredPosition = pos;
 
-        switch (anchorpos)
-        {
-            case "topleft":
-                buttontransform.anchorMin = new Vector2(0, 1);
-                buttontransform.anchorMax = new Vector2(0, 1);
-                buttontransform.pivot = new Vector2(0, 1);
-                break;
-            case "topmiddle":
-                buttontransform.anchorMin = new Vector2(0.5f, 1);
-                buttontransform.anchorMax = new Vector2(0.5f, 1);
-                buttontransform.pivot = new Vector2(0.5f, 1);
-                break;
-            case "topright":
-                buttontransform.anchorMin = new Vector2(1, 1);
-                buttontransform.anchorMax = new Vector2(1, 1);
-                buttontransform.pivot = new Vector2(1, 1);
-                break;
-            case "rightmiddle":
-                buttontransform.anchorMin = new Vector2(1, 0.5f);
-                buttontransform.anchorMax = new Vector2(1, 0.5f);
-                buttontransform.pivot = new Vector2(1, 0.5f);
-                break;
-            case "bottomright":
-                buttontransform.anchorMin = new Vector2(1, 0);
-                buttontransform.anchorMax = new Vector2(1, 0);
-                buttontransform.pivot = new Vector2(1, 0);
-                break;
-            case "bottommiddle":
-                buttontransform.anchorMin = new Vector2(0.5f, 0);
-                buttontransform.anchorMax = new Vector2(0.5f, 0);
-                buttontransform.pivot = new Vector2(0.5f, 0);
-                break;
-            case "bottomleft":
-                buttontransform.anchorMin = new Vector2(0, 0);
-                buttontransform.anchorMax = new Vector2(0, 0);
-                buttontransform.pivot = new Vector2(0, 0);
-                break;
-            case "leftmiddle":
-                buttontransform.anchorMin = new Vector2(0, 0.5f);
-                buttontransform.anchorMax = new Vector2(0, 0.5f);
-                buttontransform.pivot = new Vector2(0, 0.5f);
-                break;
-            case "middle":
-                buttontransform.anchorMin = new Vector2(0.5f, 0.5f);
-                buttontransform.anchorMax = new Vector2(0.5f, 0.5f);
-                buttontransform.pivot = new Vector2(0.5f, 0.5f);
-                break;
-        }
-
+        SetRect(buttontransform, anchorpos);
 
         buttontemplate.AddComponent<CanvasRenderer>();
         Image buttonimage = buttontemplate.AddComponent<Image>();
@@ -171,7 +133,7 @@ class Tool_UIEditor : EditorWindow
 
         TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
         buttontexttmpro.text = buttontext;
-        buttontexttmpro.fontSize = 60;
+        buttontexttmpro.fontSize = textsize;
         buttontexttmpro.alignment = TextAlignmentOptions.MidlineLeft;
         buttontexttmpro.color = Color.black;
 
@@ -188,12 +150,21 @@ class Tool_UIEditor : EditorWindow
     GameObject Create_Tab(GameObject parentobj, string name)
     {
         GameObject tab_new = new GameObject();
+        RectTransform tab_newrect = tab_new.AddComponent<RectTransform>();
+        SetRect(tab_newrect, "bottomleft");
         tab_new.name = name;
 
+        GameObject textobj = Create_Text(tab_new, "Title_" + name, new Vector2(800,800), new Vector2(1000,200), name, 100, Color.white);
 
-        switch(name)
+        switch (name)
         {
             case "Display":
+                GameObject button_start = Create_Button(tab_new, "Button_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Fullscreen = Create_Button(tab_new, "Button_Fullscreen", "Fullscreen", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Quality = Create_Button(tab_new, "Button_Quality", "Quality", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_VSync = Create_Button(tab_new, "Button_VSync", "VSync", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_MaxFPS = Create_Button(tab_new, "Button_MaxFPS", "MaxFPS", new Vector2(800, 420), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Gamma = Create_Button(tab_new, "Button_Gamma", "Gamma", new Vector2(800, 350), new Vector2(500, 60), 10, 40, "bottomleft");
                 // Resolution
                 // Fullscreen
                 // Quality
@@ -202,15 +173,23 @@ class Tool_UIEditor : EditorWindow
                 // Gamma
                 break;
             case "Graphics":
+                GameObject button_Antialiasing = Create_Button(tab_new, "Button_Antialiasing", "Antialiasing", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Shadows = Create_Button(tab_new, "Button_Shadows", "Shadows", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_ViewDistance = Create_Button(tab_new, "Button_ViewDistance", "ViewDistance", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_TextureQuality = Create_Button(tab_new, "Button_TextureQuality", "TextureQuality", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_ViolageDistance = Create_Button(tab_new, "Button_ViolageDistance", "ViolageDistance", new Vector2(800, 420), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_ViolageDensity = Create_Button(tab_new, "Button_ViolageDensity", "ViolageDensity", new Vector2(800, 350), new Vector2(500, 60), 10, 40, "bottomleft");
                 // Antialiasing
                 // Shadows
-                // View distance
-                // Texture quality
-                // Violage distance
-                // Violage density
+                // ViewDistance
+                // TextureQuality
+                // ViolageDistance
+                // ViolageDensity
                 break;
             case "Gameplay":
-                // Sound effects
+                GameObject button_SoundEffects = Create_Button(tab_new, "Button_SoundEffects", "SoundEffects", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Music = Create_Button(tab_new, "Button_Music", "Music", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
+                // SoundEffects
                 // Music
                 break;
             case "Controls":
@@ -223,6 +202,78 @@ class Tool_UIEditor : EditorWindow
 
 
         tab_new.transform.parent = parentobj.transform;
+        tab_new.SetActive(false);
         return tab_new;
+    }
+    GameObject Create_Text(GameObject parentobj, string name, Vector2 pos, Vector2 size, string textcontent, float fontsize, Color textcolor)
+    {
+        GameObject newtextobj = new GameObject();
+        RectTransform buttontextrect = newtextobj.AddComponent<RectTransform>();
+        newtextobj.name = name;
+        buttontextrect.sizeDelta = size;
+        buttontextrect.anchoredPosition = pos;
+        SetRect(buttontextrect,"bottomleft");
+
+        TextMeshProUGUI newtext = newtextobj.AddComponent<TextMeshProUGUI>();
+        newtext.text = textcontent;
+        newtext.fontSize = fontsize;
+        newtext.alignment = TextAlignmentOptions.MidlineLeft;
+        newtext.color = textcolor;
+
+        newtext.transform.parent = parentobj.transform;
+        return newtextobj;
+    }
+
+    void SetRect(RectTransform rect, string anchorpos)
+    {
+
+        switch (anchorpos)
+        {
+            case "topleft":
+                rect.anchorMin = new Vector2(0, 1);
+                rect.anchorMax = new Vector2(0, 1);
+                rect.pivot = new Vector2(0, 1);
+                break;
+            case "topmiddle":
+                rect.anchorMin = new Vector2(0.5f, 1);
+                rect.anchorMax = new Vector2(0.5f, 1);
+                rect.pivot = new Vector2(0.5f, 1);
+                break;
+            case "topright":
+                rect.anchorMin = new Vector2(1, 1);
+                rect.anchorMax = new Vector2(1, 1);
+                rect.pivot = new Vector2(1, 1);
+                break;
+            case "rightmiddle":
+                rect.anchorMin = new Vector2(1, 0.5f);
+                rect.anchorMax = new Vector2(1, 0.5f);
+                rect.pivot = new Vector2(1, 0.5f);
+                break;
+            case "bottomright":
+                rect.anchorMin = new Vector2(1, 0);
+                rect.anchorMax = new Vector2(1, 0);
+                rect.pivot = new Vector2(1, 0);
+                break;
+            case "bottommiddle":
+                rect.anchorMin = new Vector2(0.5f, 0);
+                rect.anchorMax = new Vector2(0.5f, 0);
+                rect.pivot = new Vector2(0.5f, 0);
+                break;
+            case "bottomleft":
+                rect.anchorMin = new Vector2(0, 0);
+                rect.anchorMax = new Vector2(0, 0);
+                rect.pivot = new Vector2(0, 0);
+                break;
+            case "leftmiddle":
+                rect.anchorMin = new Vector2(0, 0.5f);
+                rect.anchorMax = new Vector2(0, 0.5f);
+                rect.pivot = new Vector2(0, 0.5f);
+                break;
+            case "middle":
+                rect.anchorMin = new Vector2(0.5f, 0.5f);
+                rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.pivot = new Vector2(0.5f, 0.5f);
+                break;
+        }
     }
 }
