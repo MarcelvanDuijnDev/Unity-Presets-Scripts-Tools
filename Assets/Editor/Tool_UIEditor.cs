@@ -78,7 +78,7 @@ class Tool_UIEditor : EditorWindow
         GameObject button_options = Create_Button(main, "Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, 60, "bottomleft");
         GameObject button_quit = Create_Button(main, "Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, 60, "bottomleft");
         main.name = "Main";
-        main.transform.parent = canvasobj.transform;
+        main.transform.SetParent(canvasobj.transform);
 
         _CreatedCanvas = canvasobj;
     }
@@ -141,11 +141,69 @@ class Tool_UIEditor : EditorWindow
 
 
 
-        buttontextemplate.transform.parent = buttontemplate.transform;
+        buttontextemplate.transform.SetParent(buttontemplate.transform);
 
-        buttontemplate.transform.parent = parentobj.transform;
+        buttontemplate.transform.SetParent(parentobj.transform);
 
         return buttontemplate;
+    }
+    GameObject Create_Dropdown(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
+    {
+        // DropDown Begin
+        GameObject dropdowntemplate = new GameObject();
+        RectTransform buttontransform = dropdowntemplate.AddComponent<RectTransform>();
+        buttontransform.sizeDelta = size;
+        buttontransform.anchoredPosition = pos;
+        SetRect(buttontransform, anchorpos);
+        dropdowntemplate.AddComponent<CanvasRenderer>();
+        Image buttonimage = dropdowntemplate.AddComponent<Image>();
+        buttonimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        buttonimage.type = Image.Type.Sliced;
+        Dropdown buttonbutton = dropdowntemplate.AddComponent<Dropdown>();
+        buttonbutton.targetGraphic = buttonimage;
+        dropdowntemplate.name = name;
+        // DropDown End
+
+        // Label Begin
+        GameObject dropdown_label = Create_Text(dropdowntemplate, "Text_DropDown", pos, size, "Option A", textsize, Color.black);
+        // Label End
+
+        // Arrow Begin
+        GameObject dropdown_arrow = new GameObject();
+        RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
+        SetRect(dropdown_arrowrect, "rightmiddle");
+        dropdown_arrowrect.position = new Vector2(0,0);
+        dropdown_arrow.AddComponent<CanvasRenderer>();
+        Image dropdown_arrowimage = dropdown_arrow.AddComponent<Image>();
+        dropdown_arrowimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/DropdownArrow.psd");
+        // Arrow End
+
+
+
+        dropdown_label.transform.SetParent(dropdowntemplate.transform);
+        dropdown_arrow.transform.SetParent(dropdowntemplate.transform);
+
+        dropdowntemplate.transform.SetParent(parentobj.transform);
+
+        return dropdowntemplate;
+    }
+    GameObject Create_Text(GameObject parentobj, string name, Vector2 pos, Vector2 size, string textcontent, float fontsize, Color textcolor)
+    {
+        GameObject newtextobj = new GameObject();
+        RectTransform buttontextrect = newtextobj.AddComponent<RectTransform>();
+        newtextobj.name = name;
+        buttontextrect.sizeDelta = size;
+        buttontextrect.anchoredPosition = pos;
+        SetRect(buttontextrect, "bottomleft");
+
+        TextMeshProUGUI newtext = newtextobj.AddComponent<TextMeshProUGUI>();
+        newtext.text = textcontent;
+        newtext.fontSize = fontsize;
+        newtext.alignment = TextAlignmentOptions.MidlineLeft;
+        newtext.color = textcolor;
+
+        newtext.transform.SetParent(parentobj.transform);
+        return newtextobj;
     }
     GameObject Create_Tab(GameObject parentobj, string name)
     {
@@ -159,7 +217,7 @@ class Tool_UIEditor : EditorWindow
         switch (name)
         {
             case "Display":
-                GameObject button_start = Create_Button(tab_new, "Button_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject button_Resolution = Create_Dropdown(tab_new, "Button_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Fullscreen = Create_Button(tab_new, "Button_Fullscreen", "Fullscreen", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Quality = Create_Button(tab_new, "Button_Quality", "Quality", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_VSync = Create_Button(tab_new, "Button_VSync", "VSync", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
@@ -201,28 +259,11 @@ class Tool_UIEditor : EditorWindow
         }
 
 
-        tab_new.transform.parent = parentobj.transform;
+        tab_new.transform.SetParent(parentobj.transform);
         tab_new.SetActive(false);
         return tab_new;
     }
-    GameObject Create_Text(GameObject parentobj, string name, Vector2 pos, Vector2 size, string textcontent, float fontsize, Color textcolor)
-    {
-        GameObject newtextobj = new GameObject();
-        RectTransform buttontextrect = newtextobj.AddComponent<RectTransform>();
-        newtextobj.name = name;
-        buttontextrect.sizeDelta = size;
-        buttontextrect.anchoredPosition = pos;
-        SetRect(buttontextrect,"bottomleft");
-
-        TextMeshProUGUI newtext = newtextobj.AddComponent<TextMeshProUGUI>();
-        newtext.text = textcontent;
-        newtext.fontSize = fontsize;
-        newtext.alignment = TextAlignmentOptions.MidlineLeft;
-        newtext.color = textcolor;
-
-        newtext.transform.parent = parentobj.transform;
-        return newtextobj;
-    }
+    
 
     void SetRect(RectTransform rect, string anchorpos)
     {
