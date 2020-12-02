@@ -208,6 +208,8 @@ class Tool_UIEditor : EditorWindow
     GameObject Create_Slider(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
     {
 
+        GameObject newobj = new GameObject();
+        return newobj;
     }
     GameObject Create_Tab(GameObject parentobj, string name)
     {
