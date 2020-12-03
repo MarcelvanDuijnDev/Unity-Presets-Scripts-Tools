@@ -207,9 +207,105 @@ class Tool_UIEditor : EditorWindow
     }
     GameObject Create_Slider(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
     {
+        //Slider
+        GameObject newsliderbackground = new GameObject();
+        GameObject newsliderobj = new GameObject();
+        GameObject newsliderfillarea = new GameObject();
+        GameObject newsliderfill = new GameObject();
+        GameObject newsliderslidearea = new GameObject();
+        GameObject newsliderhandle = new GameObject();
 
-        GameObject newobj = new GameObject();
-        return newobj;
+        newsliderbackground.transform.SetParent(newsliderobj.transform);
+
+        newsliderfill.transform.SetParent(newsliderfillarea.transform);
+        newsliderfillarea.transform.SetParent(newsliderobj.transform);
+
+        newsliderhandle.transform.SetParent(newsliderslidearea.transform);
+        newsliderslidearea.transform.SetParent(newsliderobj.transform);
+        
+
+        RectTransform buttontextrect = newsliderobj.AddComponent<RectTransform>();
+        buttontextrect.sizeDelta = size;
+        buttontextrect.anchoredPosition = pos;
+        SetRect(buttontextrect, anchorpos);
+
+        Slider newsliderslider = newsliderobj.AddComponent<Slider>();
+        newsliderobj.name = name;
+
+        //BackGround
+        
+        
+
+        RectTransform newsliderbackgroundrect = newsliderbackground.AddComponent<RectTransform>();
+        newsliderbackgroundrect.anchorMin = new Vector2(0, 0.25f);
+        newsliderbackgroundrect.anchorMax = new Vector2(1, 0.75f);
+        newsliderbackgroundrect.pivot = new Vector2(0.5f,0.5f);
+        newsliderbackgroundrect.sizeDelta = new Vector2(0,0);
+        newsliderbackgroundrect.anchoredPosition = new Vector2(0, 0);
+
+        Image newsliderbackgroundimage = newsliderbackground.AddComponent<Image>();
+        newsliderbackground.name = "BackGround";
+
+
+        //FillArea
+
+        
+        RectTransform buttonfillarearect = newsliderfillarea.AddComponent<RectTransform>();
+        buttonfillarearect.anchorMin = new Vector2(0, 0.25f);
+        buttonfillarearect.anchorMax = new Vector2(1, 0.75f);
+        buttonfillarearect.pivot = new Vector2(0.5f, 0.5f);
+        buttonfillarearect.sizeDelta = new Vector2(15, 0);
+        buttonfillarearect.anchoredPosition = new Vector2(5, 0);
+
+        newsliderfillarea.name = "FillArea";
+        
+
+        RectTransform buttonfillrect = newsliderfill.AddComponent<RectTransform>();
+        buttonfillrect.anchorMin = new Vector2(0, 0.25f);
+        buttonfillrect.anchorMax = new Vector2(1, 0.75f);
+        buttonfillrect.pivot = new Vector2(0.5f, 0.5f);
+        buttonfillrect.sizeDelta = new Vector2(10, 0);
+        buttonfillrect.anchoredPosition = new Vector4(0,0);
+
+        Image newsliderfillimage = newsliderfill.AddComponent<Image>();
+        newsliderfillimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        newsliderfillimage.type = Image.Type.Sliced;
+        newsliderfillimage.color = Color.grey;
+        
+        newsliderfill.name = "Fill";
+
+        //Handle Slide Area
+        
+        
+        RectTransform buttonslidearearect = newsliderslidearea.AddComponent<RectTransform>();
+        buttonslidearearect.anchorMin = new Vector2(0, 0);
+        buttonslidearearect.anchorMax = new Vector2(1, 1);
+        buttonslidearearect.pivot = new Vector2(0.5f, 0.5f);
+        buttonslidearearect.sizeDelta = new Vector2(10, 0);
+        buttonslidearearect.anchoredPosition = new Vector2(10, 0);
+
+        newsliderslidearea.name = "Handle Slide Area";
+        
+        
+        RectTransform buttonhandlerect = newsliderhandle.AddComponent<RectTransform>();
+        buttonhandlerect.anchorMin = new Vector2(0, 0.25f);
+        buttonhandlerect.anchorMax = new Vector2(1, 0.75f);
+        buttonhandlerect.pivot = new Vector2(0.5f, 0.5f);
+        buttonhandlerect.sizeDelta = new Vector2(20, 0);
+        buttonhandlerect.anchoredPosition = new Vector2(0, 0);
+
+        Image newsliderhandleimage = newsliderhandle.AddComponent<Image>();
+        newsliderhandleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+        
+        newsliderslider.image = newsliderhandleimage;
+        newsliderslider.fillRect = buttonfillrect;
+        newsliderslider.handleRect = buttonhandlerect;
+        newsliderhandle.name = "Handle";
+
+
+        newsliderobj.transform.SetParent(parentobj.transform);
+
+        return newsliderobj;
     }
     GameObject Create_Tab(GameObject parentobj, string name)
     {
@@ -252,7 +348,7 @@ class Tool_UIEditor : EditorWindow
                 break;
             case "Gameplay":
                 GameObject button_SoundEffects = Create_Button(tab_new, "Button_SoundEffects", "SoundEffects", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Music = Create_Button(tab_new, "Button_Music", "Music", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Music = Create_Slider(tab_new, "Slider_Music", "Music", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
                 // SoundEffects
                 // Music
                 break;
