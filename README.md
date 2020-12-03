@@ -44,7 +44,6 @@ Feel free to use/copy files from this project._
 - [EditorWindowExample.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/EditorWindowExample.cs)
 - [Tool_CreateHexagonGrid.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_CreateHexagonGrid.cs)
 - [Tool_ScriptToString.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_ScriptToString.cs)
-- [Tool_TerrainGenerator.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_TerrainGenerator.cs)
 - [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs)
 - [Tool_UIEditor.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_UIEditor.cs)
 
