@@ -149,43 +149,135 @@ class Tool_UIEditor : EditorWindow
     }
     GameObject Create_Dropdown(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
     {
-        // DropDown Begin
-        GameObject dropdowntemplate = new GameObject();
-        RectTransform buttontransform = dropdowntemplate.AddComponent<RectTransform>();
-        buttontransform.sizeDelta = size;
-        buttontransform.anchoredPosition = pos;
-        SetRect(buttontransform, anchorpos);
-        dropdowntemplate.AddComponent<CanvasRenderer>();
-        Image buttonimage = dropdowntemplate.AddComponent<Image>();
-        buttonimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        buttonimage.type = Image.Type.Sliced;
-        Dropdown buttonbutton = dropdowntemplate.AddComponent<Dropdown>();
-        buttonbutton.targetGraphic = buttonimage;
-        dropdowntemplate.name = name;
-        // DropDown End
-
-        // Label Begin
-        GameObject dropdown_label = Create_Text(dropdowntemplate, "Text_DropDown", pos, size, "Option A", textsize, Color.black);
-        // Label End
-
-        // Arrow Begin
+        //Create objects
+        GameObject dropdownobj = new GameObject();
+        GameObject dropdown_label = Create_Text(dropdownobj, "Text_DropDown", pos, size, "Option A", textsize, Color.black);
         GameObject dropdown_arrow = new GameObject();
+        GameObject dropdown_template = new GameObject();
+
+        GameObject dropdown_viewport = new GameObject();
+        GameObject dropdown_content = new GameObject();
+        GameObject dropdown_item = new GameObject();
+
+        GameObject dropdown_scrollbar = new GameObject();
+        GameObject dropdown_slidingarea = new GameObject();
+        GameObject dropdown_handle = new GameObject();
+
+        dropdown_template.SetActive(false);
+
+        //Set Name
+        dropdownobj.name = "Label";
+        dropdown_label.name = "Arrow";
+        dropdown_arrow.name = "Template";
+        dropdown_template.name = "Template";
+
+        dropdown_viewport.name = "Template";
+        dropdown_content.name = "Template";
+        dropdown_item.name = "Template";
+
+        dropdown_scrollbar.name = "Template";
+        dropdown_slidingarea.name = "Template";
+        dropdown_handle.name = "Template";
+
+        //Add RectTransform
+        RectTransform dropdownobjrect = dropdownobj.AddComponent<RectTransform>();
+        RectTransform dropdown_labelrect = dropdown_label.AddComponent<RectTransform>();
         RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
-        SetRect(dropdown_arrowrect, "rightmiddle");
-        dropdown_arrowrect.position = new Vector2(0,0);
-        dropdown_arrow.AddComponent<CanvasRenderer>();
-        Image dropdown_arrowimage = dropdown_arrow.AddComponent<Image>();
-        dropdown_arrowimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/DropdownArrow.psd");
-        // Arrow End
+        RectTransform dropdown_templaterect = dropdown_template.AddComponent<RectTransform>();
+
+        RectTransform dropdown_viewportrect = dropdown_viewport.AddComponent<RectTransform>();
+        RectTransform dropdown_contentrect = dropdown_content.AddComponent<RectTransform>();
+        RectTransform dropdown_itemrect = dropdown_item.AddComponent<RectTransform>();
+
+        RectTransform dropdown_scrollbarrect = dropdown_scrollbar.AddComponent<RectTransform>();
+        RectTransform dropdown_slidingarearect = dropdown_slidingarea.AddComponent<RectTransform>();
+        RectTransform dropdown_handlerect = dropdown_handle.AddComponent<RectTransform>();
+
+        //SetParent
+        dropdown_label.transform.SetParent(dropdownobj.transform);
+        dropdown_arrow.transform.SetParent(parentobj.transform);
+        dropdown_template.transform.SetParent(parentobj.transform);
+
+        dropdown_viewport.transform.SetParent(parentobj.transform);
+        dropdown_content.transform.SetParent(dropdown_viewport.transform);
+        dropdown_item.transform.SetParent(dropdown_content.transform);
+
+        dropdown_scrollbar.transform.SetParent(parentobj.transform);
+        dropdown_slidingarea.transform.SetParent(dropdown_scrollbar.transform);
+        dropdown_handle.transform.SetParent(dropdown_slidingarea.transform);
+
+        //Set Rect dropdownobj
+        dropdownobjrect.sizeDelta = size;
+        dropdownobjrect.anchoredPosition = pos;
+        SetRect(dropdownobjrect, anchorpos);
+
+        //Set Rect Label
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_labelrect.sizeDelta = new Vector2(25, 0);
+        dropdown_labelrect.anchoredPosition = new Vector4(10, 0);
+
+        //Set Rect Arrow
+        dropdown_arrowrect.anchorMin = new Vector2(1, 0.5f);
+        dropdown_arrowrect.anchorMax = new Vector2(1, 0.5f);
+        dropdown_arrowrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_arrowrect.sizeDelta = new Vector2(20, 20);
+        dropdown_arrowrect.anchoredPosition = new Vector4(-15, 0);
+
+        //Set Rect Template
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 0);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 1);
+        dropdown_labelrect.sizeDelta = new Vector2(0, 150);
+        dropdown_labelrect.anchoredPosition = new Vector4(0, 2);
+
+        //Set Rect Viewport
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(0, 1);
+        dropdown_labelrect.sizeDelta = new Vector2(18, 0);
+        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Content
+        dropdown_labelrect.anchorMin = new Vector2(0, 1);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 1);
+        dropdown_labelrect.sizeDelta = new Vector2(0, 28);
+        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Item
+        dropdown_labelrect.anchorMin = new Vector2(0, 0.5f);
+        dropdown_labelrect.anchorMax = new Vector2(1, 0.5f);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_labelrect.sizeDelta = new Vector2(0, 20);
+        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Scrollbar
+        dropdown_labelrect.anchorMin = new Vector2(1, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(1, 1);
+        dropdown_labelrect.sizeDelta = new Vector2(20, 0);
+        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Sliding Area
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_labelrect.sizeDelta = new Vector2(10, 10);
+        dropdown_labelrect.anchoredPosition = new Vector4(10, 10);
+
+        //Set Rect Handle
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 0.2f);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_labelrect.sizeDelta = new Vector2(-10, -10);
+        dropdown_labelrect.anchoredPosition = new Vector4(-10, -10);
 
 
+        dropdownobj.transform.SetParent(parentobj.transform);
 
-        dropdown_label.transform.SetParent(dropdowntemplate.transform);
-        dropdown_arrow.transform.SetParent(dropdowntemplate.transform);
-
-        dropdowntemplate.transform.SetParent(parentobj.transform);
-
-        return dropdowntemplate;
+        return dropdownobj;
     }
     GameObject Create_Text(GameObject parentobj, string name, Vector2 pos, Vector2 size, string textcontent, float fontsize, Color textcolor)
     {
@@ -207,7 +299,7 @@ class Tool_UIEditor : EditorWindow
     }
     GameObject Create_Slider(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
     {
-        //Slider
+        //Create Objects
         GameObject newsliderbackground = new GameObject();
         GameObject newsliderobj = new GameObject();
         GameObject newsliderfillarea = new GameObject();
@@ -215,93 +307,80 @@ class Tool_UIEditor : EditorWindow
         GameObject newsliderslidearea = new GameObject();
         GameObject newsliderhandle = new GameObject();
 
-        newsliderbackground.transform.SetParent(newsliderobj.transform);
+        newsliderobj.name = name;
 
+        //Set Parents
+        newsliderbackground.transform.SetParent(newsliderobj.transform);
         newsliderfill.transform.SetParent(newsliderfillarea.transform);
         newsliderfillarea.transform.SetParent(newsliderobj.transform);
-
         newsliderhandle.transform.SetParent(newsliderslidearea.transform);
         newsliderslidearea.transform.SetParent(newsliderobj.transform);
         
-
-        RectTransform buttontextrect = newsliderobj.AddComponent<RectTransform>();
-        buttontextrect.sizeDelta = size;
-        buttontextrect.anchoredPosition = pos;
-        SetRect(buttontextrect, anchorpos);
-
-        Slider newsliderslider = newsliderobj.AddComponent<Slider>();
-        newsliderobj.name = name;
-
-        //BackGround
-        
-        
-
+        //Add RectTransform
+        RectTransform buttonobjrect = newsliderobj.AddComponent<RectTransform>();
         RectTransform newsliderbackgroundrect = newsliderbackground.AddComponent<RectTransform>();
+        RectTransform buttonfillarearect = newsliderfillarea.AddComponent<RectTransform>();
+        RectTransform buttonfillrect = newsliderfill.AddComponent<RectTransform>();
+        RectTransform buttonslidearearect = newsliderslidearea.AddComponent<RectTransform>();
+        RectTransform buttonhandlerect = newsliderhandle.AddComponent<RectTransform>();
+
+        //Add Images
+        Image newsliderbackgroundimage = newsliderbackground.AddComponent<Image>();
+        Image newsliderfillimage = newsliderfill.AddComponent<Image>();
+        newsliderfillimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        newsliderfillimage.type = Image.Type.Sliced;
+        newsliderfillimage.color = Color.grey;
+        Image newsliderhandleimage = newsliderhandle.AddComponent<Image>();
+
+        //Set Rect NewObj
+        buttonobjrect.sizeDelta = size;
+        buttonobjrect.anchoredPosition = pos;
+        SetRect(buttonobjrect, anchorpos);
+        Slider newsliderslider = newsliderobj.AddComponent<Slider>();
+        
+        //Set Rect Background
         newsliderbackgroundrect.anchorMin = new Vector2(0, 0.25f);
         newsliderbackgroundrect.anchorMax = new Vector2(1, 0.75f);
         newsliderbackgroundrect.pivot = new Vector2(0.5f,0.5f);
         newsliderbackgroundrect.sizeDelta = new Vector2(0,0);
         newsliderbackgroundrect.anchoredPosition = new Vector2(0, 0);
-
-        Image newsliderbackgroundimage = newsliderbackground.AddComponent<Image>();
         newsliderbackground.name = "BackGround";
 
-
-        //FillArea
-
-        
-        RectTransform buttonfillarearect = newsliderfillarea.AddComponent<RectTransform>();
+        //Set Rect FillArea
         buttonfillarearect.anchorMin = new Vector2(0, 0.25f);
         buttonfillarearect.anchorMax = new Vector2(1, 0.75f);
         buttonfillarearect.pivot = new Vector2(0.5f, 0.5f);
         buttonfillarearect.sizeDelta = new Vector2(15, 0);
         buttonfillarearect.anchoredPosition = new Vector2(5, 0);
-
         newsliderfillarea.name = "FillArea";
-        
 
-        RectTransform buttonfillrect = newsliderfill.AddComponent<RectTransform>();
+        //Set Rect Fill
         buttonfillrect.anchorMin = new Vector2(0, 0.25f);
         buttonfillrect.anchorMax = new Vector2(1, 0.75f);
         buttonfillrect.pivot = new Vector2(0.5f, 0.5f);
         buttonfillrect.sizeDelta = new Vector2(10, 0);
         buttonfillrect.anchoredPosition = new Vector4(0,0);
-
-        Image newsliderfillimage = newsliderfill.AddComponent<Image>();
-        newsliderfillimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        newsliderfillimage.type = Image.Type.Sliced;
-        newsliderfillimage.color = Color.grey;
-        
         newsliderfill.name = "Fill";
 
-        //Handle Slide Area
-        
-        
-        RectTransform buttonslidearearect = newsliderslidearea.AddComponent<RectTransform>();
+        //Set Rect SliderArea
         buttonslidearearect.anchorMin = new Vector2(0, 0);
         buttonslidearearect.anchorMax = new Vector2(1, 1);
         buttonslidearearect.pivot = new Vector2(0.5f, 0.5f);
         buttonslidearearect.sizeDelta = new Vector2(10, 0);
         buttonslidearearect.anchoredPosition = new Vector2(10, 0);
-
         newsliderslidearea.name = "Handle Slide Area";
-        
-        
-        RectTransform buttonhandlerect = newsliderhandle.AddComponent<RectTransform>();
+         
+        //Set Rect Handle
         buttonhandlerect.anchorMin = new Vector2(0, 0.25f);
         buttonhandlerect.anchorMax = new Vector2(1, 0.75f);
         buttonhandlerect.pivot = new Vector2(0.5f, 0.5f);
         buttonhandlerect.sizeDelta = new Vector2(20, 0);
         buttonhandlerect.anchoredPosition = new Vector2(0, 0);
-
-        Image newsliderhandleimage = newsliderhandle.AddComponent<Image>();
         newsliderhandleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
-        
         newsliderslider.image = newsliderhandleimage;
         newsliderslider.fillRect = buttonfillrect;
         newsliderslider.handleRect = buttonhandlerect;
         newsliderhandle.name = "Handle";
-
 
         newsliderobj.transform.SetParent(parentobj.transform);
 
@@ -319,7 +398,7 @@ class Tool_UIEditor : EditorWindow
         switch (name)
         {
             case "Display":
-                GameObject button_Resolution = Create_Dropdown(tab_new, "Button_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject button_Resolution = Create_Dropdown(tab_new, "Dropdown_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Fullscreen = Create_Button(tab_new, "Button_Fullscreen", "Fullscreen", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Quality = Create_Button(tab_new, "Button_Quality", "Quality", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_VSync = Create_Button(tab_new, "Button_VSync", "VSync", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
@@ -366,10 +445,8 @@ class Tool_UIEditor : EditorWindow
         return tab_new;
     }
     
-
     void SetRect(RectTransform rect, string anchorpos)
     {
-
         switch (anchorpos)
         {
             case "topleft":
