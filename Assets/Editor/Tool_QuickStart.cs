@@ -819,6 +819,10 @@ public class Tool_QuickStart : EditorWindow
         GameObject dropdown_content = new GameObject();
         GameObject dropdown_item = new GameObject();
 
+        GameObject dropdown_item_background = new GameObject();
+        GameObject dropdown_item_checkmark = new GameObject();
+        GameObject dropdown_item_label = new GameObject();
+
         GameObject dropdown_scrollbar = new GameObject();
         GameObject dropdown_slidingarea = new GameObject();
         GameObject dropdown_handle = new GameObject();
@@ -833,8 +837,11 @@ public class Tool_QuickStart : EditorWindow
 
         dropdown_viewport.name = "Viewport";
         dropdown_content.name = "Conten";
-        dropdown_item.name = "Item" +
-            "";
+        dropdown_item.name = "Item";
+
+        dropdown_item_background.name = "Item Background";
+        dropdown_item_checkmark.name = "Item Checkmark";
+        dropdown_item_label.name = "Item Label";
 
         dropdown_scrollbar.name = "Scrollbar";
         dropdown_slidingarea.name = "Sliding Area";
@@ -842,12 +849,17 @@ public class Tool_QuickStart : EditorWindow
 
         //Add RectTransform
         RectTransform dropdownobjrect = dropdownobj.AddComponent<RectTransform>();
+        RectTransform dropdown_labelrect = dropdown_label.GetComponent<RectTransform>();
         RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
         RectTransform dropdown_templaterect = dropdown_template.AddComponent<RectTransform>();
 
         RectTransform dropdown_viewportrect = dropdown_viewport.AddComponent<RectTransform>();
         RectTransform dropdown_contentrect = dropdown_content.AddComponent<RectTransform>();
         RectTransform dropdown_itemrect = dropdown_item.AddComponent<RectTransform>();
+
+        RectTransform dropdown_item_backgroundrect = dropdown_item_background.AddComponent<RectTransform>();
+        RectTransform dropdown_item_checkmarkrect = dropdown_item_checkmark.AddComponent<RectTransform>();
+        RectTransform dropdown_item_labelrect = dropdown_item_label.AddComponent<RectTransform>();
 
         RectTransform dropdown_scrollbarrect = dropdown_scrollbar.AddComponent<RectTransform>();
         RectTransform dropdown_slidingarearect = dropdown_slidingarea.AddComponent<RectTransform>();
@@ -862,6 +874,10 @@ public class Tool_QuickStart : EditorWindow
         dropdown_content.transform.SetParent(dropdown_viewport.transform);
         dropdown_item.transform.SetParent(dropdown_content.transform);
 
+        dropdown_item_background.transform.SetParent(dropdown_item.transform);
+        dropdown_item_checkmark.transform.SetParent(dropdown_item.transform);
+        dropdown_item_label.transform.SetParent(dropdown_item.transform);
+
         dropdown_scrollbar.transform.SetParent(dropdown_template.transform);
         dropdown_slidingarea.transform.SetParent(dropdown_scrollbar.transform);
         dropdown_handle.transform.SetParent(dropdown_slidingarea.transform);
@@ -874,6 +890,13 @@ public class Tool_QuickStart : EditorWindow
         dropdownimage.type = Image.Type.Sliced;
         TMP_Dropdown dropdowntmp = dropdownobj.AddComponent<TMP_Dropdown>();
         SetRect(dropdownobjrect, anchorpos);
+
+        //Set Rect Label
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_labelrect.sizeDelta = new Vector2(25, 6);
+        dropdown_labelrect.anchoredPosition = new Vector4(10, 7);
 
         //Set Rect Arrow
         dropdown_arrowrect.anchorMin = new Vector2(1, 0.5f);
@@ -910,6 +933,27 @@ public class Tool_QuickStart : EditorWindow
         dropdown_itemrect.sizeDelta = new Vector2(0, 20);
         dropdown_itemrect.anchoredPosition = new Vector4(0, 0);
 
+        //Set Rect Item Background
+        dropdown_item_backgroundrect.anchorMin = new Vector2(0,0);
+        dropdown_item_backgroundrect.anchorMax = new Vector2(1, 1);
+        dropdown_item_backgroundrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_item_backgroundrect.sizeDelta = new Vector2(0, 0);
+        dropdown_item_backgroundrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Item Checkmark
+        dropdown_item_checkmarkrect.anchorMin = new Vector2(0, 0.5f);
+        dropdown_item_checkmarkrect.anchorMax = new Vector2(0, 0.5f);
+        dropdown_item_checkmarkrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_item_checkmarkrect.sizeDelta = new Vector2(20, 20);
+        dropdown_item_checkmarkrect.anchoredPosition = new Vector4(10, 0);
+
+        //Set Rect Item Label
+        dropdown_item_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_item_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_item_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_item_labelrect.sizeDelta = new Vector2(10, 1);
+        dropdown_item_labelrect.anchoredPosition = new Vector4(20, 2);
+
         //Set Rect Scrollbar
         dropdown_scrollbarrect.anchorMin = new Vector2(1, 0);
         dropdown_scrollbarrect.anchorMax = new Vector2(1, 1);
@@ -931,6 +975,60 @@ public class Tool_QuickStart : EditorWindow
         dropdown_handlerect.sizeDelta = new Vector2(-10, -10);
         dropdown_handlerect.anchoredPosition = new Vector4(-10, -10);
 
+        //
+        dropdown_arrow.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/DropdownArrow.psd"); ;
+
+        //
+        dropdowntmp.template = dropdown_templaterect;
+        dropdowntmp.captionText = dropdown_label.GetComponent<TextMeshProUGUI>();
+        dropdowntmp.itemText = dropdown_item_label.GetComponent<TextMeshProUGUI>();
+
+        //Template
+        Image dropdown_templateimage = dropdown_template.AddComponent<Image>();
+        dropdown_templateimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        dropdown_templateimage.type = Image.Type.Sliced;
+        ScrollRect dropdown_templatescrollrect = dropdown_template.AddComponent<ScrollRect>();
+        dropdown_templatescrollrect.content = dropdown_contentrect;
+        dropdown_templatescrollrect.decelerationRate = 0.135f;
+        dropdown_templatescrollrect.scrollSensitivity = 1;
+        dropdown_templatescrollrect.viewport = dropdown_viewportrect;
+
+        //viewport
+        Image dropdown_viewportimage = dropdown_viewport.AddComponent<Image>();
+        dropdown_viewportimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        dropdown_viewportimage.type = Image.Type.Sliced;
+
+        //Item Background
+        dropdown_item_background.AddComponent<Image>();
+
+        //Item Checkmark
+        dropdown_item_checkmark.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd"); ;
+
+        //Item Label
+        TextMeshProUGUI dropdown_item_labeltmp = dropdown_item_label.AddComponent<TextMeshProUGUI>();
+        dropdown_item_labeltmp.text = "Option A";
+
+        //Item
+        Toggle dropdown_itemtoggle = dropdown_item.AddComponent<Toggle>();
+        dropdown_itemtoggle.targetGraphic = dropdown_item_background.GetComponent<Image>();
+        dropdown_itemtoggle.graphic = dropdown_item_checkmark.GetComponent<Image>();
+
+        //handle
+        Image dropdown_handleimage = dropdown_handle.AddComponent<Image>();
+        dropdown_handleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd"); ;
+        dropdown_handleimage.type = Image.Type.Sliced;
+
+        //scrollbar
+        Image dropdown_scrollbarimage = dropdown_scrollbar.AddComponent<Image>();
+        dropdown_scrollbarimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd"); ;
+        dropdown_scrollbarimage.type = Image.Type.Sliced;
+        Scrollbar dropdown_scrollbar_scroll = dropdown_scrollbar.AddComponent<Scrollbar>();
+        dropdown_scrollbar_scroll.targetGraphic = dropdown_handleimage;
+
+        //dropdownobj
+        dropdowntmp.targetGraphic = dropdownimage;
+        
+        //AddToOptions
 
         dropdownobj.transform.SetParent(parentobj.transform);
 
