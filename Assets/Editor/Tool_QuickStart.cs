@@ -15,6 +15,7 @@ public class Tool_QuickStart : EditorWindow
 {
     private int _MenuID = 0;        // QuickStart/Scripts
     private int _DimensionID = 0;   // 2D/3D
+    private int _WithUI = 0;
     private int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     private int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
 
@@ -191,6 +192,7 @@ public class Tool_QuickStart : EditorWindow
     {
         //Dimension
         _DimensionID = GUILayout.Toolbar(_DimensionID, new string[] { "2D", "3D" });
+        _WithUI = GUILayout.Toolbar(_WithUI, new string[] { "With UI", "Without UI" });
 
         //Type 2D/3D
         switch (_DimensionID)
@@ -714,6 +716,23 @@ public class Tool_QuickStart : EditorWindow
         {
             case 0:
                 CreateUI_Default();
+                CreateUI_HUD();
+                break;
+        }
+    }
+
+    void CreateUIOptions()
+    {
+        switch(_Options_Style)
+        {
+            case 0: //All
+
+                break;
+            case 1: //Menu
+
+                break;
+            case 2: //HUD
+
                 break;
         }
     }
@@ -741,6 +760,14 @@ public class Tool_QuickStart : EditorWindow
         main.transform.SetParent(canvasobj.transform);
 
         _CreatedCanvas = canvasobj;
+    }
+    void CreateUI_HUD()
+    {
+        GameObject hudobj = new GameObject();
+        RectTransform hudobjrect = hudobj.AddComponent<RectTransform>();
+        SetRect(hudobjrect, "bottomleft");
+
+
     }
 
     GameObject CreateCanvas()
@@ -811,7 +838,7 @@ public class Tool_QuickStart : EditorWindow
     {
         //Create objects
         GameObject dropdownobj = new GameObject();
-        GameObject dropdown_label = Create_Text(dropdownobj, "Text_DropDown", pos, size, "Option A", textsize, Color.black);
+        GameObject dropdown_label = new GameObject();
         GameObject dropdown_arrow = new GameObject();
         GameObject dropdown_template = new GameObject();
 
@@ -836,7 +863,7 @@ public class Tool_QuickStart : EditorWindow
         dropdown_template.name = "Template";
 
         dropdown_viewport.name = "Viewport";
-        dropdown_content.name = "Conten";
+        dropdown_content.name = "Content";
         dropdown_item.name = "Item";
 
         dropdown_item_background.name = "Item Background";
@@ -849,7 +876,7 @@ public class Tool_QuickStart : EditorWindow
 
         //Add RectTransform
         RectTransform dropdownobjrect = dropdownobj.AddComponent<RectTransform>();
-        RectTransform dropdown_labelrect = dropdown_label.GetComponent<RectTransform>();
+        RectTransform dropdown_labelrect = dropdown_label.AddComponent<RectTransform>();
         RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
         RectTransform dropdown_templaterect = dropdown_template.AddComponent<RectTransform>();
 
@@ -890,6 +917,21 @@ public class Tool_QuickStart : EditorWindow
         dropdownimage.type = Image.Type.Sliced;
         TMP_Dropdown dropdowntmp = dropdownobj.AddComponent<TMP_Dropdown>();
         SetRect(dropdownobjrect, anchorpos);
+        List<TMP_Dropdown.OptionData> newoptions = new List<TMP_Dropdown.OptionData>();
+
+        TMP_Dropdown.OptionData option1 = new TMP_Dropdown.OptionData();
+        TMP_Dropdown.OptionData option2 = new TMP_Dropdown.OptionData();
+        TMP_Dropdown.OptionData option3 = new TMP_Dropdown.OptionData();
+
+        option1.text = "Option A";
+        option2.text = "Option B";
+        option3.text = "Option C";
+
+        newoptions.Add(option1);
+        newoptions.Add(option2);
+        newoptions.Add(option3);
+
+        dropdowntmp.AddOptions(newoptions);
 
         //Set Rect Label
         dropdown_labelrect.anchorMin = new Vector2(0, 0);
@@ -916,7 +958,7 @@ public class Tool_QuickStart : EditorWindow
         dropdown_viewportrect.anchorMin = new Vector2(0, 0);
         dropdown_viewportrect.anchorMax = new Vector2(1, 1);
         dropdown_viewportrect.pivot = new Vector2(0, 1);
-        dropdown_viewportrect.sizeDelta = new Vector2(18, 0);
+        dropdown_viewportrect.sizeDelta = new Vector2(18, 15); //NotDy
         dropdown_viewportrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Content
@@ -930,8 +972,8 @@ public class Tool_QuickStart : EditorWindow
         dropdown_itemrect.anchorMin = new Vector2(0, 0.5f);
         dropdown_itemrect.anchorMax = new Vector2(1, 0.5f);
         dropdown_itemrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_itemrect.sizeDelta = new Vector2(0, 20);
-        dropdown_itemrect.anchoredPosition = new Vector4(0, 0);
+        dropdown_itemrect.sizeDelta = new Vector2(0, size.y);
+        dropdown_itemrect.anchoredPosition = new Vector4(0, -15); //NotDy
 
         //Set Rect Item Background
         dropdown_item_backgroundrect.anchorMin = new Vector2(0,0);
@@ -983,36 +1025,6 @@ public class Tool_QuickStart : EditorWindow
         dropdowntmp.captionText = dropdown_label.GetComponent<TextMeshProUGUI>();
         dropdowntmp.itemText = dropdown_item_label.GetComponent<TextMeshProUGUI>();
 
-        //Template
-        Image dropdown_templateimage = dropdown_template.AddComponent<Image>();
-        dropdown_templateimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        dropdown_templateimage.type = Image.Type.Sliced;
-        ScrollRect dropdown_templatescrollrect = dropdown_template.AddComponent<ScrollRect>();
-        dropdown_templatescrollrect.content = dropdown_contentrect;
-        dropdown_templatescrollrect.decelerationRate = 0.135f;
-        dropdown_templatescrollrect.scrollSensitivity = 1;
-        dropdown_templatescrollrect.viewport = dropdown_viewportrect;
-
-        //viewport
-        Image dropdown_viewportimage = dropdown_viewport.AddComponent<Image>();
-        dropdown_viewportimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        dropdown_viewportimage.type = Image.Type.Sliced;
-
-        //Item Background
-        dropdown_item_background.AddComponent<Image>();
-
-        //Item Checkmark
-        dropdown_item_checkmark.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd"); ;
-
-        //Item Label
-        TextMeshProUGUI dropdown_item_labeltmp = dropdown_item_label.AddComponent<TextMeshProUGUI>();
-        dropdown_item_labeltmp.text = "Option A";
-
-        //Item
-        Toggle dropdown_itemtoggle = dropdown_item.AddComponent<Toggle>();
-        dropdown_itemtoggle.targetGraphic = dropdown_item_background.GetComponent<Image>();
-        dropdown_itemtoggle.graphic = dropdown_item_checkmark.GetComponent<Image>();
-
         //handle
         Image dropdown_handleimage = dropdown_handle.AddComponent<Image>();
         dropdown_handleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd"); ;
@@ -1024,13 +1036,59 @@ public class Tool_QuickStart : EditorWindow
         dropdown_scrollbarimage.type = Image.Type.Sliced;
         Scrollbar dropdown_scrollbar_scroll = dropdown_scrollbar.AddComponent<Scrollbar>();
         dropdown_scrollbar_scroll.targetGraphic = dropdown_handleimage;
+        dropdown_scrollbar_scroll.handleRect = dropdown_handlerect;
+        dropdown_scrollbar_scroll.direction = Scrollbar.Direction.BottomToTop;
+
+        //Template
+        Image dropdown_templateimage = dropdown_template.AddComponent<Image>();
+        dropdown_templateimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        dropdown_templateimage.type = Image.Type.Sliced;
+        ScrollRect dropdown_templatescrollrect = dropdown_template.AddComponent<ScrollRect>();
+        dropdown_templatescrollrect.content = dropdown_contentrect;
+        dropdown_templatescrollrect.decelerationRate = 0.135f;
+        dropdown_templatescrollrect.scrollSensitivity = 1;
+        dropdown_templatescrollrect.viewport = dropdown_viewportrect;
+        dropdown_templatescrollrect.movementType = ScrollRect.MovementType.Clamped;
+        dropdown_templatescrollrect.verticalScrollbar = dropdown_scrollbar_scroll;
+        dropdown_templatescrollrect.horizontal = false;
+
+        //viewport
+        Mask dropdown_viewportmask = dropdown_viewport.AddComponent<Mask>();
+        Image dropdown_viewportimage = dropdown_viewport.AddComponent<Image>();
+        dropdown_viewportimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UIMask.psd");
+        dropdown_viewportimage.type = Image.Type.Sliced;
+
+        //Item Background
+        dropdown_item_background.AddComponent<Image>();
+
+        //Item Checkmark
+        dropdown_item_checkmark.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd"); ;
+
+        //Item Label
+        TextMeshProUGUI dropdown_item_labeltmp = dropdown_item_label.AddComponent<TextMeshProUGUI>();
+        dropdown_item_labeltmp.text = "Option A";
+        dropdown_item_labeltmp.color = Color.black;
+
+        //LabelText
+        TextMeshProUGUI dropdown_labeltext = dropdown_label.AddComponent<TextMeshProUGUI>();
+        dropdown_labeltext.alignment = TextAlignmentOptions.MidlineLeft;
+        dropdown_labeltext.color = Color.black;
+        dropdown_labeltext.text = "Option A";
+
+        //Item
+        Toggle dropdown_itemtoggle = dropdown_item.AddComponent<Toggle>();
+        dropdown_itemtoggle.targetGraphic = dropdown_item_background.GetComponent<Image>();
+        dropdown_itemtoggle.graphic = dropdown_item_checkmark.GetComponent<Image>();
+        dropdown_itemtoggle.isOn = true;
 
         //dropdownobj
         dropdowntmp.targetGraphic = dropdownimage;
-        
-        //AddToOptions
+        dropdowntmp.itemText = dropdown_item_labeltmp;
 
+        //AddToOptions
         dropdownobj.transform.SetParent(parentobj.transform);
+
+        dropdowntmp.captionText = dropdown_labeltext;
 
         return dropdownobj;
     }
