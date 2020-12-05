@@ -63,6 +63,8 @@ Feel free to use/copy files from this project._
 - [ObjectPool.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPool.cs)
 - [ObjectPoolSimple.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPoolSimple.cs)
 - [OnCollision.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/OnCollision.cs)
+- [SettingsHandler.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/SettingsHandler.cs)
+- [Turret.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/Turret.cs)
 - [UIEffects.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Useful/UIEffects.cs)
 
 # Examples
