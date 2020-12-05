@@ -756,7 +756,7 @@ public class Tool_QuickStart : EditorWindow
         if (GameObject.Find("EventSystem") == null)
         {
             GameObject eventsystemobj = new GameObject();
-            eventsystemobj.name = "EventSytem";
+            eventsystemobj.name = "EventSystem";
             eventsystemobj.AddComponent<EventSystem>();
             eventsystemobj.AddComponent<StandaloneInputModule>();
         }
