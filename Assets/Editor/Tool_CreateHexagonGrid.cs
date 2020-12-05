@@ -17,7 +17,6 @@ public class Tool_CreateHexagonGrid : EditorWindow
     private bool _Center = true;
     private bool _Invert = false;
 
-
     [MenuItem("Tools/CreateHexagonGrid")]
     static void Init()
     {
@@ -26,8 +25,7 @@ public class Tool_CreateHexagonGrid : EditorWindow
     }
 
     void OnGUI()
-    {
-
+    { 
         GUILayout.BeginVertical("Box");
         _CenterObj = (GameObject)EditorGUILayout.ObjectField("Center Object", _CenterObj, typeof(GameObject), true);
         GUILayout.EndVertical();
