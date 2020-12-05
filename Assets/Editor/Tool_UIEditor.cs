@@ -24,11 +24,11 @@ class Tool_UIEditor : EditorWindow
 
         if(_Options_Type == 0)
         {
-            _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default", "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
+            _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default" });//, "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
         }
         else
         {
-            _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default", "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
+            _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default" });//, "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
         }
 
         GUILayout.BeginHorizontal();
@@ -166,22 +166,22 @@ class Tool_UIEditor : EditorWindow
         dropdown_template.SetActive(false);
 
         //Set Name
-        dropdownobj.name = "Label";
-        dropdown_label.name = "Arrow";
-        dropdown_arrow.name = "Template";
+        dropdownobj.name = name;
+        dropdown_label.name = "Label";
+        dropdown_arrow.name = "Arrow";
         dropdown_template.name = "Template";
 
-        dropdown_viewport.name = "Template";
-        dropdown_content.name = "Template";
-        dropdown_item.name = "Template";
+        dropdown_viewport.name = "Viewport";
+        dropdown_content.name = "Conten";
+        dropdown_item.name = "Item" +
+            "";
 
-        dropdown_scrollbar.name = "Template";
-        dropdown_slidingarea.name = "Template";
-        dropdown_handle.name = "Template";
+        dropdown_scrollbar.name = "Scrollbar";
+        dropdown_slidingarea.name = "Sliding Area";
+        dropdown_handle.name = "Handle";
 
         //Add RectTransform
         RectTransform dropdownobjrect = dropdownobj.AddComponent<RectTransform>();
-        RectTransform dropdown_labelrect = dropdown_label.AddComponent<RectTransform>();
         RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
         RectTransform dropdown_templaterect = dropdown_template.AddComponent<RectTransform>();
 
@@ -195,28 +195,25 @@ class Tool_UIEditor : EditorWindow
 
         //SetParent
         dropdown_label.transform.SetParent(dropdownobj.transform);
-        dropdown_arrow.transform.SetParent(parentobj.transform);
-        dropdown_template.transform.SetParent(parentobj.transform);
+        dropdown_arrow.transform.SetParent(dropdownobj.transform);
+        dropdown_template.transform.SetParent(dropdownobj.transform);
 
-        dropdown_viewport.transform.SetParent(parentobj.transform);
+        dropdown_viewport.transform.SetParent(dropdown_template.transform);
         dropdown_content.transform.SetParent(dropdown_viewport.transform);
         dropdown_item.transform.SetParent(dropdown_content.transform);
 
-        dropdown_scrollbar.transform.SetParent(parentobj.transform);
+        dropdown_scrollbar.transform.SetParent(dropdown_template.transform);
         dropdown_slidingarea.transform.SetParent(dropdown_scrollbar.transform);
         dropdown_handle.transform.SetParent(dropdown_slidingarea.transform);
 
         //Set Rect dropdownobj
         dropdownobjrect.sizeDelta = size;
         dropdownobjrect.anchoredPosition = pos;
+        Image dropdownimage = dropdownobj.AddComponent<Image>();
+        dropdownimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        dropdownimage.type = Image.Type.Sliced;
+        TMP_Dropdown dropdowntmp = dropdownobj.AddComponent<TMP_Dropdown>();
         SetRect(dropdownobjrect, anchorpos);
-
-        //Set Rect Label
-        dropdown_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_labelrect.sizeDelta = new Vector2(25, 0);
-        dropdown_labelrect.anchoredPosition = new Vector4(10, 0);
 
         //Set Rect Arrow
         dropdown_arrowrect.anchorMin = new Vector2(1, 0.5f);
@@ -226,53 +223,53 @@ class Tool_UIEditor : EditorWindow
         dropdown_arrowrect.anchoredPosition = new Vector4(-15, 0);
 
         //Set Rect Template
-        dropdown_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 0);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 1);
-        dropdown_labelrect.sizeDelta = new Vector2(0, 150);
-        dropdown_labelrect.anchoredPosition = new Vector4(0, 2);
+        dropdown_templaterect.anchorMin = new Vector2(0, 0);
+        dropdown_templaterect.anchorMax = new Vector2(1, 0);
+        dropdown_templaterect.pivot = new Vector2(0.5f, 1);
+        dropdown_templaterect.sizeDelta = new Vector2(0, 150);
+        dropdown_templaterect.anchoredPosition = new Vector4(0, 2);
 
         //Set Rect Viewport
-        dropdown_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_labelrect.pivot = new Vector2(0, 1);
-        dropdown_labelrect.sizeDelta = new Vector2(18, 0);
-        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+        dropdown_viewportrect.anchorMin = new Vector2(0, 0);
+        dropdown_viewportrect.anchorMax = new Vector2(1, 1);
+        dropdown_viewportrect.pivot = new Vector2(0, 1);
+        dropdown_viewportrect.sizeDelta = new Vector2(18, 0);
+        dropdown_viewportrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Content
-        dropdown_labelrect.anchorMin = new Vector2(0, 1);
-        dropdown_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 1);
-        dropdown_labelrect.sizeDelta = new Vector2(0, 28);
-        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+        dropdown_contentrect.anchorMin = new Vector2(0, 1);
+        dropdown_contentrect.anchorMax = new Vector2(1, 1);
+        dropdown_contentrect.pivot = new Vector2(0.5f, 1);
+        dropdown_contentrect.sizeDelta = new Vector2(0, 28);
+        dropdown_contentrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Item
-        dropdown_labelrect.anchorMin = new Vector2(0, 0.5f);
-        dropdown_labelrect.anchorMax = new Vector2(1, 0.5f);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_labelrect.sizeDelta = new Vector2(0, 20);
-        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+        dropdown_itemrect.anchorMin = new Vector2(0, 0.5f);
+        dropdown_itemrect.anchorMax = new Vector2(1, 0.5f);
+        dropdown_itemrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_itemrect.sizeDelta = new Vector2(0, 20);
+        dropdown_itemrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Scrollbar
-        dropdown_labelrect.anchorMin = new Vector2(1, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_labelrect.pivot = new Vector2(1, 1);
-        dropdown_labelrect.sizeDelta = new Vector2(20, 0);
-        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
+        dropdown_scrollbarrect.anchorMin = new Vector2(1, 0);
+        dropdown_scrollbarrect.anchorMax = new Vector2(1, 1);
+        dropdown_scrollbarrect.pivot = new Vector2(1, 1);
+        dropdown_scrollbarrect.sizeDelta = new Vector2(20, 0);
+        dropdown_scrollbarrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Sliding Area
-        dropdown_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_labelrect.sizeDelta = new Vector2(10, 10);
-        dropdown_labelrect.anchoredPosition = new Vector4(10, 10);
+        dropdown_slidingarearect.anchorMin = new Vector2(0, 0);
+        dropdown_slidingarearect.anchorMax = new Vector2(1, 1);
+        dropdown_slidingarearect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_slidingarearect.sizeDelta = new Vector2(10, 10);
+        dropdown_slidingarearect.anchoredPosition = new Vector4(10, 10);
 
         //Set Rect Handle
-        dropdown_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 0.2f);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_labelrect.sizeDelta = new Vector2(-10, -10);
-        dropdown_labelrect.anchoredPosition = new Vector4(-10, -10);
+        dropdown_handlerect.anchorMin = new Vector2(0, 0);
+        dropdown_handlerect.anchorMax = new Vector2(1, 0.2f);
+        dropdown_handlerect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_handlerect.sizeDelta = new Vector2(-10, -10);
+        dropdown_handlerect.anchoredPosition = new Vector4(-10, -10);
 
 
         dropdownobj.transform.SetParent(parentobj.transform);
