@@ -192,7 +192,7 @@ public class Tool_QuickStart : EditorWindow
     {
         //Dimension
         _DimensionID = GUILayout.Toolbar(_DimensionID, new string[] { "2D", "3D" });
-        _WithUI = GUILayout.Toolbar(_WithUI, new string[] { "With UI", "Without UI" });
+        _WithUI = GUILayout.Toolbar(_WithUI, new string[] { "No UI", "UI All", "UI Menu", "UI HUD" });
 
         //Type 2D/3D
         switch (_DimensionID)
@@ -767,6 +767,10 @@ public class Tool_QuickStart : EditorWindow
         RectTransform hudobjrect = hudobj.AddComponent<RectTransform>();
         SetRect(hudobjrect, "bottomleft");
 
+
+    }
+    void CreateUI_PauzeMenu()
+    {
 
     }
 
