@@ -46,6 +46,7 @@ public class Tool_QuickStart : EditorWindow
 "SaveLoad_JSON",
 "SaveLoad_XML",
 "ScriptebleGameObject",
+"SettingsHandler",
 "Shooting",
 "ShootingRayCast",
 "StringFormats",
@@ -82,6 +83,7 @@ public class Tool_QuickStart : EditorWindow
         "using System.Collections.Generic;\n using System.IO;\n using UnityEngine;\n  public class SaveLoad_JSON : MonoBehaviour {     private Json_SaveData _SaveData = new Json_SaveData();\n      void Start()     {         LoadData();\n     }\n      public void SaveData()     {         string jsonData = JsonUtility.ToJson(_SaveData, true);\n         File.WriteAllText(Application.persistentDataPath + \"/SaveData.json\", jsonData);\n     }\n     public void LoadData()     {         try         {             string dataAsJson = File.ReadAllText(Application.persistentDataPath + \"/SaveData.json\");\n             _SaveData = JsonUtility.FromJson<Json_SaveData>(dataAsJson);\n         }\n         catch         {             SaveData();\n         }\n     }\n     public Json_SaveData GetSaveData()     {         return _SaveData;\n     }\n     public void CreateNewSave()     {         Json_ExampleData newsave = new Json_ExampleData();\n         newsave.exampleValue = 10;\n         _SaveData.saveData.Add(newsave);\n     }\n }\n  [System.Serializable] public class Json_SaveData {     public List <Json_ExampleData> saveData = new List<Json_ExampleData>();\n }\n [System.Serializable] public class Json_ExampleData {     public float exampleValue = 0;\n }",
         "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using System.Xml.Serialization;\n using System.IO;\n  public class SaveLoad_XML : MonoBehaviour {     private XML_SaveData _SaveData = new XML_SaveData();\n      void Start()     {         LoadData();\n     }\n      public void SaveData()     {         XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));\n          using (FileStream stream = new FileStream(Application.persistentDataPath + \"/SaveData.xml\", FileMode.Create))         {             serializer.Serialize(stream, _SaveData);\n         }\n     }\n      public void LoadData()     {         try         {             XmlSerializer serializer = new XmlSerializer(typeof(XML_SaveData));\n              using (FileStream stream = new FileStream(Application.persistentDataPath + \"/SaveData.xml\", FileMode.Open))             {                 _SaveData = serializer.Deserialize(stream) as XML_SaveData;\n             }\n         }\n         catch         {             SaveData();\n         }\n     }\n      public XML_SaveData GetSaveData()     {         return _SaveData;\n     }\n     public void CreateNewSave()     {         XML_ExampleData newsave = new XML_ExampleData();\n         newsave.exampleValue = 10;\n         _SaveData.saveData.Add(newsave);\n     }\n }\n  [System.Serializable] public class XML_SaveData {     public List<XML_ExampleData> saveData = new List<XML_ExampleData>();\n }\n [System.Serializable] public class XML_ExampleData {     public float exampleValue = 0;\n }",
         "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  [CreateAssetMenu(fileName = \"Example\", menuName = \"SO/ExampleSO\", order = 1)] public class ScriptebleGameObject : ScriptableObject {     public string examplestring;\n     public int exampleint;\n }",
+        "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using TMPro;\n using UnityEngine.Audio;\n using UnityEngine.UI;\n using System;\n  public class SettingsHandler : MonoBehaviour {     [SerializeField] private AudioMixer _AudioMixer;\n     [SerializeField] private float _Current_Volume;\n       [SerializeField] private TMP_Dropdown _Dropdown_Resolution;\n     [SerializeField] private TMP_Dropdown _Dropdown_Quality;\n     [SerializeField] private TMP_Dropdown _Dropdown_Texture;\n     [SerializeField] private TMP_Dropdown _Dropdown_AA;\n     [SerializeField] private Slider _Slider_Volume;\n      [SerializeField] private Resolution[] _Resolutions;\n      private void Start()     {         _Resolutions = Screen.resolutions;\n         _Dropdown_Resolution.ClearOptions();\n         List<string> options = new List<string>();\n          int currentresid = 0;\n         for (int i = 0;\n i < _Resolutions.Length;\n i++)         {             string option = _Resolutions[i].width + \" x \" + _Resolutions[i].height;\n             options.Add(option);\n              if (_Resolutions[i].width == Screen.currentResolution.width && _Resolutions[i].height == Screen.currentResolution.height)                 currentresid = i;\n         }\n          _Dropdown_Resolution.AddOptions(options);\n         _Dropdown_Resolution.value = currentresid;\n         _Dropdown_Resolution.RefreshShownValue();\n     }\n      // [Display]     //Resolution     \npublic void Set_Resolution(int resid)     {         Resolution resolution = _Resolutions[resid];\n         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);\n     }\n      //FullScreen     \npublic void Set_FullScreen(bool isFullscreen)     {         Screen.fullScreen = isFullscreen;\n     }\n      //Quiality     \npublic void Set_Quality(int qualityid)     {         if (qualityid != 6) // \nif the user is not using                                 //any of the presets             QualitySettings.SetQualityLevel(qualityid);\n         \nswitch (qualityid)         {             case 0: // quality level - very low                 _Dropdown_Texture.value = 3;\n                 _Dropdown_AA.value = 0;\n                 break;\n             \ncase 1: // quality level - low                 _Dropdown_Texture.value = 2;\n                 _Dropdown_AA.value = 0;\n                 break;\n             \ncase 2: // quality level - medium                 _Dropdown_Texture.value = 1;\n                 _Dropdown_AA.value = 0;\n                 break;\n             \ncase 3: // quality level - high                 _Dropdown_Texture.value = 0;\n                 _Dropdown_AA.value = 0;\n                 break;\n             \ncase 4: // quality level - very high                 _Dropdown_Texture.value = 0;\n                 _Dropdown_AA.value = 1;\n                 break;\n             \ncase 5: // quality level - ultra                 _Dropdown_Texture.value = 0;\n                 _Dropdown_AA.value = 2;\n                 break;\n         }\n          _Dropdown_Quality.value = qualityid;\n     }\n      //Vsync     //MaxFOS     //Gama      // [Grapics]     //Antialiasing     \npublic void SetAntiAliasing(int aaid)     {         QualitySettings.antiAliasing = aaid;\n         _Dropdown_Quality.value = 6;\n     }\n      //Shadows     //ViewDistance     //TextureQuality     \npublic void Set_TextureQuality(int textureid)     {         QualitySettings.masterTextureLimit = textureid;\n         _Dropdown_Quality.value = 6;\n     }\n      //ViolageDistance     //ViolageDensity      // [Gameplay]     //SoundAll     \npublic void Set_Volume(float volume)     {         _AudioMixer.SetFloat(\"Volume\", volume);\n         _Current_Volume = volume;\n     }\n      //SoundEffects     //Music        // Quit / Save / Load     \npublic void ExitGame()     {         Application.Quit();\n     }\n     public void SaveSettings()     {         PlayerPrefs.SetInt(\"QualitySettingPreference\",                    _Dropdown_Quality.value);\n         PlayerPrefs.SetInt(\"ResolutionPreference\",                    _Dropdown_Resolution.value);\n         PlayerPrefs.SetInt(\"TextureQualityPreference\",                    _Dropdown_Texture.value);\n         PlayerPrefs.SetInt(\"AntiAliasingPreference\",                    _Dropdown_AA.value);\n         PlayerPrefs.SetInt(\"FullscreenPreference\",                    Convert.ToInt32(Screen.fullScreen));\n         PlayerPrefs.SetFloat(\"VolumePreference\",                    _Current_Volume);\n     }\n     public void LoadSettings(int currentResolutionIndex)     {         if (PlayerPrefs.HasKey(\"QualitySettingPreference\"))             _Dropdown_Quality.value =                          PlayerPrefs.GetInt(\"QualitySettingPreference\");\n         else             _Dropdown_Quality.value = 3;\n         if (PlayerPrefs.HasKey(\"ResolutionPreference\"))             _Dropdown_Resolution.value =                          PlayerPrefs.GetInt(\"ResolutionPreference\");\n         else             _Dropdown_Resolution.value = currentResolutionIndex;\n         if (PlayerPrefs.HasKey(\"TextureQualityPreference\"))             _Dropdown_Texture.value =                          PlayerPrefs.GetInt(\"TextureQualityPreference\");\n         else             _Dropdown_Texture.value = 0;\n         if (PlayerPrefs.HasKey(\"AntiAliasingPreference\"))             _Dropdown_AA.value =                          PlayerPrefs.GetInt(\"AntiAliasingPreference\");\n         else             _Dropdown_AA.value = 1;\n         if (PlayerPrefs.HasKey(\"FullscreenPreference\"))             Screen.fullScreen =             Convert.ToBoolean(PlayerPrefs.GetInt(\"FullscreenPreference\"));\n         else             Screen.fullScreen = true;\n         if (PlayerPrefs.HasKey(\"VolumePreference\"))             _Slider_Volume.value =                         PlayerPrefs.GetFloat(\"VolumePreference\");\n         else             _Slider_Volume.value =                         PlayerPrefs.GetFloat(\"VolumePreference\");\n     }\n       //Set     \npublic void SetDropDown_Resolution(TMP_Dropdown resolutions)     {         _Dropdown_Resolution = resolutions;\n     }\n     public void SetDropDown_Quality(TMP_Dropdown quality)     {         _Dropdown_Quality = quality;\n     }\n     public void SetDropDown_TextureQuality(TMP_Dropdown texturequality)     {         _Dropdown_Texture = texturequality;\n     }\n     public void SetDropDown_AA(TMP_Dropdown aa)     {         _Dropdown_AA = aa;\n     }\n     public void SetSlider_VolumeSlider(Slider volumeslider)     {         _Slider_Volume = volumeslider;\n     }\n }\n ",
         "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class Shooting : MonoBehaviour {     [Header(\"Settings\")]\n     [SerializeField] ObjectPool _ObjectPool = null;\n     [SerializeField] private GameObject _BulletPrefab = null;\n     [SerializeField] private GameObject _ShootPoint = null;\n      [Header(\"Semi\")]\n     [SerializeField] private int _SemiAutomaticBulletAmount = 3;\n     [SerializeField] private float _SemiShootSpeed = 0.2f;\n     [Header(\"Automatic\")]\n     [SerializeField] private float _SecondsBetweenShots = 0.5f;\n      private enum ShootModes { SingleShot, SemiAutomatic, Automatic }\n     [SerializeField] private ShootModes _ShootMode = ShootModes.SingleShot;\n      private bool _CheckSingleShot;\n     private float _Timer;\n     private bool _LockShooting;\n      void Update()     {         if (Input.GetMouseButton(0))         {             switch (_ShootMode)             {                 case ShootModes.SingleShot:                     if (!_CheckSingleShot)                         Shoot();\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.SemiAutomatic:                     if (!_CheckSingleShot && !_LockShooting)                         StartCoroutine(SemiShot());\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.Automatic:                     _Timer += 1 * Time.deltaTime;\n                     if (_Timer >= _SecondsBetweenShots)                     {                         Shoot();\n                         _Timer = 0;\n                     }\n                     break;\n             }\n         }\n         if (Input.GetMouseButtonUp(0))         {             _CheckSingleShot = false;\n         }\n     }\n      IEnumerator SemiShot()     {         _LockShooting = true;\n         for (int i = 0;\n i < _SemiAutomaticBulletAmount;\n i++)         {             Shoot();\n             yield return new WaitForSeconds(_SemiShootSpeed);\n         }\n         _LockShooting = false;\n     }\n      void Shoot()     {        GameObject bullet = _ObjectPool.GetObject(_BulletPrefab, true);\n         bullet.SetActive(true);\n         bullet.transform.position = _ShootPoint.transform.position;\n         bullet.transform.rotation = _ShootPoint.transform.rotation;\n     }\n }\n ",
         "using System.Collections;\n using System.Collections.Generic;\n using System.Threading;\n using UnityEngine;\n  public class ShootingRayCast : MonoBehaviour {     [Header(\"Settings\")]\n     [SerializeField] private float _Damage = 20;\n     [SerializeField] private float _ShootDistance = 50;\n     [SerializeField] private string _EnemyTag = \"Enemy\";\n      [Header(\"Semi\")]\n     [SerializeField] private int _SemiAutomaticBulletAmount = 3;\n     [SerializeField] private float _SemiShootSpeed = 0.2f;\n     [Header(\"Automatic\")]\n     [SerializeField] private float _SecondsBetweenShots = 0.5f;\n      private enum ShootModes {SingleShot, SemiAutomatic, Automatic }\n     [SerializeField] private ShootModes _ShootMode = ShootModes.SingleShot;\n      private bool _CheckSingleShot;\n     private float _Timer;\n     private bool _LockShooting;\n      void Update()     {         if (Input.GetMouseButton(0))         {             switch (_ShootMode)             {                 case ShootModes.SingleShot:                     if (!_CheckSingleShot)                         Shoot();\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.SemiAutomatic:                     if (!_CheckSingleShot && !_LockShooting)                         StartCoroutine(SemiShot());\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.Automatic:                     _Timer += 1 * Time.deltaTime;\n                     if(_Timer >= _SecondsBetweenShots)                     {                         Shoot();\n                         _Timer = 0;\n                     }\n                     break;\n             }\n         }\n         if(Input.GetMouseButtonUp(0))         {             _CheckSingleShot = false;\n         }\n     }\n      IEnumerator SemiShot()     {         _LockShooting = true;\n         for (int i = 0;\n i < _SemiAutomaticBulletAmount;\n i++)         {             Shoot();\n             yield return new WaitForSeconds(_SemiShootSpeed);\n         }\n         _LockShooting = false;\n     }\n      void Shoot()     {         RaycastHit hit;\n         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, _ShootDistance))             if (hit.transform.tag == _EnemyTag)             {                 hit.transform.GetComponent<Health>().DoDamage(_Damage);\n             }\n     }\n }",
         "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using TMPro;\n  public class StringFormats : MonoBehaviour {     private enum FormatOptions {DigitalTime }\n;\n     [SerializeField] private FormatOptions _FormatOption = FormatOptions.DigitalTime;\n     [SerializeField] private TextMeshProUGUI _ExampleText = null;\n      private float _Timer;\n      void Update()     {         _Timer += 1 * Time.deltaTime;\n          switch (_FormatOption)         {             case FormatOptions.DigitalTime:                 _ExampleText.text = string.Format(\"{0:00}:{1:00}:{2:00}\", Mathf.Floor(_Timer / 3600), Mathf.Floor((_Timer / 60) % 60), _Timer % 60);\n                 break;\n}\n     }\n }\n",
@@ -117,6 +119,7 @@ public class Tool_QuickStart : EditorWindow
         "save_load_json",
         "save_load_xml",
         "scripteble_gameobject",
+        "",
         "shooting",
         "shooting_raycast",
         "string_format",
@@ -716,9 +719,11 @@ public class Tool_QuickStart : EditorWindow
         {
             case 0:
                 CreateUI_Default();
-                CreateUI_HUD();
+                //CreateUI_HUD();
                 break;
         }
+
+        Set_SettingsHandler();
     }
 
     void CreateUIOptions()
@@ -766,6 +771,7 @@ public class Tool_QuickStart : EditorWindow
         GameObject hudobj = new GameObject();
         RectTransform hudobjrect = hudobj.AddComponent<RectTransform>();
         SetRect(hudobjrect, "bottomleft");
+        hudobj.name = "HUD";
 
 
     }
@@ -1217,7 +1223,7 @@ public class Tool_QuickStart : EditorWindow
             case "Display":
                 GameObject button_Resolution = Create_Dropdown(tab_new, "Dropdown_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Fullscreen = Create_Button(tab_new, "Button_Fullscreen", "Fullscreen", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Quality = Create_Button(tab_new, "Button_Quality", "Quality", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_Quality = Create_Dropdown(tab_new, "Dropdown_Quality", "Quality", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_VSync = Create_Button(tab_new, "Button_VSync", "VSync", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_MaxFPS = Create_Button(tab_new, "Button_MaxFPS", "MaxFPS", new Vector2(800, 420), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Gamma = Create_Button(tab_new, "Button_Gamma", "Gamma", new Vector2(800, 350), new Vector2(500, 60), 10, 40, "bottomleft");
@@ -1229,10 +1235,10 @@ public class Tool_QuickStart : EditorWindow
                 // Gamma
                 break;
             case "Graphics":
-                GameObject button_Antialiasing = Create_Button(tab_new, "Button_Antialiasing", "Antialiasing", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject button_Antialiasing = Create_Dropdown(tab_new, "Dropdown_Antialiasing", "Antialiasing", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_Shadows = Create_Button(tab_new, "Button_Shadows", "Shadows", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_ViewDistance = Create_Button(tab_new, "Button_ViewDistance", "ViewDistance", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_TextureQuality = Create_Button(tab_new, "Button_TextureQuality", "TextureQuality", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
+                GameObject Button_TextureQuality = Create_Button(tab_new, "Dropdown_TextureQuality", "TextureQuality", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_ViolageDistance = Create_Button(tab_new, "Button_ViolageDistance", "ViolageDistance", new Vector2(800, 420), new Vector2(500, 60), 10, 40, "bottomleft");
                 GameObject Button_ViolageDensity = Create_Button(tab_new, "Button_ViolageDensity", "ViolageDensity", new Vector2(800, 350), new Vector2(500, 60), 10, 40, "bottomleft");
                 // Antialiasing
@@ -1311,6 +1317,57 @@ public class Tool_QuickStart : EditorWindow
                 rect.anchorMax = new Vector2(0.5f, 0.5f);
                 rect.pivot = new Vector2(0.5f, 0.5f);
                 break;
+        }
+    }
+
+
+    void Set_SettingsHandler()
+    {
+        if (ScriptExist("SettingsHandler"))
+        {
+            string UniType = "SettingsHandler";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            GameObject settingshandlerobj = new GameObject();
+            settingshandlerobj.AddComponent(UnityType);
+
+            TMP_Dropdown[] dropdowns = Resources.FindObjectsOfTypeAll<TMP_Dropdown>();
+
+            for (int i = 0; i < dropdowns.Length; i++)
+            {
+                if(dropdowns[i].name == "Dropdown_Resolution")
+                {
+                    settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_Resolution", dropdowns[i]);
+                }
+                if (dropdowns[i].name == "Dropdown_Quality")
+                {
+                    settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_Quality", dropdowns[i]);
+                }
+                if (dropdowns[i].name == "Dropdown_Antialiasing")
+                {
+                    settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_AA", dropdowns[i]);
+                }
+                if (dropdowns[i].name == "Dropdown_TextureQuality")
+                {
+                    settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_TextureQuality", dropdowns[i]);
+                }
+            }
+
+            /*
+            TMP_Dropdown resolution = Resources.FindObjectsOfTypeAll<TMP_Dropdown>(); //GameObject.Find("Dropdown_Resolution").GetComponent<TMP_Dropdown>();
+            TMP_Dropdown quality = GameObject.Find("").GetComponent<TMP_Dropdown>();
+            TMP_Dropdown texturequality = GameObject.Find("").GetComponent<TMP_Dropdown>();
+            TMP_Dropdown aa = GameObject.Find("").GetComponent<TMP_Dropdown>();
+            Slider volumeslider = GameObject.Find("").GetComponent<Slider>();
+
+            
+            settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_Quality", quality);
+            settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_TextureQuality", texturequality);
+            settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_AA", aa);
+
+            settingshandlerobj.GetComponent(UnityType).SendMessage("SetSlider_VolumeSlider", volumeslider);
+            */
+
+            settingshandlerobj.name = "SettingsHandler";
         }
     }
 }
