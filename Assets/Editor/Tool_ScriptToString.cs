@@ -46,6 +46,7 @@ public class Tool_ScriptToString : EditorWindow
         }
 
         bool headercheck = false;
+        bool forcheck = false;
         bool commentcheck = false;
 
         for (int i = 0; i < textedit.Count; i++)
@@ -57,7 +58,16 @@ public class Tool_ScriptToString : EditorWindow
                     headercheck = true;
             }
 
-            // Comment check
+            //For check
+            if(i + 2 < textedit.Count)
+            {
+                if(textedit[i] + textedit[i+1] + textedit[i + 2] == "for")
+                {
+                    forcheck = true;
+                }
+            }
+
+            //Comment check
             if (i + 1 < textedit.Count)
             {
                 if (textedit[i] + textedit[i + 1] == "//" || textedit[i] + textedit[i + 1] == "/*")
@@ -77,6 +87,12 @@ public class Tool_ScriptToString : EditorWindow
                 {
                     //if
                     if (textedit[i] + textedit[i + 1] == "if")
+                    {
+                        scriptasstring += "\\n";
+                        commentcheck = false;
+                    }
+                    //for
+                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] == "for")
                     {
                         scriptasstring += "\\n";
                         commentcheck = false;
@@ -111,6 +127,12 @@ public class Tool_ScriptToString : EditorWindow
                         scriptasstring += "\\n";
                         commentcheck = false;
                     }
+                    //custom variable
+                    if (textedit[i] == "_")
+                    {
+                        scriptasstring += "\\n";
+                        commentcheck = false;
+                    }
                 }
             }
 
@@ -128,7 +150,7 @@ public class Tool_ScriptToString : EditorWindow
                 {
                     scriptasstring += "\\n";
                 }
-                if (textedit[i] == ";")
+                if (textedit[i] == ";" && !forcheck)
                 {
                     scriptasstring += "\\n";
                 }
@@ -137,11 +159,12 @@ public class Tool_ScriptToString : EditorWindow
                     scriptasstring += "\\n";
                     headercheck = false;
                 }
+                if (textedit[i] == ")" && forcheck)
+                {
+                    scriptasstring += "\\n";
+                    forcheck = false;
+                }
             }
-
-
-
-
         }
 
         scriptasstring += "\"";
