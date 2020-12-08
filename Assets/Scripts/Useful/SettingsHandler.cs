@@ -8,17 +8,17 @@ using System;
 
 public class SettingsHandler : MonoBehaviour
 {
-    [SerializeField] private AudioMixer _AudioMixer;
-    [SerializeField] private float _Current_Volume;
+    [SerializeField] private AudioMixer _AudioMixer = null;
+    [SerializeField] private float _Current_Volume = 1;
 
 
-    [SerializeField] private TMP_Dropdown _Dropdown_Resolution;
-    [SerializeField] private TMP_Dropdown _Dropdown_Quality;
-    [SerializeField] private TMP_Dropdown _Dropdown_Texture;
-    [SerializeField] private TMP_Dropdown _Dropdown_AA;
-    [SerializeField] private Slider _Slider_Volume;
+    [SerializeField] private TMP_Dropdown _Dropdown_Resolution = null;
+    [SerializeField] private TMP_Dropdown _Dropdown_Quality = null;
+    [SerializeField] private TMP_Dropdown _Dropdown_Texture = null;
+    [SerializeField] private TMP_Dropdown _Dropdown_AA = null;
+    [SerializeField] private Slider _Slider_Volume = null;
 
-    [SerializeField] private Resolution[] _Resolutions;
+    [SerializeField] private Resolution[] _Resolutions = null;
 
     private void Start()
     {
@@ -126,8 +126,6 @@ public class SettingsHandler : MonoBehaviour
 
     //SoundEffects
     //Music
-
-
 
     // Quit / Save / Load
     public void ExitGame()
