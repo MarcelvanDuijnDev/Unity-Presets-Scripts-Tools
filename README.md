@@ -20,6 +20,7 @@ Feel free to use/copy files from this project._
 * [Networking](#networking)
 * [Useful](#useful)
 * [Examples](#examples)
+* [Practical](#practical)
 * [Other](#other)
 * [License & Copyright](#license--copyright)
   
@@ -71,6 +72,9 @@ Feel free to use/copy files from this project._
 # Examples
 - [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/ScriptebleGameObject.cs)
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
+
+# Practical
+- [DontDestory.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/DontDestroy.cs)
 
 # Other
 - [MVD_Namespace.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
