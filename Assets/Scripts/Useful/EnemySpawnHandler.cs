@@ -28,6 +28,7 @@ public class EnemySpawnHandler : MonoBehaviour
 
     [Header("Settings - Waves")]
     [SerializeField] private EnemySpawnHandler_WaveSettings _Waves = null;
+    [SerializeField] private bool _WaitForAllEnemiesKilled;
 
     private float _Timer = 0;
     private int _CurrentWave = 0;
@@ -90,7 +91,14 @@ public class EnemySpawnHandler : MonoBehaviour
             if (_CheckWave != _CurrentWave)
             {
                 //Get info / time between
-                _TimerBetweenWaves += 1 * Time.deltaTime;
+                if (_WaitForAllEnemiesKilled)
+                {
+
+                }
+                else
+                {
+                    _TimerBetweenWaves += 1 * Time.deltaTime;
+                }
                 if (_TimerBetweenWaves >= _Waves.TimeBetweenWaves)
                 {
                     _TimerBetweenWaves = 0;
