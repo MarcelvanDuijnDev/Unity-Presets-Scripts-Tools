@@ -28,13 +28,15 @@ public class EnemySpawnHandler : MonoBehaviour
 
     [Header("Settings - Waves")]
     [SerializeField] private EnemySpawnHandler_WaveSettings _Waves = null;
-    [SerializeField] private bool _WaitForAllEnemiesKilled;
+    [SerializeField] private bool _WaitForAllEnemiesKilled = true;
 
     private float _Timer = 0;
     private int _CurrentWave = 0;
     private int _CheckWave = 999;
     private float _TimerBetweenWaves = 0;
     private float _SpawnSpeed = 0;
+
+    private int _EnemiesAlive = 0;
 
     private void Start()
     {
@@ -49,7 +51,7 @@ public class EnemySpawnHandler : MonoBehaviour
         {
             _Waves.WaveAmount = 1;
             GenerateWaves();
-            GenerateWaves();
+            GenerateWaves(1);
         }
     }
 
@@ -86,26 +88,27 @@ public class EnemySpawnHandler : MonoBehaviour
     }
     private void Update_Waves()
     {
-        if (_CurrentWave < _Waves.WaveAmount)
+        if (_CurrentWave < _Waves.Waves.Count)
         {
             if (_CheckWave != _CurrentWave)
             {
-                //Get info / time between
                 if (_WaitForAllEnemiesKilled)
                 {
+                    EnemiesAlive();
 
+                    if (_EnemiesAlive == 0)
+                        _TimerBetweenWaves += 1 * Time.deltaTime;
                 }
                 else
-                {
                     _TimerBetweenWaves += 1 * Time.deltaTime;
-                }
+
                 if (_TimerBetweenWaves >= _Waves.TimeBetweenWaves)
                 {
                     _TimerBetweenWaves = 0;
                     _CheckWave = _CurrentWave;
                     _SpawnSpeed = _Waves.Waves[_CurrentWave].SpawnDuration / _Waves.Waves[_CurrentWave].TotalEnemies;
                     if (_Waves.WaveOption == EnemySpawnHandler_WaveSettings.WaveOptions.Endless)
-                        GenerateWaves();
+                        GenerateWaves(_CurrentWave+2);
                 }
             }
             else
@@ -139,13 +142,18 @@ public class EnemySpawnHandler : MonoBehaviour
     }
 
     //Generate Waves
-    private void GenerateWaves()
+    private void GenerateWaves(int waveid = 0)
     {
         int enemytypes = _Enemies.Length;
         for (int i = 0; i < _Waves.WaveAmount; i++)
         {
             EnemySpawnHandler_Wave newwave = new EnemySpawnHandler_Wave();
-            int enemyamount = Mathf.RoundToInt(_Waves.EnemyAmount * ((_Waves.EnemyIncreaseAmount * i) + 1));
+            int enemyamount = 0;
+
+            if (waveid == 0)
+                enemyamount = Mathf.RoundToInt(_Waves.EnemyAmount * ((_Waves.EnemyIncreaseAmount * i) + 1));
+            else
+                enemyamount = Mathf.RoundToInt(_Waves.EnemyAmount * ((_Waves.EnemyIncreaseAmount * waveid) + 1));
 
             //Set enemy amount
             newwave.EnemyID = new int[enemytypes];
@@ -187,6 +195,10 @@ public class EnemySpawnHandler : MonoBehaviour
         GameObject obj = _ObjectPool.GetObjectPrefabName(_Enemies[enemyid].EnemyPrefab.name, false);
         obj.transform.position = _SpawnLocations[spawnid].position;
         obj.SetActive(true);
+    }
+    private void EnemiesAlive()
+    {
+        _EnemiesAlive = GameObject.FindGameObjectsWithTag("Enemy").Length;
     }
 }
 
