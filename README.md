@@ -79,7 +79,7 @@ Feel free to use/copy files from this project._
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/DoEvent.cs)
 - [OnCollision.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/OnCollision.cs)
 - [PosToPos.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/PosToPos.cs)
-- [Rotation.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/PosToPos.cs)
+- [Rotation.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/Rotation.cs)
 
 # Other
 - [MVD_Namespace.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
