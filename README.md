@@ -13,7 +13,7 @@ Feel free to use/copy files from this project._
 
 ### Content:
 * [Movement](#movement)
-* [Vechicles](#vechicles)
+* [Vehicles](#vehicles)
 * [AI](#ai)
 * [Weapons / Shooting](#weapons--shooting)
 * [Editor](#editor)
@@ -34,7 +34,7 @@ Feel free to use/copy files from this project._
 - [Movement_CC_TopDown.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_TopDown.cs)
 - [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
 
-# Vechicles
+# Vehicles
 - [CarRealistic.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Vehicle/CarRealistic.cs)
 - [CarArcade.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Vehicle/CarArcade.cs)
 
