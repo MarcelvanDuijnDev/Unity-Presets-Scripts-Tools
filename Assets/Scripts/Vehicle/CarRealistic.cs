@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class CarRealistic : MonoBehaviour
 {
+    [Header("Motor")]
     [SerializeField] private List<AxleInfo> axleInfos = null;
     [SerializeField] private float maxMotorTorque = 1000;
+
+    [Header("Steering")]
     [SerializeField] private float maxSteeringAngle = 50;
 
     public void FixedUpdate()
