@@ -22,14 +22,16 @@ public class Tool_ScriptToString : EditorWindow
 
     void OnGUI()
     {
-        //Convert
         if (GUILayout.Button("Convert", GUILayout.Height(30)))
-        {
             _ScriptOutput = ConvertScriptToString();
-        }
 
+        Display_InputOutput();
+        Display_TextEditor();
+    }
+
+    private void Display_InputOutput()
+    {
         GUILayout.Space(20);
-
         //Input
         GUILayout.Label("Input: ", EditorStyles.boldLabel);
         _ScriptInput = EditorGUILayout.TextField("", _ScriptInput);
@@ -37,22 +39,30 @@ public class Tool_ScriptToString : EditorWindow
         //Output
         GUILayout.Label("Output: ", EditorStyles.boldLabel);
         EditorGUILayout.TextField("", _ScriptOutput);
-
         GUILayout.Space(20);
+    }
 
+    private void Display_TextEditor()
+    {
+        //TextEditor Info
         GUILayout.Label("Use Custom Keywords to fix lines that should not be included into the commend. \n" +
+            "Sometimes it leaves code after the command, you can addit it by adding a keyword below." +
             "The x on the left shows the lines that contain a comment.");
-
         GUILayout.Space(20);
 
-        //Other Settings
+        //TextEditor
         GUILayout.Label("Custom Keywords: ", EditorStyles.boldLabel);
         _CustomCommandCheck = EditorGUILayout.TextField("", _CustomCommandCheck);
         if (GUILayout.Button("AddKeyword"))
         {
-            _CustomCommandCheckKeywords.Add(_CustomCommandCheck);
-            _CustomCommandCheck = "";
-            _ScriptOutput = ConvertScriptToString();
+            if (_CustomCommandCheck == "")
+                Debug.Log("Enter a keyword");
+            else
+            {
+                _CustomCommandCheckKeywords.Add(_CustomCommandCheck);
+                _CustomCommandCheck = "";
+                _ScriptOutput = ConvertScriptToString();
+            }
         }
         for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)
         {
@@ -61,6 +71,8 @@ public class Tool_ScriptToString : EditorWindow
             if (GUILayout.Button("Remove", GUILayout.Width(100)))
             {
                 _CustomCommandCheckKeywords.RemoveAt(i);
+                _CustomCommandCheck = "";
+                _ScriptOutput = ConvertScriptToString();
             }
             GUILayout.EndHorizontal();
         }
@@ -79,9 +91,9 @@ public class Tool_ScriptToString : EditorWindow
 
         for (int i = 0; i < output.Count; i++)
         {
-            if(i + 1 < output.Count)
+            if (i + 1 < output.Count)
             {
-                if(output[i] + output[i + 1] == "\\n")
+                if (output[i] + output[i + 1] == "\\n")
                 {
                     endcalc = i;
                     string addstring = "";
@@ -103,7 +115,7 @@ public class Tool_ScriptToString : EditorWindow
         for (int i = 0; i < output2.Count; i++)
         {
             GUILayout.BeginHorizontal();
-            if(output2[i].Contains("//"))
+            if (output2[i].Contains("//"))
             {
                 EditorGUILayout.TextField("", "x", GUILayout.MaxWidth(15));
             }
@@ -115,7 +127,7 @@ public class Tool_ScriptToString : EditorWindow
             EditorGUILayout.TextField("", output2[i]);
             GUILayout.EndHorizontal();
         }
-        
+
         EditorGUILayout.EndScrollView();
     }
 
