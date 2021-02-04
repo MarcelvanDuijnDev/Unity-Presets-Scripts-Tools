@@ -194,6 +194,8 @@ public class Tool_QuickStart : EditorWindow
     {
         _Options_Type = GUILayout.Toolbar(_Options_Type, new string[] { "All", "Menu", "HUD" });
 
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Profile: ");
         if (_Options_Type == 0)
         {
             _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default" });//, "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
@@ -202,6 +204,7 @@ public class Tool_QuickStart : EditorWindow
         {
             _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default" });//, "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
         }
+        GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Create"))
@@ -224,7 +227,6 @@ public class Tool_QuickStart : EditorWindow
     {
         //Dimension
         _DimensionID = GUILayout.Toolbar(_DimensionID, new string[] { "2D", "3D" });
-        _WithUI = GUILayout.Toolbar(_WithUI, new string[] { "No UI", "UI All", "UI Menu", "UI HUD" });
 
         //Type 2D/3D
         switch (_DimensionID)
@@ -748,11 +750,11 @@ public class Tool_QuickStart : EditorWindow
         {
             case 0:
                 CreateUI_Default();
-                //CreateUI_HUD();
                 break;
         }
 
-        Set_SettingsHandler();
+        if (_Options_Type == 0 || _Options_Type == 1)
+            Set_SettingsHandler();
     }
 
     void CreateUIOptions()
@@ -776,34 +778,39 @@ public class Tool_QuickStart : EditorWindow
         //Add canvas
         GameObject canvasobj = CreateCanvas();
 
-        //Add setting tabs
-        GameObject tab_display = Create_Tab(canvasobj, "Display");
-        GameObject tab_graphics = Create_Tab(canvasobj, "Graphics");
-        GameObject tab_gameplay = Create_Tab(canvasobj, "Gameplay");
-        GameObject tab_controls = Create_Tab(canvasobj, "Controls");
-        GameObject tab_keybinding = Create_Tab(canvasobj, "Keybinding");
+        if (_Options_Type == 0 || _Options_Type == 1) //Menu
+        {
+            //Add setting tabs
+            GameObject tab_display = Create_Tab(canvasobj, "Display");
+            GameObject tab_graphics = Create_Tab(canvasobj, "Graphics");
+            GameObject tab_gameplay = Create_Tab(canvasobj, "Gameplay");
+            GameObject tab_controls = Create_Tab(canvasobj, "Controls");
+            GameObject tab_keybinding = Create_Tab(canvasobj, "Keybinding");
 
-        //Add Buttons
-        GameObject main = new GameObject();
-        RectTransform mainrect = main.AddComponent<RectTransform>();
-        SetRect(mainrect, "bottomleft");
-        GameObject button_start = Create_Button(main, "Button_Start", "Start", new Vector2(40, 450), new Vector2(700, 100), 30, 60, "bottomleft");
-        GameObject button_options = Create_Button(main, "Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, 60, "bottomleft");
-        GameObject button_quit = Create_Button(main, "Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, 60, "bottomleft");
-        main.name = "Main";
-        main.transform.SetParent(canvasobj.transform);
+            //Add Buttons
+            GameObject main = new GameObject();
+            RectTransform mainrect = main.AddComponent<RectTransform>();
+            SetRect(mainrect, "bottomleft");
+            GameObject button_start = Create_Button(main, "Button_Start", "Start", new Vector2(40, 450), new Vector2(700, 100), 30, 60, "bottomleft");
+            GameObject button_options = Create_Button(main, "Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, 60, "bottomleft");
+            GameObject button_quit = Create_Button(main, "Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, 60, "bottomleft");
+            main.name = "Main";
+            main.transform.SetParent(canvasobj.transform);
+        }
+
+        if(_Options_Type == 0 || _Options_Type == 2) //HUD
+        {
+            GameObject hudobj = new GameObject();
+            RectTransform hudobjrect = hudobj.AddComponent<RectTransform>();
+            SetRect(hudobjrect, "bottomleft");
+            hudobj.name = "HUD";
+
+            hudobj.transform.SetParent(canvasobj.transform);
+        }
 
         _CreatedCanvas = canvasobj;
     }
-    void CreateUI_HUD()
-    {
-        GameObject hudobj = new GameObject();
-        RectTransform hudobjrect = hudobj.AddComponent<RectTransform>();
-        SetRect(hudobjrect, "bottomleft");
-        hudobj.name = "HUD";
 
-
-    }
     void CreateUI_PauzeMenu()
     {
 
