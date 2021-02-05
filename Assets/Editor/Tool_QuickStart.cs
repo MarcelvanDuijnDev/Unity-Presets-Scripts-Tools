@@ -15,7 +15,6 @@ public class Tool_QuickStart : EditorWindow
 {
     private int _MenuID = 0;        // QuickStart/Scripts
     private int _DimensionID = 0;   // 2D/3D
-    private int _WithUI = 0;
     private int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     private int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
 
@@ -169,6 +168,10 @@ public class Tool_QuickStart : EditorWindow
     int _Options_Type;
     int _Options_Style;
     GameObject _CreatedCanvas;
+    bool _EnableHUDLiveEdit;
+    List<Tool_QuickStartUIObject.HUD_Types> _CheckTypes = new List<Tool_QuickStartUIObject.HUD_Types>();
+
+    List<Tool_QuickStartUIObject> _UIObjects = new List<Tool_QuickStartUIObject>();
 
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
@@ -218,8 +221,17 @@ public class Tool_QuickStart : EditorWindow
             }
         GUILayout.EndHorizontal();
 
-        GUILayout.Label("Info:");
-        _CreatedCanvas = (GameObject)EditorGUILayout.ObjectField("Created object", _CreatedCanvas, typeof(GameObject), true);
+        GUILayout.BeginHorizontal();
+        _CreatedCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _CreatedCanvas, typeof(GameObject), true);
+        if(_CreatedCanvas == null)
+        {
+            if (GUILayout.Button("Create Canvas"))
+                _CreatedCanvas = CreateCanvas();
+        }
+        GUILayout.EndHorizontal();
+
+        //LiveEditor
+        LiveHUDEditor();
     }
 
     //Menu QuickStart
@@ -756,23 +768,6 @@ public class Tool_QuickStart : EditorWindow
         if (_Options_Type == 0 || _Options_Type == 1)
             Set_SettingsHandler();
     }
-
-    void CreateUIOptions()
-    {
-        switch(_Options_Style)
-        {
-            case 0: //All
-
-                break;
-            case 1: //Menu
-
-                break;
-            case 2: //HUD
-
-                break;
-        }
-    }
-
     void CreateUI_Default()
     {
         //Add canvas
@@ -810,11 +805,123 @@ public class Tool_QuickStart : EditorWindow
 
         _CreatedCanvas = canvasobj;
     }
-
-    void CreateUI_PauzeMenu()
+    void LiveHUDEditor()
     {
+        _EnableHUDLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate",_EnableHUDLiveEdit);
 
+        for (int i = 0; i < _UIObjects.Count; i++)
+        {
+
+            GUILayout.BeginHorizontal();
+            _UIObjects[i].HUD_Name = EditorGUILayout.TextField(_UIObjects[i].HUD_Name,"");
+            _UIObjects[i].HUD_Type = (Tool_QuickStartUIObject.HUD_Types)EditorGUILayout.EnumPopup("", _UIObjects[i].HUD_Type);
+            if (_UIObjects[i].HUD_Type != _CheckTypes[i])
+            {
+                if (GUILayout.Button("Update"))
+                {
+                    _UIObjects[i].HUD_RectTransform = null;
+                    DestroyImmediate(_UIObjects[i].HUD_Object);
+                    HUD_ChangeType(_UIObjects[i]);
+                }
+            }
+            GUILayout.EndHorizontal();
+
+            _UIObjects[i].HUD_FoldOut = EditorGUILayout.Foldout(_UIObjects[i].HUD_FoldOut, "More: ");
+
+            if (_UIObjects[i].HUD_FoldOut)
+            {
+                _UIObjects[i].HUD_Location = (Tool_QuickStartUIObject.HUD_Locations)EditorGUILayout.EnumPopup("Location:", _UIObjects[i].HUD_Location);
+            }
+        }
+
+        if (_CreatedCanvas != null)
+        {
+            if (_EnableHUDLiveEdit)
+            {
+                if (GUILayout.Button("Create"))
+                {
+                    Tool_QuickStartUIObject newuiobj = new Tool_QuickStartUIObject();
+                    newuiobj.HUD_Object = Create_Text(_CreatedCanvas,"new",Vector2.zero,new Vector2(100,100),"New String", 16, Color.white);
+                    newuiobj.HUD_RectTransform = newuiobj.HUD_Object.GetComponent<RectTransform>();
+
+                    //newuiobj.HUD_Object = Create_Text();
+                    _UIObjects.Add(newuiobj);
+                    _CheckTypes.Add(Tool_QuickStartUIObject.HUD_Types.String);
+                }
+
+                LiveHUDEditorUpdate();
+            }
+            else
+            {
+                if (GUILayout.Button("Add"))
+                {
+                    Tool_QuickStartUIObject newuiobj = new Tool_QuickStartUIObject();
+                    _UIObjects.Add(newuiobj);
+                }
+                if (GUILayout.Button("Update"))
+                {
+                    LiveHUDEditorUpdate();
+                }
+            }
+        }
+        else
+        {
+            GUILayout.Label("Add or assign canvas to create/add");
+        }
     }
+
+
+    void LiveHUDEditorUpdate()
+    {
+        for (int i = 0; i < _UIObjects.Count; i++)
+        {
+            if(_UIObjects[i].HUD_Object != null)
+            {
+                //Update HUD
+                HUD_UpdatePosition(_UIObjects[i]);
+                SetSize(_UIObjects[i].HUD_RectTransform, _UIObjects[i].HUD_Size);
+            }
+        }
+    }
+
+    void HUD_UpdatePosition(Tool_QuickStartUIObject obj)
+    {
+        switch(obj.HUD_Location)
+        {
+            case Tool_QuickStartUIObject.HUD_Locations.TopLeft: SetRect(obj.HUD_RectTransform, "topleft"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.TopMiddle: SetRect(obj.HUD_RectTransform, "topmiddle"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.TopRight: SetRect(obj.HUD_RectTransform, "topright"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.RightMiddle: SetRect(obj.HUD_RectTransform, "rightmiddle"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.LeftMiddle: SetRect(obj.HUD_RectTransform, "leftmiddle"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.BottomLeft: SetRect(obj.HUD_RectTransform, "bottomleft"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.BottomMiddle: SetRect(obj.HUD_RectTransform, "bottommiddle"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.BottomRight: SetRect(obj.HUD_RectTransform, "bottomright"); break;
+            case Tool_QuickStartUIObject.HUD_Locations.Middle: SetRect(obj.HUD_RectTransform, "middle"); break;
+        }
+    }
+    void HUD_ChangeType(Tool_QuickStartUIObject obj)
+    {
+        //Change Type
+        switch(obj.HUD_Type)
+        {
+            case Tool_QuickStartUIObject.HUD_Types.String:
+                obj.HUD_Object = Create_Text(_CreatedCanvas, "NewString", Vector2.zero, obj.HUD_Size, "New Text", 16, Color.white);
+                break;
+            case Tool_QuickStartUIObject.HUD_Types.Bar:
+                //obj.HUD_Object = 
+                break;
+            case Tool_QuickStartUIObject.HUD_Types.Dropdown:
+                obj.HUD_Object = Create_Dropdown(_CreatedCanvas, "NewDropdown", "New Button", Vector2.zero, obj.HUD_Size, 1, 16, "topright");
+                break;
+            case Tool_QuickStartUIObject.HUD_Types.Slider:
+                
+                break;
+        }
+        obj.HUD_RectTransform = obj.HUD_Object.GetComponent<RectTransform>();
+        HUD_UpdatePosition(obj);
+    }
+
+
 
     GameObject CreateCanvas()
     {
@@ -1303,6 +1410,12 @@ public class Tool_QuickStart : EditorWindow
         tab_new.SetActive(false);
         return tab_new;
     }
+    GameObject Create_Bar(GameObject parentobj, string name)
+    {
+        GameObject newbar = new GameObject();
+
+        return newbar;
+    }
 
     void SetRect(RectTransform rect, string anchorpos)
     {
@@ -1355,7 +1468,10 @@ public class Tool_QuickStart : EditorWindow
                 break;
         }
     }
-
+    void SetSize(RectTransform rect, Vector2 size)
+    {
+        rect.sizeDelta = size;
+    }
 
     void Set_SettingsHandler()
     {
@@ -1406,4 +1522,25 @@ public class Tool_QuickStart : EditorWindow
             settingshandlerobj.name = "SettingsHandler";
         }
     }
+}
+
+public class Tool_QuickStartUIObject
+{
+    //Object / Components
+    public GameObject HUD_Object;
+    public RectTransform HUD_RectTransform;
+
+    //Settings
+    public string HUD_Name;
+    public Vector2 HUD_Offset;
+    public Vector2 HUD_Size;
+
+    //Other
+    public bool HUD_FoldOut;
+
+    //DropDown
+    public enum HUD_Types {String, Slider, Dropdown, Bar }
+    public HUD_Types HUD_Type;
+    public enum HUD_Locations {TopLeft,TopMiddle,TopRight,LeftMiddle,RightMiddle,BottomLeft,BottomMiddle,BottomRight,Middle }
+    public HUD_Locations HUD_Location;
 }
