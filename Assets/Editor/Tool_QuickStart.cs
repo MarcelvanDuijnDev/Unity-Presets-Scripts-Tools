@@ -167,8 +167,8 @@ public class Tool_QuickStart : EditorWindow
     //UI
     int _Options_Type;
     int _Options_Style;
-    GameObject _CreatedCanvas;
-    bool _EnableHUDLiveEdit;
+    GameObject _MainCanvas;
+    bool _EnableHUDLiveEdit = true;
     List<Tool_QuickStartUIObject.HUD_Types> _CheckTypes = new List<Tool_QuickStartUIObject.HUD_Types>();
 
     List<Tool_QuickStartUIObject> _UIObjects = new List<Tool_QuickStartUIObject>();
@@ -213,20 +213,20 @@ public class Tool_QuickStart : EditorWindow
         if (GUILayout.Button("Create"))
             CreateUI();
         if (GUILayout.Button("Delete"))
-            if (_CreatedCanvas != null)
+            if (_MainCanvas != null)
             {
-                DestroyImmediate(_CreatedCanvas);
-                _CreatedCanvas = null;
+                DestroyImmediate(_MainCanvas);
+                _MainCanvas = null;
 
             }
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        _CreatedCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _CreatedCanvas, typeof(GameObject), true);
-        if(_CreatedCanvas == null)
+        _MainCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _MainCanvas, typeof(GameObject), true);
+        if(_MainCanvas == null)
         {
             if (GUILayout.Button("Create Canvas"))
-                _CreatedCanvas = CreateCanvas();
+                _MainCanvas = CreateCanvas();
         }
         GUILayout.EndHorizontal();
 
@@ -803,7 +803,7 @@ public class Tool_QuickStart : EditorWindow
             hudobj.transform.SetParent(canvasobj.transform);
         }
 
-        _CreatedCanvas = canvasobj;
+        _MainCanvas = canvasobj;
     }
     void LiveHUDEditor()
     {
@@ -831,22 +831,28 @@ public class Tool_QuickStart : EditorWindow
             if (_UIObjects[i].HUD_FoldOut)
             {
                 _UIObjects[i].HUD_Location = (Tool_QuickStartUIObject.HUD_Locations)EditorGUILayout.EnumPopup("Location:", _UIObjects[i].HUD_Location);
+
+                _UIObjects[i].HUD_Offset.x = EditorGUILayout.FloatField("Offset X:", _UIObjects[i].HUD_Offset.x);
+                _UIObjects[i].HUD_Offset.y = EditorGUILayout.FloatField("Offset Y:", _UIObjects[i].HUD_Offset.y);
+
+                _UIObjects[i].HUD_Size.x = EditorGUILayout.FloatField("Size X:", _UIObjects[i].HUD_Size.x);
+                _UIObjects[i].HUD_Size.y = EditorGUILayout.FloatField("Size Y:", _UIObjects[i].HUD_Size.y);
             }
         }
 
-        if (_CreatedCanvas != null)
+        if (_MainCanvas != null)
         {
             if (_EnableHUDLiveEdit)
             {
                 if (GUILayout.Button("Create"))
                 {
                     Tool_QuickStartUIObject newuiobj = new Tool_QuickStartUIObject();
-                    newuiobj.HUD_Object = Create_Text(_CreatedCanvas,"new",Vector2.zero,new Vector2(100,100),"New String", 16, Color.white);
+                    newuiobj.HUD_Object = Create_Text(_MainCanvas,"new",Vector2.zero,new Vector2(100,100),"New String", 16, Color.white);
                     newuiobj.HUD_RectTransform = newuiobj.HUD_Object.GetComponent<RectTransform>();
 
                     //newuiobj.HUD_Object = Create_Text();
                     _UIObjects.Add(newuiobj);
-                    _CheckTypes.Add(Tool_QuickStartUIObject.HUD_Types.String);
+                    _CheckTypes.Add(Tool_QuickStartUIObject.HUD_Types.Text);
                 }
 
                 LiveHUDEditorUpdate();
@@ -907,27 +913,26 @@ public class Tool_QuickStart : EditorWindow
         //Change Type
         switch(obj.HUD_Type)
         {
-            case Tool_QuickStartUIObject.HUD_Types.String:
-                obj.HUD_Object = Create_Text(_CreatedCanvas, "NewString", Vector2.zero, obj.HUD_Size, "New Text", 16, Color.white);
+            case Tool_QuickStartUIObject.HUD_Types.Text:
+                obj.HUD_Object = HUD_Create_Text();
                 break;
-            case Tool_QuickStartUIObject.HUD_Types.Bar:
-                //obj.HUD_Object = 
+            case Tool_QuickStartUIObject.HUD_Types.Button:
+                obj.HUD_Object = HUD_Create_Button();
                 break;
             case Tool_QuickStartUIObject.HUD_Types.Dropdown:
-                obj.HUD_Object = Create_Dropdown(_CreatedCanvas, "NewDropdown", "New Button", Vector2.zero, obj.HUD_Size, 1, 16, "topright");
+                obj.HUD_Object = HUD_Create_DropDown();
                 break;
             case Tool_QuickStartUIObject.HUD_Types.Slider:
-                
+                obj.HUD_Object = HUD_Create_Slider();
+                break;
+            case Tool_QuickStartUIObject.HUD_Types.Bar:
+                obj.HUD_Object = HUD_Create_Bar();
                 break;
         }
         obj.HUD_RectTransform = obj.HUD_Object.GetComponent<RectTransform>();
         HUD_Change_Position(obj);
     }
     void HUD_Change_Name()
-    {
-
-    }
-    void HUD_Change_Text()
     {
 
     }
@@ -939,31 +944,394 @@ public class Tool_QuickStart : EditorWindow
     {
 
     }
+
     //HUD Create
     GameObject HUD_Create_Text()
     {
+        GameObject newhud_text = HUD_Template();
+        newhud_text.AddComponent<TextMeshProUGUI>();
 
         return new GameObject();
     }
     GameObject HUD_Create_Button()
     {
+        GameObject newhud_button = HUD_Template();
 
-        return new GameObject();
+        newhud_button.AddComponent<CanvasRenderer>();
+        Image buttonimage = newhud_button.AddComponent<Image>();
+        buttonimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        buttonimage.type = Image.Type.Sliced;
+        Button buttonbutton = newhud_button.AddComponent<Button>();
+        buttonbutton.targetGraphic = buttonimage;
+
+        GameObject buttontextemplate = new GameObject();
+        buttontextemplate.AddComponent<RectTransform>();
+
+        TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
+        buttontexttmpro.text = "New Button";
+        buttontexttmpro.alignment = TextAlignmentOptions.MidlineLeft;
+        buttontexttmpro.color = Color.black;
+
+        buttontextemplate.name = name + "text";
+
+        buttontextemplate.transform.SetParent(newhud_button.transform);
+
+        newhud_button.transform.SetParent(_MainCanvas.transform);
+
+        return newhud_button;
     }
     GameObject HUD_Create_DropDown()
     {
+        //Create objects
+        GameObject dropdownobj = new GameObject();
+        GameObject dropdown_label = new GameObject();
+        GameObject dropdown_arrow = new GameObject();
+        GameObject dropdown_template = new GameObject();
 
-        return new GameObject();
+        GameObject dropdown_viewport = new GameObject();
+        GameObject dropdown_content = new GameObject();
+        GameObject dropdown_item = new GameObject();
+
+        GameObject dropdown_item_background = new GameObject();
+        GameObject dropdown_item_checkmark = new GameObject();
+        GameObject dropdown_item_label = new GameObject();
+
+        GameObject dropdown_scrollbar = new GameObject();
+        GameObject dropdown_slidingarea = new GameObject();
+        GameObject dropdown_handle = new GameObject();
+
+        dropdown_template.SetActive(false);
+
+        //Set Name
+        dropdownobj.name = name;
+        dropdown_label.name = "Label";
+        dropdown_arrow.name = "Arrow";
+        dropdown_template.name = "Template";
+
+        dropdown_viewport.name = "Viewport";
+        dropdown_content.name = "Content";
+        dropdown_item.name = "Item";
+
+        dropdown_item_background.name = "Item Background";
+        dropdown_item_checkmark.name = "Item Checkmark";
+        dropdown_item_label.name = "Item Label";
+
+        dropdown_scrollbar.name = "Scrollbar";
+        dropdown_slidingarea.name = "Sliding Area";
+        dropdown_handle.name = "Handle";
+
+        //Add RectTransform
+        RectTransform dropdownobjrect = dropdownobj.AddComponent<RectTransform>();
+        RectTransform dropdown_labelrect = dropdown_label.AddComponent<RectTransform>();
+        RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
+        RectTransform dropdown_templaterect = dropdown_template.AddComponent<RectTransform>();
+
+        RectTransform dropdown_viewportrect = dropdown_viewport.AddComponent<RectTransform>();
+        RectTransform dropdown_contentrect = dropdown_content.AddComponent<RectTransform>();
+        RectTransform dropdown_itemrect = dropdown_item.AddComponent<RectTransform>();
+
+        RectTransform dropdown_item_backgroundrect = dropdown_item_background.AddComponent<RectTransform>();
+        RectTransform dropdown_item_checkmarkrect = dropdown_item_checkmark.AddComponent<RectTransform>();
+        RectTransform dropdown_item_labelrect = dropdown_item_label.AddComponent<RectTransform>();
+
+        RectTransform dropdown_scrollbarrect = dropdown_scrollbar.AddComponent<RectTransform>();
+        RectTransform dropdown_slidingarearect = dropdown_slidingarea.AddComponent<RectTransform>();
+        RectTransform dropdown_handlerect = dropdown_handle.AddComponent<RectTransform>();
+
+        //SetParent
+        dropdown_label.transform.SetParent(dropdownobj.transform);
+        dropdown_arrow.transform.SetParent(dropdownobj.transform);
+        dropdown_template.transform.SetParent(dropdownobj.transform);
+
+        dropdown_viewport.transform.SetParent(dropdown_template.transform);
+        dropdown_content.transform.SetParent(dropdown_viewport.transform);
+        dropdown_item.transform.SetParent(dropdown_content.transform);
+
+        dropdown_item_background.transform.SetParent(dropdown_item.transform);
+        dropdown_item_checkmark.transform.SetParent(dropdown_item.transform);
+        dropdown_item_label.transform.SetParent(dropdown_item.transform);
+
+        dropdown_scrollbar.transform.SetParent(dropdown_template.transform);
+        dropdown_slidingarea.transform.SetParent(dropdown_scrollbar.transform);
+        dropdown_handle.transform.SetParent(dropdown_slidingarea.transform);
+
+        //Set Rect dropdownobj
+        Image dropdownimage = dropdownobj.AddComponent<Image>();
+        dropdownimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        dropdownimage.type = Image.Type.Sliced;
+        TMP_Dropdown dropdowntmp = dropdownobj.AddComponent<TMP_Dropdown>();
+        List<TMP_Dropdown.OptionData> newoptions = new List<TMP_Dropdown.OptionData>();
+
+        TMP_Dropdown.OptionData option1 = new TMP_Dropdown.OptionData();
+        TMP_Dropdown.OptionData option2 = new TMP_Dropdown.OptionData();
+        TMP_Dropdown.OptionData option3 = new TMP_Dropdown.OptionData();
+
+        option1.text = "Option A";
+        option2.text = "Option B";
+        option3.text = "Option C";
+
+        newoptions.Add(option1);
+        newoptions.Add(option2);
+        newoptions.Add(option3);
+
+        dropdowntmp.AddOptions(newoptions);
+
+        //Set Rect Label
+        dropdown_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_labelrect.sizeDelta = new Vector2(25, 6);
+        dropdown_labelrect.anchoredPosition = new Vector4(10, 7);
+
+        //Set Rect Arrow
+        dropdown_arrowrect.anchorMin = new Vector2(1, 0.5f);
+        dropdown_arrowrect.anchorMax = new Vector2(1, 0.5f);
+        dropdown_arrowrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_arrowrect.sizeDelta = new Vector2(20, 20);
+        dropdown_arrowrect.anchoredPosition = new Vector4(-15, 0);
+
+        //Set Rect Template
+        dropdown_templaterect.anchorMin = new Vector2(0, 0);
+        dropdown_templaterect.anchorMax = new Vector2(1, 0);
+        dropdown_templaterect.pivot = new Vector2(0.5f, 1);
+        dropdown_templaterect.sizeDelta = new Vector2(0, 150);
+        dropdown_templaterect.anchoredPosition = new Vector4(0, 2);
+
+        //Set Rect Viewport
+        dropdown_viewportrect.anchorMin = new Vector2(0, 0);
+        dropdown_viewportrect.anchorMax = new Vector2(1, 1);
+        dropdown_viewportrect.pivot = new Vector2(0, 1);
+        dropdown_viewportrect.sizeDelta = new Vector2(18, 15); //NotDy
+        dropdown_viewportrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Content
+        dropdown_contentrect.anchorMin = new Vector2(0, 1);
+        dropdown_contentrect.anchorMax = new Vector2(1, 1);
+        dropdown_contentrect.pivot = new Vector2(0.5f, 1);
+        dropdown_contentrect.sizeDelta = new Vector2(0, 28);
+        dropdown_contentrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Item
+        dropdown_itemrect.anchorMin = new Vector2(0, 0.5f);
+        dropdown_itemrect.anchorMax = new Vector2(1, 0.5f);
+        dropdown_itemrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_itemrect.anchoredPosition = new Vector4(0, -15); //NotDy
+
+        //Set Rect Item Background
+        dropdown_item_backgroundrect.anchorMin = new Vector2(0, 0);
+        dropdown_item_backgroundrect.anchorMax = new Vector2(1, 1);
+        dropdown_item_backgroundrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_item_backgroundrect.sizeDelta = new Vector2(0, 0);
+        dropdown_item_backgroundrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Item Checkmark
+        dropdown_item_checkmarkrect.anchorMin = new Vector2(0, 0.5f);
+        dropdown_item_checkmarkrect.anchorMax = new Vector2(0, 0.5f);
+        dropdown_item_checkmarkrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_item_checkmarkrect.sizeDelta = new Vector2(20, 20);
+        dropdown_item_checkmarkrect.anchoredPosition = new Vector4(10, 0);
+
+        //Set Rect Item Label
+        dropdown_item_labelrect.anchorMin = new Vector2(0, 0);
+        dropdown_item_labelrect.anchorMax = new Vector2(1, 1);
+        dropdown_item_labelrect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_item_labelrect.sizeDelta = new Vector2(10, 1);
+        dropdown_item_labelrect.anchoredPosition = new Vector4(20, 2);
+
+        //Set Rect Scrollbar
+        dropdown_scrollbarrect.anchorMin = new Vector2(1, 0);
+        dropdown_scrollbarrect.anchorMax = new Vector2(1, 1);
+        dropdown_scrollbarrect.pivot = new Vector2(1, 1);
+        dropdown_scrollbarrect.sizeDelta = new Vector2(20, 0);
+        dropdown_scrollbarrect.anchoredPosition = new Vector4(0, 0);
+
+        //Set Rect Sliding Area
+        dropdown_slidingarearect.anchorMin = new Vector2(0, 0);
+        dropdown_slidingarearect.anchorMax = new Vector2(1, 1);
+        dropdown_slidingarearect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_slidingarearect.sizeDelta = new Vector2(10, 10);
+        dropdown_slidingarearect.anchoredPosition = new Vector4(10, 10);
+
+        //Set Rect Handle
+        dropdown_handlerect.anchorMin = new Vector2(0, 0);
+        dropdown_handlerect.anchorMax = new Vector2(1, 0.2f);
+        dropdown_handlerect.pivot = new Vector2(0.5f, 0.5f);
+        dropdown_handlerect.sizeDelta = new Vector2(-10, -10);
+        dropdown_handlerect.anchoredPosition = new Vector4(-10, -10);
+
+        //
+        dropdown_arrow.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/DropdownArrow.psd"); ;
+
+        //
+        dropdowntmp.template = dropdown_templaterect;
+        dropdowntmp.captionText = dropdown_label.GetComponent<TextMeshProUGUI>();
+        dropdowntmp.itemText = dropdown_item_label.GetComponent<TextMeshProUGUI>();
+
+        //handle
+        Image dropdown_handleimage = dropdown_handle.AddComponent<Image>();
+        dropdown_handleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd"); ;
+        dropdown_handleimage.type = Image.Type.Sliced;
+
+        //scrollbar
+        Image dropdown_scrollbarimage = dropdown_scrollbar.AddComponent<Image>();
+        dropdown_scrollbarimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd"); ;
+        dropdown_scrollbarimage.type = Image.Type.Sliced;
+        Scrollbar dropdown_scrollbar_scroll = dropdown_scrollbar.AddComponent<Scrollbar>();
+        dropdown_scrollbar_scroll.targetGraphic = dropdown_handleimage;
+        dropdown_scrollbar_scroll.handleRect = dropdown_handlerect;
+        dropdown_scrollbar_scroll.direction = Scrollbar.Direction.BottomToTop;
+
+        //Template
+        Image dropdown_templateimage = dropdown_template.AddComponent<Image>();
+        dropdown_templateimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        dropdown_templateimage.type = Image.Type.Sliced;
+        ScrollRect dropdown_templatescrollrect = dropdown_template.AddComponent<ScrollRect>();
+        dropdown_templatescrollrect.content = dropdown_contentrect;
+        dropdown_templatescrollrect.decelerationRate = 0.135f;
+        dropdown_templatescrollrect.scrollSensitivity = 1;
+        dropdown_templatescrollrect.viewport = dropdown_viewportrect;
+        dropdown_templatescrollrect.movementType = ScrollRect.MovementType.Clamped;
+        dropdown_templatescrollrect.verticalScrollbar = dropdown_scrollbar_scroll;
+        dropdown_templatescrollrect.horizontal = false;
+
+        //viewport
+        Mask dropdown_viewportmask = dropdown_viewport.AddComponent<Mask>();
+        Image dropdown_viewportimage = dropdown_viewport.AddComponent<Image>();
+        dropdown_viewportimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UIMask.psd");
+        dropdown_viewportimage.type = Image.Type.Sliced;
+
+        //Item Background
+        dropdown_item_background.AddComponent<Image>();
+
+        //Item Checkmark
+        dropdown_item_checkmark.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd"); ;
+
+        //Item Label
+        TextMeshProUGUI dropdown_item_labeltmp = dropdown_item_label.AddComponent<TextMeshProUGUI>();
+        dropdown_item_labeltmp.text = "Option A";
+        dropdown_item_labeltmp.color = Color.black;
+
+        //LabelText
+        TextMeshProUGUI dropdown_labeltext = dropdown_label.AddComponent<TextMeshProUGUI>();
+        dropdown_labeltext.alignment = TextAlignmentOptions.MidlineLeft;
+        dropdown_labeltext.color = Color.black;
+        dropdown_labeltext.text = "Option A";
+
+        //Item
+        Toggle dropdown_itemtoggle = dropdown_item.AddComponent<Toggle>();
+        dropdown_itemtoggle.targetGraphic = dropdown_item_background.GetComponent<Image>();
+        dropdown_itemtoggle.graphic = dropdown_item_checkmark.GetComponent<Image>();
+        dropdown_itemtoggle.isOn = true;
+
+        //dropdownobj
+        dropdowntmp.targetGraphic = dropdownimage;
+        dropdowntmp.itemText = dropdown_item_labeltmp;
+
+        //AddToOptions
+        dropdownobj.transform.SetParent(_MainCanvas.transform);
+
+        dropdowntmp.captionText = dropdown_labeltext;
+
+        return dropdownobj;
     }
     GameObject HUD_Create_Slider()
     {
+        //Create Objects
+        GameObject newsliderbackground = new GameObject();
+        GameObject newsliderobj = new GameObject();
+        GameObject newsliderfillarea = new GameObject();
+        GameObject newsliderfill = new GameObject();
+        GameObject newsliderslidearea = new GameObject();
+        GameObject newsliderhandle = new GameObject();
 
-        return new GameObject();
+        newsliderobj.name = name;
+
+        //Set Parents
+        newsliderbackground.transform.SetParent(newsliderobj.transform);
+        newsliderfill.transform.SetParent(newsliderfillarea.transform);
+        newsliderfillarea.transform.SetParent(newsliderobj.transform);
+        newsliderhandle.transform.SetParent(newsliderslidearea.transform);
+        newsliderslidearea.transform.SetParent(newsliderobj.transform);
+
+        //Add RectTransform
+        RectTransform buttonobjrect = newsliderobj.AddComponent<RectTransform>();
+        RectTransform newsliderbackgroundrect = newsliderbackground.AddComponent<RectTransform>();
+        RectTransform buttonfillarearect = newsliderfillarea.AddComponent<RectTransform>();
+        RectTransform buttonfillrect = newsliderfill.AddComponent<RectTransform>();
+        RectTransform buttonslidearearect = newsliderslidearea.AddComponent<RectTransform>();
+        RectTransform buttonhandlerect = newsliderhandle.AddComponent<RectTransform>();
+
+        //Add Images
+        Image newsliderbackgroundimage = newsliderbackground.AddComponent<Image>();
+        Image newsliderfillimage = newsliderfill.AddComponent<Image>();
+        newsliderfillimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        newsliderfillimage.type = Image.Type.Sliced;
+        newsliderfillimage.color = Color.grey;
+        Image newsliderhandleimage = newsliderhandle.AddComponent<Image>();
+
+        //Set Rect NewObj
+        Slider newsliderslider = newsliderobj.AddComponent<Slider>();
+
+        //Set Rect Background
+        newsliderbackgroundrect.anchorMin = new Vector2(0, 0.25f);
+        newsliderbackgroundrect.anchorMax = new Vector2(1, 0.75f);
+        newsliderbackgroundrect.pivot = new Vector2(0.5f, 0.5f);
+        newsliderbackgroundrect.sizeDelta = new Vector2(0, 0);
+        newsliderbackgroundrect.anchoredPosition = new Vector2(0, 0);
+        newsliderbackground.name = "BackGround";
+
+        //Set Rect FillArea
+        buttonfillarearect.anchorMin = new Vector2(0, 0.25f);
+        buttonfillarearect.anchorMax = new Vector2(1, 0.75f);
+        buttonfillarearect.pivot = new Vector2(0.5f, 0.5f);
+        buttonfillarearect.sizeDelta = new Vector2(15, 0);
+        buttonfillarearect.anchoredPosition = new Vector2(5, 0);
+        newsliderfillarea.name = "FillArea";
+
+        //Set Rect Fill
+        buttonfillrect.anchorMin = new Vector2(0, 0.25f);
+        buttonfillrect.anchorMax = new Vector2(1, 0.75f);
+        buttonfillrect.pivot = new Vector2(0.5f, 0.5f);
+        buttonfillrect.sizeDelta = new Vector2(10, 0);
+        buttonfillrect.anchoredPosition = new Vector4(0, 0);
+        newsliderfill.name = "Fill";
+
+        //Set Rect SliderArea
+        buttonslidearearect.anchorMin = new Vector2(0, 0);
+        buttonslidearearect.anchorMax = new Vector2(1, 1);
+        buttonslidearearect.pivot = new Vector2(0.5f, 0.5f);
+        buttonslidearearect.sizeDelta = new Vector2(10, 0);
+        buttonslidearearect.anchoredPosition = new Vector2(10, 0);
+        newsliderslidearea.name = "Handle Slide Area";
+
+        //Set Rect Handle
+        buttonhandlerect.anchorMin = new Vector2(0, 0.25f);
+        buttonhandlerect.anchorMax = new Vector2(1, 0.75f);
+        buttonhandlerect.pivot = new Vector2(0.5f, 0.5f);
+        buttonhandlerect.sizeDelta = new Vector2(20, 0);
+        buttonhandlerect.anchoredPosition = new Vector2(0, 0);
+        newsliderhandleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+        newsliderslider.image = newsliderhandleimage;
+        newsliderslider.fillRect = buttonfillrect;
+        newsliderslider.handleRect = buttonhandlerect;
+        newsliderhandle.name = "Handle";
+
+        newsliderobj.transform.SetParent(_MainCanvas.transform);
+
+        return newsliderobj;
     }
     GameObject HUD_Create_Bar()
     {
+        GameObject newhud_text = HUD_Template();
 
-        return new GameObject();
+        return newhud_text;
+    }
+    GameObject HUD_Template()
+    {
+        GameObject newhudobj = new GameObject();
+        RectTransform newhud_text_rect = newhudobj.AddComponent<RectTransform>();
+        newhudobj.transform.SetParent(_MainCanvas.transform);
+        return newhudobj;
     }
 
 
@@ -998,7 +1366,7 @@ public class Tool_QuickStart : EditorWindow
 
         buttontransform.sizeDelta = size;
         buttontransform.anchoredPosition = pos;
-
+        
         SetRect(buttontransform, anchorpos);
 
         buttontemplate.AddComponent<CanvasRenderer>();
@@ -1586,7 +1954,7 @@ public class Tool_QuickStartUIObject
     public bool HUD_FoldOut;
 
     //DropDown
-    public enum HUD_Types {String, Slider, Dropdown, Bar }
+    public enum HUD_Types {Text , Slider, Dropdown, Bar, Button }
     public HUD_Types HUD_Type;
     public enum HUD_Locations {TopLeft,TopMiddle,TopRight,LeftMiddle,RightMiddle,BottomLeft,BottomMiddle,BottomRight,Middle }
     public HUD_Locations HUD_Location;
