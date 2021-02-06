@@ -821,7 +821,7 @@ public class Tool_QuickStart : EditorWindow
                 {
                     _UIObjects[i].HUD_RectTransform = null;
                     DestroyImmediate(_UIObjects[i].HUD_Object);
-                    HUD_ChangeType(_UIObjects[i]);
+                    HUD_Change_Type(_UIObjects[i]);
                 }
             }
             GUILayout.EndHorizontal();
@@ -878,13 +878,16 @@ public class Tool_QuickStart : EditorWindow
             if(_UIObjects[i].HUD_Object != null)
             {
                 //Update HUD
-                HUD_UpdatePosition(_UIObjects[i]);
+                HUD_Change_Position(_UIObjects[i]);
                 SetSize(_UIObjects[i].HUD_RectTransform, _UIObjects[i].HUD_Size);
             }
         }
     }
 
-    void HUD_UpdatePosition(Tool_QuickStartUIObject obj)
+
+
+    //HUD Edit
+    void HUD_Change_Position(Tool_QuickStartUIObject obj)
     {
         switch(obj.HUD_Location)
         {
@@ -899,7 +902,7 @@ public class Tool_QuickStart : EditorWindow
             case Tool_QuickStartUIObject.HUD_Locations.Middle: SetRect(obj.HUD_RectTransform, "middle"); break;
         }
     }
-    void HUD_ChangeType(Tool_QuickStartUIObject obj)
+    void HUD_Change_Type(Tool_QuickStartUIObject obj)
     {
         //Change Type
         switch(obj.HUD_Type)
@@ -918,11 +921,53 @@ public class Tool_QuickStart : EditorWindow
                 break;
         }
         obj.HUD_RectTransform = obj.HUD_Object.GetComponent<RectTransform>();
-        HUD_UpdatePosition(obj);
+        HUD_Change_Position(obj);
+    }
+    void HUD_Change_Name()
+    {
+
+    }
+    void HUD_Change_Text()
+    {
+
+    }
+    void HUD_TextOffset()
+    {
+
+    }
+    void HUD_TextSize()
+    {
+
+    }
+    //HUD Create
+    GameObject HUD_Create_Text()
+    {
+
+        return new GameObject();
+    }
+    GameObject HUD_Create_Button()
+    {
+
+        return new GameObject();
+    }
+    GameObject HUD_Create_DropDown()
+    {
+
+        return new GameObject();
+    }
+    GameObject HUD_Create_Slider()
+    {
+
+        return new GameObject();
+    }
+    GameObject HUD_Create_Bar()
+    {
+
+        return new GameObject();
     }
 
 
-
+    //Create UIObjects
     GameObject CreateCanvas()
     {
         GameObject canvasobj = new GameObject();
@@ -1416,6 +1461,8 @@ public class Tool_QuickStart : EditorWindow
 
         return newbar;
     }
+
+
 
     void SetRect(RectTransform rect, string anchorpos)
     {
