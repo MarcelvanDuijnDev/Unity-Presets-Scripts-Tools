@@ -822,6 +822,7 @@ public class Tool_QuickStart : EditorWindow
                     _UIObjects[i].HUD_RectTransform = null;
                     DestroyImmediate(_UIObjects[i].HUD_Object);
                     HUD_Change_Type(_UIObjects[i]);
+                    _CheckTypes[i] = _UIObjects[i].HUD_Type;
                 }
             }
             GUILayout.EndHorizontal();
@@ -832,11 +833,15 @@ public class Tool_QuickStart : EditorWindow
             {
                 _UIObjects[i].HUD_Location = (Tool_QuickStartUIObject.HUD_Locations)EditorGUILayout.EnumPopup("Location:", _UIObjects[i].HUD_Location);
 
-                _UIObjects[i].HUD_Offset.x = EditorGUILayout.FloatField("Offset X:", _UIObjects[i].HUD_Offset.x);
-                _UIObjects[i].HUD_Offset.y = EditorGUILayout.FloatField("Offset Y:", _UIObjects[i].HUD_Offset.y);
+                EditorGUILayout.BeginHorizontal();
+                _UIObjects[i].HUD_Size.x = EditorGUILayout.FloatField("Size X", _UIObjects[i].HUD_Size.x);
+                _UIObjects[i].HUD_Size.y = EditorGUILayout.FloatField("Y", _UIObjects[i].HUD_Size.y);
+                EditorGUILayout.EndHorizontal();
 
-                _UIObjects[i].HUD_Size.x = EditorGUILayout.FloatField("Size X:", _UIObjects[i].HUD_Size.x);
-                _UIObjects[i].HUD_Size.y = EditorGUILayout.FloatField("Size Y:", _UIObjects[i].HUD_Size.y);
+                EditorGUILayout.BeginHorizontal();
+                _UIObjects[i].HUD_Offset.x = EditorGUILayout.FloatField("Offset X", _UIObjects[i].HUD_Offset.x);
+                _UIObjects[i].HUD_Offset.y = EditorGUILayout.FloatField("Y", _UIObjects[i].HUD_Offset.y);
+                EditorGUILayout.EndHorizontal();
             }
         }
 
