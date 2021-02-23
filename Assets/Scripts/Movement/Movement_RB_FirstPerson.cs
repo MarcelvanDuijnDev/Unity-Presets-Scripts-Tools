@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Movement_RB_FirstPerson : MonoBehaviour
 {
     [Header("Set Refference")]
@@ -12,9 +13,7 @@ public class Movement_RB_FirstPerson : MonoBehaviour
     [SerializeField] private float _JumpSpeed = 5;
     [SerializeField] private float _CameraSensitivity = 1;
 
-    private bool _LockRotation;
     private Vector2 _LookRot = new Vector2(90,0);
-
     private Rigidbody _RB;
     private bool _Grounded;
 
@@ -31,7 +30,7 @@ public class Movement_RB_FirstPerson : MonoBehaviour
         //Check Grounded
         _Grounded = Physics.CheckSphere(new Vector3(transform.position.x, transform.position.y - 1, transform.position.z), 0.4f);
 
-        //Movment
+        //Movement
         float x = Input.GetAxisRaw("Horizontal") * _MovementSpeed;
         float y = Input.GetAxisRaw("Vertical") * _MovementSpeed;
 
@@ -44,14 +43,11 @@ public class Movement_RB_FirstPerson : MonoBehaviour
         _RB.velocity = new Vector3(move.x, _RB.velocity.y, move.z);
 
         //Look around
-        if (!_LockRotation)
-        {
-            _LookRot.x += Input.GetAxis("Mouse X") * _CameraSensitivity;
-            _LookRot.y += Input.GetAxis("Mouse Y") * _CameraSensitivity;
-            _LookRot.y = Mathf.Clamp(_LookRot.y, -90, 90);
+        _LookRot.x += Input.GetAxis("Mouse X") * _CameraSensitivity;
+        _LookRot.y += Input.GetAxis("Mouse Y") * _CameraSensitivity;
+        _LookRot.y = Mathf.Clamp(_LookRot.y, -90, 90);
 
-            transform.localRotation = Quaternion.AngleAxis(_LookRot.x, Vector3.up);
-            _Head.transform.localRotation = Quaternion.AngleAxis(_LookRot.y, Vector3.left);
-        }
+        transform.localRotation = Quaternion.AngleAxis(_LookRot.x, Vector3.up);
+        _Head.transform.localRotation = Quaternion.AngleAxis(_LookRot.y, Vector3.left);
     }
 }
