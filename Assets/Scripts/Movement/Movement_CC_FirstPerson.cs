@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class Movement_CC : MonoBehaviour
+public class Movement_CC_FirstPerson : MonoBehaviour
 {
     //Movement
     [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;

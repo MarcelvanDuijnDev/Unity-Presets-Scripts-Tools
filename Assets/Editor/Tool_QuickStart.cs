@@ -37,7 +37,7 @@ public class Tool_QuickStart : EditorWindow
 "Movement_Camera",
 "Movement_CC_Platformer",
 "Movement_CC_TopDown",
-"Movement_CC",
+"Movement_CC_FirstPerson",
 "Movement_FreeCamera",
 "MVD_Namespace",
 "ObjectPool",
