@@ -39,7 +39,7 @@ public class Tool_MapEditor : EditorWindow
     private Vector2 _GridSize = new Vector2(1, 1);
 
     //Rotation/Size
-    private float _SnapRot, _Rotation, _Size = 1;
+    private float _Rotation, _Size = 1;
     private bool _RandomRot = false;
     #endregion
     #region Check
@@ -482,14 +482,18 @@ public class Tool_MapEditor : EditorWindow
         GameObject createdObj = PrefabUtility.InstantiatePrefab(_Prefabs[_SelectedID]) as GameObject;
         createdObj.transform.position = createPos;
         createdObj.transform.localScale = new Vector3(_Size, _Size, _Size);
-        if (_ParentObj != null)
+
+        if(_ParentObj == null)
         {
-            createdObj.transform.parent = _ParentObj.transform;
-            if (_SnapPosActive)
-                createdObj.transform.position = _SnapPos;
-            else
-                createdObj.transform.position = _MousePos;
+            _ParentObj = new GameObject();
+            _ParentObj.name = "MapEditor_Parent";
         }
+
+        createdObj.transform.parent = _ParentObj.transform;
+        if (_SnapPosActive)
+            createdObj.transform.position = _SnapPos;
+        else
+            createdObj.transform.position = _MousePos;
         if (_RandomRot)
             createdObj.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
         else
