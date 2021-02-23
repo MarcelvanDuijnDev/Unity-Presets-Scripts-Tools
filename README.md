@@ -28,9 +28,10 @@ Feel free to use/copy files from this project._
 - [Movement_2D_Platformer.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_2D_Platformer.cs)
 - [Movement_2D_TopDown.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_2D_TopDown.cs)
 - [Movement_Camera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_Camera.cs)
-- [Movement_CC.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC.cs)
+- [Movement_CC_FirstPerson.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_FirstPerson.cs)
 - [Movement_CC_Platformer.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_Platformer.cs)
 - [Movement_CC_TopDown.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_CC_TopDown.cs)
+- [Movement_RB_FirstPerson.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_RB_FirstPerson.cs)
 - [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
 
 # Vehicles
