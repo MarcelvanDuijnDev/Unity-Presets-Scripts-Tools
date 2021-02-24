@@ -326,9 +326,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30bfd6fe8c0424841a5cf19cb81d27cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _Itterations: 0
   _RuleSet: L
   _UpdatesInSeconds: 0
-  _PrefabObj: {fileID: 4834947582354126, guid: 6f536dbcdf0e1f648a25346edf20885b, type: 3}
+  _PrefabObj_Left: {fileID: 4834947582354126, guid: 41a4b1d6302436042859edc51cbeb7d3, type: 3}
+  _PrefabObj_Right: {fileID: 4834947582354126, guid: a616201a15771d24480dce565cb1a02d, type: 3}
 --- !u!23 &1228689703
 MeshRenderer:
   m_ObjectHideFlags: 0
