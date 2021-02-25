@@ -21,6 +21,7 @@ Feel free to use/copy files from this project._
 * [Useful](#useful)
 * [Examples](#examples)
 * [Practical](#practical)
+* [MathAndAlgorithms](#mathandalgorithms)
 * [Other](#other)
 * [License & Copyright](#license--copyright)
   
@@ -49,6 +50,7 @@ Feel free to use/copy files from this project._
 # Editor
 - [EditorWindowExample.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/EditorWindowExample.cs)
 - [Tool_CreateHexagonGrid.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_CreateHexagonGrid.cs)
+- [Tool_MapEditor.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_MapEditor.cs)
 - [Tool_Math.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_Math.cs)
 - [Tool_ScriptToString.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_ScriptToString.cs)
 - [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs)
@@ -86,6 +88,11 @@ Feel free to use/copy files from this project._
 - [OnCollision.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/OnCollision.cs)
 - [PosToPos.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/PosToPos.cs)
 - [Rotation.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/Rotation.cs)
+
+# MathAndAlgorithms
+- [Flocking](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/MathAndAlgorithms/Flocking)
+- [LangtonsAnt](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/MathAndAlgorithms/LangtonsAnt)
+- [LSytem](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Scripts/MathAndAlgorithms/L-System)
 
 # Other
 - [MVD_Namespace.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
