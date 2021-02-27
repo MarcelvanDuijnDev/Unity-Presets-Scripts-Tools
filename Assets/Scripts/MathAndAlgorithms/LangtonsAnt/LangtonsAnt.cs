@@ -7,8 +7,9 @@ public class LangtonsAnt : MonoBehaviour {
     [Header("Info")]
     [SerializeField] private int _Itterations;
 
+    //Rulesets not working yet
     [Header("Settings")]
-    [SerializeField] private string _RuleSet = "L";
+    private string _RuleSet = "L";
     [SerializeField] private float _UpdatesInSeconds = 0;
     [SerializeField] private Transform _PrefabObj_Left;
     [SerializeField] private Transform _PrefabObj_Right;
