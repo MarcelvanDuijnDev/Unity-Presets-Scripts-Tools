@@ -88,7 +88,7 @@ public class Interactable : MonoBehaviour
     }
     public void TrowObject(Transform transformtrow)
     {
-        GetComponent<Rigidbody>().AddForce(transformtrow.forward * 5000);
+        _RB.AddForce(transformtrow.forward * 5000);
     }
     public void OpenDoor()
     {
