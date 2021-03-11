@@ -169,7 +169,6 @@ public class Tool_QuickStart : EditorWindow
     int _Options_Style;
     GameObject _MainCanvas;
     bool _EnableHUDLiveEdit = true;
-    List<Tool_QuickStartUIObject.HUD_Types> _CheckTypes = new List<Tool_QuickStartUIObject.HUD_Types>();
 
     List<Tool_QuickStartUIObject> _UIObjects = new List<Tool_QuickStartUIObject>();
 
@@ -216,6 +215,7 @@ public class Tool_QuickStart : EditorWindow
             if (_MainCanvas != null)
             {
                 DestroyImmediate(_MainCanvas);
+                _UIObjects.Clear();
                 _MainCanvas = null;
 
             }
@@ -813,16 +813,16 @@ public class Tool_QuickStart : EditorWindow
         {
 
             GUILayout.BeginHorizontal();
-            _UIObjects[i].HUD_Name = EditorGUILayout.TextField(_UIObjects[i].HUD_Name,"");
+            _UIObjects[i].HUD_Name = EditorGUILayout.TextField("", _UIObjects[i].HUD_Name);
             _UIObjects[i].HUD_Type = (Tool_QuickStartUIObject.HUD_Types)EditorGUILayout.EnumPopup("", _UIObjects[i].HUD_Type);
-            if (_UIObjects[i].HUD_Type != _CheckTypes[i])
+            if (_UIObjects[i].HUD_Type != _UIObjects[i].HUD_CheckType)
             {
                 if (GUILayout.Button("Update"))
                 {
                     _UIObjects[i].HUD_RectTransform = null;
                     DestroyImmediate(_UIObjects[i].HUD_Object);
                     HUD_Change_Type(_UIObjects[i]);
-                    _CheckTypes[i] = _UIObjects[i].HUD_Type;
+                    _UIObjects[i].HUD_CheckType = _UIObjects[i].HUD_Type;
                 }
             }
             GUILayout.EndHorizontal();
@@ -856,10 +856,9 @@ public class Tool_QuickStart : EditorWindow
                     newuiobj.HUD_RectTransform = newuiobj.HUD_Object.GetComponent<RectTransform>();
 
                     //newuiobj.HUD_Object = Create_Text();
+                    newuiobj.HUD_CheckType = Tool_QuickStartUIObject.HUD_Types.Text;
                     _UIObjects.Add(newuiobj);
-                    _CheckTypes.Add(Tool_QuickStartUIObject.HUD_Types.Text);
                 }
-
                 LiveHUDEditorUpdate();
             }
             else
@@ -891,6 +890,7 @@ public class Tool_QuickStart : EditorWindow
                 //Update HUD
                 HUD_Change_Position(_UIObjects[i]);
                 SetSize(_UIObjects[i].HUD_RectTransform, _UIObjects[i].HUD_Size);
+                _UIObjects[i].HUD_Object.name = _UIObjects[i].HUD_Name;
             }
         }
     }
@@ -956,7 +956,7 @@ public class Tool_QuickStart : EditorWindow
         GameObject newhud_text = HUD_Template();
         newhud_text.AddComponent<TextMeshProUGUI>();
 
-        return new GameObject();
+        return newhud_text;
     }
     GameObject HUD_Create_Button()
     {
@@ -1961,6 +1961,7 @@ public class Tool_QuickStartUIObject
     //DropDown
     public enum HUD_Types {Text , Slider, Dropdown, Bar, Button }
     public HUD_Types HUD_Type;
+    public HUD_Types HUD_CheckType;
     public enum HUD_Locations {TopLeft,TopMiddle,TopRight,LeftMiddle,RightMiddle,BottomLeft,BottomMiddle,BottomRight,Middle }
     public HUD_Locations HUD_Location;
 }
