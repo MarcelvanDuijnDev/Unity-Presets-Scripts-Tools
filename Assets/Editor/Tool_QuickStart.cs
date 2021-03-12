@@ -173,6 +173,11 @@ public class Tool_QuickStart : EditorWindow
     RectTransform _MainCanvasRect;
     Vector2 _CheckMainCanvasRectSize;
 
+    //ui profiles
+    int _ProfileID;
+    enum HUDProfiles {Default};
+    HUDProfiles _HUDProfiles;
+
     List<Tool_QuickStartUI_Tab> _UITab = new List<Tool_QuickStartUI_Tab>();
 
     [MenuItem("Tools/Tool_QuickStart")]
@@ -820,10 +825,12 @@ public class Tool_QuickStart : EditorWindow
     
     void LiveHUDEditor()
     {
+        LiveHUDEditor_Profile();
         LiveHUDEditor_Tabs();
 
         _EnableHUDLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate",_EnableHUDLiveEdit);
 
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
         //Edit UI Object
         for (int i = 0; i < _UITab[_UITabID].HUD_TabOjects.Count; i++)
         {
@@ -881,6 +888,8 @@ public class Tool_QuickStart : EditorWindow
                     newuiobj.HUD_CheckType = Tool_QuickStartUI_Object.HUD_Types.Text;
                     newuiobj.HUD_Object.name = "New Text";
                     newuiobj.HUD_Name = "New Text";
+                    newuiobj.HUD_Scale = new Vector3(1,1,1);
+                    newuiobj.HUD_Size = new Vector2(200,60);
                     newuiobj.HUD_Object.transform.SetParent(_UITab[_UITabID].HUD_TabParent.transform);
                     _UITab[_UITabID].HUD_TabOjects.Add(newuiobj);
                 }
@@ -903,6 +912,7 @@ public class Tool_QuickStart : EditorWindow
         {
             GUILayout.Label("Add or assign canvas to create/add");
         }
+        EditorGUILayout.EndScrollView();
     }
     void LiveHUDEditor_Tabs()
     {
@@ -925,6 +935,22 @@ public class Tool_QuickStart : EditorWindow
             _UITab[_UITabID].HUD_TabParent.SetActive(!_UITab[_UITabID].HUD_TabParent.activeSelf);
         }
 
+    }
+    void LiveHUDEditor_Profile()
+    {
+        GUILayout.BeginHorizontal();
+        _HUDProfiles = (HUDProfiles)EditorGUILayout.EnumPopup("Load Profile:", _HUDProfiles);
+        if (GUILayout.Button("Load", GUILayout.Width(50)))
+        {
+            HUD_ClearLoaded();
+            switch (_HUDProfiles)
+            {
+                case HUDProfiles.Default:
+                    HUD_LoadProfile_Default();
+                    break;
+            }
+        }
+        GUILayout.EndHorizontal();
     }
 
     void HUD_AddTab()
@@ -971,6 +997,19 @@ public class Tool_QuickStart : EditorWindow
                     }
                     _CheckMainCanvasRectSize = _MainCanvasRect.sizeDelta;
                 }
+
+                //Update text size
+                for (int j = 0; j < _UITab[_UITabID].HUD_TabOjects.Count; j++)
+                {
+                    if(_UITab[_UITabID].HUD_TabOjects[j].HUD_Type == Tool_QuickStartUI_Object.HUD_Types.Button)
+                    {
+                        for (int o = 0; o < _UITab[_UITabID].HUD_TabOjects[j].HUD_Text.Count; o++)
+                        {
+                            _UITab[_UITabID].HUD_TabOjects[j].HUD_Text[o].rectTransform.sizeDelta = _UITab[_UITabID].HUD_TabOjects[j].HUD_Size;
+                        }
+                        
+                    }
+                }
             }
         }
     }
@@ -1013,12 +1052,16 @@ public class Tool_QuickStart : EditorWindow
             case Tool_QuickStartUI_Object.HUD_Types.Slider:
                 obj.HUD_Object = HUD_Create_Slider();
                 obj.HUD_Object.name = "New Slider";
+                obj.HUD_Size = new Vector2(obj.HUD_Size.x, obj.HUD_Size.y / 3);
                 break;
             case Tool_QuickStartUI_Object.HUD_Types.Bar:
                 obj.HUD_Object = HUD_Create_Bar();
                 obj.HUD_Object.name = "New Bar";
                 break;
         }
+
+        if(obj.HUD_Type != Tool_QuickStartUI_Object.HUD_Types.Slider && obj.HUD_CheckType == Tool_QuickStartUI_Object.HUD_Types.Slider)
+            obj.HUD_Size = new Vector2(obj.HUD_Size.x, obj.HUD_Size.y * 3);
 
         if (obj.HUD_Name == "" || obj.HUD_Name == null || obj.HUD_Name == "New Text" || obj.HUD_Name == "New Button" || obj.HUD_Name == "New Dropdown" || obj.HUD_Name == "New Slider" || obj.HUD_Name == "New Bar")
             obj.HUD_Name = obj.HUD_Object.name;
@@ -1075,7 +1118,7 @@ public class Tool_QuickStart : EditorWindow
         GameObject buttontextemplate = new GameObject();
         RectTransform buttontextrect = buttontextemplate.AddComponent<RectTransform>();
         buttontextrect.anchoredPosition = new Vector3(5,0,0);
-        buttontextrect.localScale = new Vector3(0.5f,0.5f,0.5f);
+        buttontextrect.localScale = new Vector3(1,1,1);
 
         TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
         buttontexttmpro.text = "New Button";
@@ -1445,39 +1488,75 @@ public class Tool_QuickStart : EditorWindow
     }
 
     //Premade Profiles
+    void HUD_ClearLoaded()
+    {
+        for (int i = 0; i < _UITab.Count; i++)
+        {
+            DestroyImmediate(_UITab[i].HUD_TabParent);
+        }
+        _UITab.Clear();
+        _UITabID = 0;
+    }
     void HUD_LoadProfile_Default()
     {
-        Tool_QuickStartUI_Tab tab_home = new Tool_QuickStartUI_Tab();
+        HUD_AddTab(); //0 Home
+        HUD_AddTab(); //1 Display
+        HUD_AddTab(); //2 Graphics
+        HUD_AddTab(); //3 Gameplay
+        HUD_AddTab(); //4 Controls
+
+        //============================================================================================= 0 Home
         Tool_QuickStartUI_Object tab_home_startbutton = new Tool_QuickStartUI_Object();
+        tab_home_startbutton.HUD_Name = "Button_Start";
         tab_home_startbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
-        tab_home_startbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle;
-        tab_home_startbutton.HUD_Offset = new Vector3(50,0,0);
+        tab_home_startbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_home_startbutton.HUD_Offset = new Vector3(40, 450, 0);
+        tab_home_startbutton.HUD_Size = new Vector2(700, 100);
+        tab_home_startbutton.HUD_Scale = new Vector3(1, 1, 1);
 
         Tool_QuickStartUI_Object tab_home_optionsbutton = new Tool_QuickStartUI_Object();
+        tab_home_optionsbutton.HUD_Name = "Button_Options";
         tab_home_optionsbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
-        tab_home_optionsbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle;
-        tab_home_optionsbutton.HUD_Offset = new Vector3(50, -100, 0);
+        tab_home_optionsbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_home_optionsbutton.HUD_Offset = new Vector3(40, 330, 0);
+        tab_home_optionsbutton.HUD_Size = new Vector2(700, 100);
+        tab_home_optionsbutton.HUD_Scale = new Vector3(1, 1, 1);
 
         Tool_QuickStartUI_Object tab_home_quitbutton = new Tool_QuickStartUI_Object();
+        tab_home_quitbutton.HUD_Name = "Button_Quit";
         tab_home_quitbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
-        tab_home_quitbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle;
-        tab_home_quitbutton.HUD_Offset = new Vector3(50, -200, 0);
+        tab_home_quitbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_home_quitbutton.HUD_Offset = new Vector3(40, 210, 0);
+        tab_home_quitbutton.HUD_Size = new Vector2(700, 100);
+        tab_home_quitbutton.HUD_Scale = new Vector3(1, 1, 1);
 
-        Tool_QuickStartUI_Tab tab_display = new Tool_QuickStartUI_Tab();
+        _UITab[0].HUD_TabOjects.Add(tab_home_startbutton);
+        _UITab[0].HUD_TabOjects.Add(tab_home_optionsbutton);
+        _UITab[0].HUD_TabOjects.Add(tab_home_quitbutton);
+        //============================================================================================= 1 Display
+        Tool_QuickStartUI_Object tab_display_title = new Tool_QuickStartUI_Object();
+        tab_display_title.HUD_Name = "Title_Display";
+        tab_display_title.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Text;
+        tab_display_title.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        //tab_display_title.HUD_RectTransform.sizeDelta = new Vector2(200, 50);
+        tab_display_title.HUD_Offset = new Vector3(800, 800, 0);
 
 
-        Tool_QuickStartUI_Tab tab_graphics = new Tool_QuickStartUI_Tab();
+
+        _UITab[1].HUD_TabOjects.Add(tab_display_title);
 
 
-        Tool_QuickStartUI_Tab tab_gameplay = new Tool_QuickStartUI_Tab();
-
-
-        Tool_QuickStartUI_Tab tab_controls = new Tool_QuickStartUI_Tab();
-
-
-        Tool_QuickStartUI_Tab tab_keybinding = new Tool_QuickStartUI_Tab();
-
-
+        //Update
+        for (int i = 0; i < _UITab.Count; i++)
+        {
+            for (int j = 0; j < _UITab[i].HUD_TabOjects.Count; j++)
+            {
+                _UITab[i].HUD_TabOjects[j].HUD_RectTransform = null;
+                DestroyImmediate(_UITab[i].HUD_TabOjects[j].HUD_Object);
+                HUD_Change_Type(_UITab[i].HUD_TabOjects[j]);
+                _UITab[i].HUD_TabOjects[j].HUD_CheckType = _UITab[i].HUD_TabOjects[j].HUD_Type;
+            }
+        }
     }
 
     //Create UIObjects
