@@ -170,6 +170,8 @@ public class Tool_QuickStart : EditorWindow
     int _Options_Style;
     GameObject _MainCanvas;
     bool _EnableHUDLiveEdit = true;
+    RectTransform _MainCanvasRect;
+    Vector2 _CheckMainCanvasRectSize;
 
     List<Tool_QuickStartUI_Tab> _UITab = new List<Tool_QuickStartUI_Tab>();
 
@@ -195,7 +197,7 @@ public class Tool_QuickStart : EditorWindow
     //UI
     void Menu_UI()
     {
-        _Options_Type = GUILayout.Toolbar(_Options_Type, new string[] { "All", "Menu", "HUD" });
+        //_Options_Type = GUILayout.Toolbar(_Options_Type, new string[] { "All", "Menu", "HUD" });
 
         /*
         GUILayout.BeginHorizontal();
@@ -229,10 +231,13 @@ public class Tool_QuickStart : EditorWindow
 
         GUILayout.BeginHorizontal();
         _MainCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _MainCanvas, typeof(GameObject), true);
-        if(_MainCanvas == null)
+        if (_MainCanvas == null)
         {
             if (GUILayout.Button("Create Canvas"))
+            {
                 _MainCanvas = CreateCanvas();
+                HUD_AddTab();
+            }
         }
         else
         {
@@ -241,14 +246,16 @@ public class Tool_QuickStart : EditorWindow
                 {
                     DestroyImmediate(_MainCanvas);
                     _UITab.Clear();
+                    _CheckMainCanvasRectSize = Vector2.zero;
+                    _MainCanvasRect = null;
                     _MainCanvas = null;
-
                 }
         }
         GUILayout.EndHorizontal();
 
         //LiveEditor
-        LiveHUDEditor();
+        if (_MainCanvas != null)
+            LiveHUDEditor();
     }
 
     //Menu QuickStart
@@ -342,7 +349,7 @@ public class Tool_QuickStart : EditorWindow
         {
             case 0: //FPS
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Movement_CC");
+                ScriptStatus("Movement_CC_FirstPerson");
                 ScriptStatus("Health");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
                 //
@@ -351,14 +358,14 @@ public class Tool_QuickStart : EditorWindow
                 EditorGUILayout.BeginHorizontal("box");
                 GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
                 if (GUILayout.Button("Essential"))
-                    AddScriptsMultiple(new string[] { "Movement_CC"});
+                    AddScriptsMultiple(new string[] { "Movement_CC_FirstPerson"});
                 if (GUILayout.Button("All"))
                     AddScriptsMultiple(new string[] { "" });
                 EditorGUILayout.EndHorizontal();
                 break;
             case 1: //ThirdPerson
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("Movement_CC");
+                ScriptStatus("Movement_CC_FirstPerson");
                 ScriptStatus("Movement_Camera");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
                 ScriptStatus("Health");
@@ -368,7 +375,7 @@ public class Tool_QuickStart : EditorWindow
                 EditorGUILayout.BeginHorizontal("box");
                 GUILayout.Label("Add:", EditorStyles.boldLabel, GUILayout.Width(30));
                 if (GUILayout.Button("Essential"))
-                    AddScriptsMultiple(new string[] { "Movement_CC", "Movement_Camera" });
+                    AddScriptsMultiple(new string[] { "Movement_CC_FirstPerson", "Movement_Camera" });
                 if (GUILayout.Button("All"))
                     AddScriptsMultiple(new string[] { "" });
                 EditorGUILayout.EndHorizontal();
@@ -642,9 +649,9 @@ public class Tool_QuickStart : EditorWindow
             objpool.AddComponent(UnityType);
             objpool.name = "ObjectPool";
         }
-        if (ScriptExist("Movement_CC"))
+        if (ScriptExist("Movement_CC_FirstPerson"))
         {
-            string UniType = "Movement_CC";
+            string UniType = "Movement_CC_FirstPerson";
             Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
             playerobj.AddComponent(UnityType);
         }
@@ -667,7 +674,7 @@ public class Tool_QuickStart : EditorWindow
             Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
             playerobj.AddComponent(UnityType);
         }
-        if (ScriptExist("Movement_CC"))
+        if (ScriptExist("Movement_CC_FirstPerson"))
         {
             string UniType = "Movement_CC";
             Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
@@ -810,18 +817,14 @@ public class Tool_QuickStart : EditorWindow
 
         _MainCanvas = canvasobj;
     }
+    
     void LiveHUDEditor()
     {
-        //Check tab != null
-        if(_UITab == null || _UITab.Count == 0)
-        {
-            Tool_QuickStartUI_Tab newtab = new Tool_QuickStartUI_Tab();
-            _UITab.Add(newtab);
-        }
+        LiveHUDEditor_Tabs();
 
-        //
         _EnableHUDLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate",_EnableHUDLiveEdit);
 
+        //Edit UI Object
         for (int i = 0; i < _UITab[_UITabID].HUD_TabOjects.Count; i++)
         {
             GUILayout.BeginHorizontal();
@@ -865,6 +868,7 @@ public class Tool_QuickStart : EditorWindow
 
         if (_MainCanvas != null)
         {
+            //LiveEdit
             if (_EnableHUDLiveEdit)
             {
                 if (GUILayout.Button("Create"))
@@ -875,6 +879,9 @@ public class Tool_QuickStart : EditorWindow
 
                     //newuiobj.HUD_Object = Create_Text();
                     newuiobj.HUD_CheckType = Tool_QuickStartUI_Object.HUD_Types.Text;
+                    newuiobj.HUD_Object.name = "New Text";
+                    newuiobj.HUD_Name = "New Text";
+                    newuiobj.HUD_Object.transform.SetParent(_UITab[_UITabID].HUD_TabParent.transform);
                     _UITab[_UITabID].HUD_TabOjects.Add(newuiobj);
                 }
                 LiveHUDEditorUpdate();
@@ -897,6 +904,44 @@ public class Tool_QuickStart : EditorWindow
             GUILayout.Label("Add or assign canvas to create/add");
         }
     }
+    void LiveHUDEditor_Tabs()
+    {
+        String[] tabs = new string[_UITab.Count];
+        for (int i = 0; i < _UITab.Count; i++)
+        {
+            tabs[i] = i.ToString();
+        }
+
+        GUILayout.BeginHorizontal();
+        _UITabID = GUILayout.Toolbar(_UITabID, tabs);
+
+        if (GUILayout.Button("Add", GUILayout.Width(50)))
+        {
+            HUD_AddTab();
+        }
+        GUILayout.EndHorizontal();
+        if (GUILayout.Button("ToggleActive"))
+        {
+            _UITab[_UITabID].HUD_TabParent.SetActive(!_UITab[_UITabID].HUD_TabParent.activeSelf);
+        }
+
+    }
+
+    void HUD_AddTab()
+    {
+        Tool_QuickStartUI_Tab newtab = new Tool_QuickStartUI_Tab();
+        newtab.HUD_TabParent = HUD_Template();
+
+        RectTransform rect_main = _MainCanvas.GetComponent<RectTransform>();
+        RectTransform rect_tab = newtab.HUD_TabParent.GetComponent<RectTransform>();
+
+        rect_tab.sizeDelta = rect_main.sizeDelta;
+        rect_tab.localScale = new Vector3(1,1,1);
+        rect_tab.anchoredPosition = new Vector2(0,0);
+
+        newtab.HUD_TabParent.name = _UITab.Count.ToString();
+        _UITab.Add(newtab);
+    }
 
 
     void LiveHUDEditorUpdate()
@@ -909,8 +954,23 @@ public class Tool_QuickStart : EditorWindow
                 HUD_Change_Position(_UITab[_UITabID].HUD_TabOjects[i]);
                 SetSize(_UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform, _UITab[_UITabID].HUD_TabOjects[i].HUD_Size);
                 SetScale(_UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform, _UITab[_UITabID].HUD_TabOjects[i].HUD_Scale);
-                // SetOffSet(_UIObjects[i].HUD_RectTransform, _UIObjects[i].HUD_Offset);
+                SetOffSet(_UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform, _UITab[_UITabID].HUD_TabOjects[i].HUD_Offset);
                 _UITab[_UITabID].HUD_TabOjects[i].HUD_Object.name = _UITab[_UITabID].HUD_TabOjects[i].HUD_Name;
+
+                HUD_TextSize(_UITab[_UITabID].HUD_TabOjects[i]);
+
+                //Update canvas size / tab size
+                if(_MainCanvasRect == null)
+                    _MainCanvasRect = _MainCanvas.GetComponent<RectTransform>();
+
+                if (_CheckMainCanvasRectSize != _MainCanvasRect.sizeDelta)
+                {
+                    for (int j = 0; j < _UITab.Count; j++)
+                    {
+                        _UITab[j].HUD_TabParent.GetComponent<RectTransform>().sizeDelta = _MainCanvasRect.sizeDelta;
+                    }
+                    _CheckMainCanvasRectSize = _MainCanvasRect.sizeDelta;
+                }
             }
         }
     }
@@ -940,22 +1000,42 @@ public class Tool_QuickStart : EditorWindow
         {
             case Tool_QuickStartUI_Object.HUD_Types.Text:
                 obj.HUD_Object = HUD_Create_Text();
+                obj.HUD_Object.name = "New Text";
                 break;
             case Tool_QuickStartUI_Object.HUD_Types.Button:
                 obj.HUD_Object = HUD_Create_Button();
+                obj.HUD_Object.name = "New Button";
                 break;
             case Tool_QuickStartUI_Object.HUD_Types.Dropdown:
                 obj.HUD_Object = HUD_Create_DropDown();
+                obj.HUD_Object.name = "New Dropdown";
                 break;
             case Tool_QuickStartUI_Object.HUD_Types.Slider:
                 obj.HUD_Object = HUD_Create_Slider();
+                obj.HUD_Object.name = "New Slider";
                 break;
             case Tool_QuickStartUI_Object.HUD_Types.Bar:
                 obj.HUD_Object = HUD_Create_Bar();
+                obj.HUD_Object.name = "New Bar";
                 break;
         }
+
+        if (obj.HUD_Name == "" || obj.HUD_Name == null || obj.HUD_Name == "New Text" || obj.HUD_Name == "New Button" || obj.HUD_Name == "New Dropdown" || obj.HUD_Name == "New Slider" || obj.HUD_Name == "New Bar")
+            obj.HUD_Name = obj.HUD_Object.name;
+
         obj.HUD_RectTransform = obj.HUD_Object.GetComponent<RectTransform>();
         HUD_Change_Position(obj);
+
+        //Add to tab
+        obj.HUD_Object.transform.SetParent(_UITab[_UITabID].HUD_TabParent.transform);
+
+        //Update UI Obj text ref
+        obj.HUD_Text.Clear();
+        for (int i = 0; i < obj.HUD_Object.transform.childCount; i++)
+        {
+            if (obj.HUD_Object.transform.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
+                obj.HUD_Text.Add(obj.HUD_Object.transform.GetChild(i).GetComponent<TextMeshProUGUI>());
+        }
     }
     void HUD_Change_Name()
     {
@@ -965,9 +1045,12 @@ public class Tool_QuickStart : EditorWindow
     {
 
     }
-    void HUD_TextSize()
+    void HUD_TextSize(Tool_QuickStartUI_Object obj)
     {
-
+        for (int i = 0; i < obj.HUD_Text.Count; i++)
+        {
+            obj.HUD_Text[i].fontSize = obj.HUD_TextFontSize;
+        }
     }
 
     //HUD Create
@@ -990,12 +1073,15 @@ public class Tool_QuickStart : EditorWindow
         buttonbutton.targetGraphic = buttonimage;
 
         GameObject buttontextemplate = new GameObject();
-        buttontextemplate.AddComponent<RectTransform>();
+        RectTransform buttontextrect = buttontextemplate.AddComponent<RectTransform>();
+        buttontextrect.anchoredPosition = new Vector3(5,0,0);
+        buttontextrect.localScale = new Vector3(0.5f,0.5f,0.5f);
 
         TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
         buttontexttmpro.text = "New Button";
         buttontexttmpro.alignment = TextAlignmentOptions.MidlineLeft;
         buttontexttmpro.color = Color.black;
+
 
         buttontextemplate.name = name + "text";
 
@@ -1358,6 +1444,41 @@ public class Tool_QuickStart : EditorWindow
         return newhudobj;
     }
 
+    //Premade Profiles
+    void HUD_LoadProfile_Default()
+    {
+        Tool_QuickStartUI_Tab tab_home = new Tool_QuickStartUI_Tab();
+        Tool_QuickStartUI_Object tab_home_startbutton = new Tool_QuickStartUI_Object();
+        tab_home_startbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
+        tab_home_startbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle;
+        tab_home_startbutton.HUD_Offset = new Vector3(50,0,0);
+
+        Tool_QuickStartUI_Object tab_home_optionsbutton = new Tool_QuickStartUI_Object();
+        tab_home_optionsbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
+        tab_home_optionsbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle;
+        tab_home_optionsbutton.HUD_Offset = new Vector3(50, -100, 0);
+
+        Tool_QuickStartUI_Object tab_home_quitbutton = new Tool_QuickStartUI_Object();
+        tab_home_quitbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
+        tab_home_quitbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle;
+        tab_home_quitbutton.HUD_Offset = new Vector3(50, -200, 0);
+
+        Tool_QuickStartUI_Tab tab_display = new Tool_QuickStartUI_Tab();
+
+
+        Tool_QuickStartUI_Tab tab_graphics = new Tool_QuickStartUI_Tab();
+
+
+        Tool_QuickStartUI_Tab tab_gameplay = new Tool_QuickStartUI_Tab();
+
+
+        Tool_QuickStartUI_Tab tab_controls = new Tool_QuickStartUI_Tab();
+
+
+        Tool_QuickStartUI_Tab tab_keybinding = new Tool_QuickStartUI_Tab();
+
+
+    }
 
     //Create UIObjects
     GameObject CreateCanvas()
@@ -1916,7 +2037,7 @@ public class Tool_QuickStart : EditorWindow
     }
     void SetOffSet(RectTransform rect, Vector3 offset)
     {
-        rect.position = offset;
+        rect.anchoredPosition = offset;
     }
 
     void Set_SettingsHandler()
@@ -1972,9 +2093,9 @@ public class Tool_QuickStart : EditorWindow
 
 public class Tool_QuickStartUI_Tab
 {
+    public GameObject HUD_TabParent;
     public List<Tool_QuickStartUI_Object> HUD_TabOjects = new List<Tool_QuickStartUI_Object>();
 }
-
 public class Tool_QuickStartUI_Object
 {
     //Object / Components
@@ -1986,6 +2107,7 @@ public class Tool_QuickStartUI_Object
     public Vector3 HUD_Offset;
     public Vector2 HUD_Size = new Vector2(100,25);
     public Vector3 HUD_Scale = new Vector3(4,4,4);
+    public float HUD_TextFontSize = 16;
 
     //Other
     public bool HUD_FoldOut;
@@ -1996,4 +2118,7 @@ public class Tool_QuickStartUI_Object
     public HUD_Types HUD_CheckType;
     public enum HUD_Locations {TopLeft,TopMiddle,TopRight,LeftMiddle,RightMiddle,BottomLeft,BottomMiddle,BottomRight,Middle }
     public HUD_Locations HUD_Location;
+
+    //Info
+    public List<TextMeshProUGUI> HUD_Text = new List<TextMeshProUGUI>();
 }
