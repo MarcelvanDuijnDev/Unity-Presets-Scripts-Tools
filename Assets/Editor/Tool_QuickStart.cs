@@ -13,11 +13,13 @@ using TMPro;
 
 public class Tool_QuickStart : EditorWindow
 {
+    //Menu / Settings
     private int _MenuID = 0;        // QuickStart/Scripts
     private int _DimensionID = 0;   // 2D/3D
     private int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     private int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
 
+    //Scripts
     private bool[] _ScriptExist = new bool[50];
     private string[] _ScriptNames = new string[] {
 "AudioHandler",
@@ -158,27 +160,27 @@ public class Tool_QuickStart : EditorWindow
 "Car_Movement_Vehicle"
     };
 
+    //Settings
     private int _CreateSceneOptions = 0;
     private Vector2 _ScrollPos = new Vector2();
 
+    //Search
     private string _Search_Script = "";
     private string _Search_Tag = "";
 
-    //UI
-    int _UITabID;
-    int _Options_Type;
-    int _Options_Style;
+    //HUD
+    int _HUD_TabID;
+    bool _HUD_EnableLiveEdit = true;
     GameObject _MainCanvas;
-    bool _EnableHUDLiveEdit = true;
     RectTransform _MainCanvasRect;
     Vector2 _CheckMainCanvasRectSize;
 
-    //ui profiles
-    int _ProfileID;
+    //HUD Profiles
     enum HUDProfiles {Default};
-    HUDProfiles _HUDProfiles;
+    HUDProfiles _HUD_Profiles;
 
-    List<Tool_QuickStartUI_Tab> _UITab = new List<Tool_QuickStartUI_Tab>();
+    //HUD Tab
+    List<Tool_QuickStartUI_Tab> _HUD_Tab = new List<Tool_QuickStartUI_Tab>();
 
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
@@ -202,46 +204,14 @@ public class Tool_QuickStart : EditorWindow
     //UI
     void Menu_UI()
     {
-        //_Options_Type = GUILayout.Toolbar(_Options_Type, new string[] { "All", "Menu", "HUD" });
-
-        /*
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Profile: ");
-        if (_Options_Type == 0)
-        {
-            _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default" });//, "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
-        }
-        else
-        {
-            _Options_Style = GUILayout.Toolbar(_Options_Style, new string[] { "Default" });//, "CSGO", "Overwatch", "Minecraft", "RocketLeague" });
-        }
-        GUILayout.EndHorizontal();
-        
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Create"))
-            CreateUI();
-
-        if (GUILayout.Button("Delete"))
-            if (_MainCanvas != null)
-            {
-                DestroyImmediate(_MainCanvas);
-                _UIObjects.Clear();
-                _MainCanvas = null;
-
-            }
-        GUILayout.EndHorizontal();
-        */
-        
-
         GUILayout.BeginHorizontal();
         _MainCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _MainCanvas, typeof(GameObject), true);
         if (_MainCanvas == null)
         {
             if (GUILayout.Button("Create Canvas"))
             {
-                _MainCanvas = CreateCanvas();
-                HUD_AddTab();
+                _MainCanvas = HUD_Create_Canvas();
+                HUD_Add_Tab();
             }
         }
         else
@@ -250,7 +220,7 @@ public class Tool_QuickStart : EditorWindow
                 if (_MainCanvas != null)
                 {
                     DestroyImmediate(_MainCanvas);
-                    _UITab.Clear();
+                    _HUD_Tab.Clear();
                     _CheckMainCanvasRectSize = Vector2.zero;
                     _MainCanvasRect = null;
                     _MainCanvas = null;
@@ -260,7 +230,7 @@ public class Tool_QuickStart : EditorWindow
 
         //LiveEditor
         if (_MainCanvas != null)
-            LiveHUDEditor();
+            HUD_Editor();
     }
 
     //Menu QuickStart
@@ -783,167 +753,93 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-
-    //UI
-    void CreateUI_Default()
+    //HUD Editor
+    void HUD_Editor()
     {
-        //Add canvas
-        GameObject canvasobj = CreateCanvas();
+        HUD_Editor_Profile();
+        HUD_Editor_Tabs();
 
-        if (_Options_Type == 0 || _Options_Type == 1) //Menu
-        {
-            //Add setting tabs
-            GameObject tab_display = Create_Tab(canvasobj, "Display");
-            GameObject tab_graphics = Create_Tab(canvasobj, "Graphics");
-            GameObject tab_gameplay = Create_Tab(canvasobj, "Gameplay");
-            GameObject tab_controls = Create_Tab(canvasobj, "Controls");
-            GameObject tab_keybinding = Create_Tab(canvasobj, "Keybinding");
-
-            //Add Buttons
-            GameObject main = new GameObject();
-            RectTransform mainrect = main.AddComponent<RectTransform>();
-            SetRect(mainrect, "bottomleft");
-            GameObject button_start = Create_Button(main, "Button_Start", "Start", new Vector2(40, 450), new Vector2(700, 100), 30, 60, "bottomleft");
-            GameObject button_options = Create_Button(main, "Button_Options", "Options", new Vector2(40, 330), new Vector2(700, 100), 30, 60, "bottomleft");
-            GameObject button_quit = Create_Button(main, "Button_Quit", "Quit", new Vector2(40, 210), new Vector2(700, 100), 30, 60, "bottomleft");
-            main.name = "Main";
-            main.transform.SetParent(canvasobj.transform);
-        }
-
-        if(_Options_Type == 0 || _Options_Type == 2) //HUD
-        {
-            GameObject hudobj = new GameObject();
-            RectTransform hudobjrect = hudobj.AddComponent<RectTransform>();
-            SetRect(hudobjrect, "bottomleft");
-            hudobj.name = "HUD";
-
-            hudobj.transform.SetParent(canvasobj.transform);
-        }
-
-        _MainCanvas = canvasobj;
-    }
-    
-    void LiveHUDEditor()
-    {
-        LiveHUDEditor_Profile();
-        LiveHUDEditor_Tabs();
-
-        _EnableHUDLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate",_EnableHUDLiveEdit);
-
+        //HUD Settings
+        _HUD_EnableLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate",_HUD_EnableLiveEdit);
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
-        //Edit UI Object
-        for (int i = 0; i < _UITab[_UITabID].HUD_TabOjects.Count; i++)
+        HUD_Editor_Obj();
+        HUD_Editor_CanvasOptions();
+
+        EditorGUILayout.EndScrollView();
+    }
+    void HUD_Editor_Obj()
+    {
+        for (int i = 0; i < _HUD_Tab[_HUD_TabID].HUD_TabOjects.Count; i++)
         {
             GUILayout.BeginHorizontal();
-            _UITab[_UITabID].HUD_TabOjects[i].HUD_Name = EditorGUILayout.TextField("", _UITab[_UITabID].HUD_TabOjects[i].HUD_Name);
-            _UITab[_UITabID].HUD_TabOjects[i].HUD_Type = (Tool_QuickStartUI_Object.HUD_Types)EditorGUILayout.EnumPopup("", _UITab[_UITabID].HUD_TabOjects[i].HUD_Type);
-            if (_UITab[_UITabID].HUD_TabOjects[i].HUD_Type != _UITab[_UITabID].HUD_TabOjects[i].HUD_CheckType)
+            _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Name = EditorGUILayout.TextField("", _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Name);
+            _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Type = (Tool_QuickStartUI_Object.HUD_Types)EditorGUILayout.EnumPopup("", _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Type);
+            if (_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Type != _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_CheckType)
             {
                 if (GUILayout.Button("Update"))
                 {
-                    _UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform = null;
-                    DestroyImmediate(_UITab[_UITabID].HUD_TabOjects[i].HUD_Object);
-                    HUD_Change_Type(_UITab[_UITabID].HUD_TabOjects[i]);
-                    _UITab[_UITabID].HUD_TabOjects[i].HUD_CheckType = _UITab[_UITabID].HUD_TabOjects[i].HUD_Type;
+                    _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_RectTransform = null;
+                    DestroyImmediate(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Object);
+                    HUD_Change_Type(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i]);
+                    _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_CheckType = _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Type;
                 }
             }
             GUILayout.EndHorizontal();
 
 
             //MoreInfo
-            _UITab[_UITabID].HUD_TabOjects[i].HUD_FoldOut = EditorGUILayout.Foldout(_UITab[_UITabID].HUD_TabOjects[i].HUD_FoldOut, "More: ");
-            if (_UITab[_UITabID].HUD_TabOjects[i].HUD_FoldOut)
+            _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_FoldOut = EditorGUILayout.Foldout(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_FoldOut, "More: ");
+            if (_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_FoldOut)
             {
-                _UITab[_UITabID].HUD_TabOjects[i].HUD_Location = (Tool_QuickStartUI_Object.HUD_Locations)EditorGUILayout.EnumPopup("Location:", _UITab[_UITabID].HUD_TabOjects[i].HUD_Location);
+                _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Location = (Tool_QuickStartUI_Object.HUD_Locations)EditorGUILayout.EnumPopup("Location:", _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Location);
 
                 //Size
-                _UITab[_UITabID].HUD_TabOjects[i].HUD_Size = EditorGUILayout.Vector2Field("Size", _UITab[_UITabID].HUD_TabOjects[i].HUD_Size);
+                _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Size = EditorGUILayout.Vector2Field("Size", _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Size);
 
                 //Scale
-                _UITab[_UITabID].HUD_TabOjects[i].HUD_Scale = EditorGUILayout.Vector3Field("Scale", _UITab[_UITabID].HUD_TabOjects[i].HUD_Scale);
+                _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Scale = EditorGUILayout.Vector3Field("Scale", _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Scale);
 
                 //Offset
-                _UITab[_UITabID].HUD_TabOjects[i].HUD_Offset = EditorGUILayout.Vector2Field("Offset", _UITab[_UITabID].HUD_TabOjects[i].HUD_Offset);
+                _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Offset = EditorGUILayout.Vector2Field("Offset", _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Offset);
 
                 if (GUILayout.Button("Remove"))
                 {
-                    DestroyImmediate(_UITab[_UITabID].HUD_TabOjects[i].HUD_Object);
-                    _UITab[_UITabID].HUD_TabOjects.Remove(_UITab[_UITabID].HUD_TabOjects[i]);
+                    DestroyImmediate(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Object);
+                    _HUD_Tab[_HUD_TabID].HUD_TabOjects.Remove(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i]);
                 }
             }
         }
-
-        if (_MainCanvas != null)
-        {
-            //LiveEdit
-            if (_EnableHUDLiveEdit)
-            {
-                if (GUILayout.Button("Create"))
-                {
-                    Tool_QuickStartUI_Object newuiobj = new Tool_QuickStartUI_Object();
-                    newuiobj.HUD_Object = Create_Text(_MainCanvas,"new",Vector2.zero,new Vector2(100,100),"New String", 16, Color.white);
-                    newuiobj.HUD_RectTransform = newuiobj.HUD_Object.GetComponent<RectTransform>();
-
-                    //newuiobj.HUD_Object = Create_Text();
-                    newuiobj.HUD_CheckType = Tool_QuickStartUI_Object.HUD_Types.Text;
-                    newuiobj.HUD_Object.name = "New Text";
-                    newuiobj.HUD_Name = "New Text";
-                    newuiobj.HUD_Scale = new Vector3(1,1,1);
-                    newuiobj.HUD_Size = new Vector2(200,60);
-                    newuiobj.HUD_Object.transform.SetParent(_UITab[_UITabID].HUD_TabParent.transform);
-                    _UITab[_UITabID].HUD_TabOjects.Add(newuiobj);
-                }
-                LiveHUDEditorUpdate();
-            }
-            else
-            {
-                if (GUILayout.Button("Add"))
-                {
-                    Tool_QuickStartUI_Object newuiobj = new Tool_QuickStartUI_Object();
-                    _UITab[_UITabID].HUD_TabOjects.Add(newuiobj);
-                }
-                if (GUILayout.Button("Update"))
-                {
-                    LiveHUDEditorUpdate();
-                }
-            }
-        }
-        else
-        {
-            GUILayout.Label("Add or assign canvas to create/add");
-        }
-        EditorGUILayout.EndScrollView();
     }
-    void LiveHUDEditor_Tabs()
+    void HUD_Editor_Tabs()
     {
-        String[] tabs = new string[_UITab.Count];
-        for (int i = 0; i < _UITab.Count; i++)
+        String[] tabs = new string[_HUD_Tab.Count];
+        for (int i = 0; i < _HUD_Tab.Count; i++)
         {
             tabs[i] = i.ToString();
         }
 
         GUILayout.BeginHorizontal();
-        _UITabID = GUILayout.Toolbar(_UITabID, tabs);
+        _HUD_TabID = GUILayout.Toolbar(_HUD_TabID, tabs);
 
         if (GUILayout.Button("Add", GUILayout.Width(50)))
         {
-            HUD_AddTab();
+            HUD_Add_Tab();
         }
         GUILayout.EndHorizontal();
         if (GUILayout.Button("ToggleActive"))
         {
-            _UITab[_UITabID].HUD_TabParent.SetActive(!_UITab[_UITabID].HUD_TabParent.activeSelf);
+            _HUD_Tab[_HUD_TabID].HUD_TabParent.SetActive(!_HUD_Tab[_HUD_TabID].HUD_TabParent.activeSelf);
         }
 
     }
-    void LiveHUDEditor_Profile()
+    void HUD_Editor_Profile()
     {
         GUILayout.BeginHorizontal();
-        _HUDProfiles = (HUDProfiles)EditorGUILayout.EnumPopup("Load Profile:", _HUDProfiles);
+        _HUD_Profiles = (HUDProfiles)EditorGUILayout.EnumPopup("Load Profile:", _HUD_Profiles);
         if (GUILayout.Button("Load", GUILayout.Width(50)))
         {
             HUD_ClearLoaded();
-            switch (_HUDProfiles)
+            switch (_HUD_Profiles)
             {
                 case HUDProfiles.Default:
                     HUD_LoadProfile_Default();
@@ -952,38 +848,59 @@ public class Tool_QuickStart : EditorWindow
         }
         GUILayout.EndHorizontal();
     }
-
-    void HUD_AddTab()
+    void HUD_Editor_CanvasOptions()
     {
-        Tool_QuickStartUI_Tab newtab = new Tool_QuickStartUI_Tab();
-        newtab.HUD_TabParent = HUD_Template();
-
-        RectTransform rect_main = _MainCanvas.GetComponent<RectTransform>();
-        RectTransform rect_tab = newtab.HUD_TabParent.GetComponent<RectTransform>();
-
-        rect_tab.sizeDelta = rect_main.sizeDelta;
-        rect_tab.localScale = new Vector3(1,1,1);
-        rect_tab.anchoredPosition = new Vector2(0,0);
-
-        newtab.HUD_TabParent.name = _UITab.Count.ToString();
-        _UITab.Add(newtab);
+        if (_MainCanvas != null)
+        {
+            //LiveEdit
+            if (_HUD_EnableLiveEdit)
+            {
+                if (GUILayout.Button("Create"))
+                {
+                    Tool_QuickStartUI_Object newuiobj = new Tool_QuickStartUI_Object();
+                    newuiobj.HUD_Object = HUD_Create_Text();
+                    newuiobj.HUD_RectTransform = newuiobj.HUD_Object.GetComponent<RectTransform>();
+                    newuiobj.HUD_CheckType = Tool_QuickStartUI_Object.HUD_Types.Text;
+                    newuiobj.HUD_Object.name = "New Text";
+                    newuiobj.HUD_Name = "New Text";
+                    newuiobj.HUD_Size = new Vector2(200, 60);
+                    newuiobj.HUD_Object.transform.SetParent(_HUD_Tab[_HUD_TabID].HUD_TabParent.transform);
+                    _HUD_Tab[_HUD_TabID].HUD_TabOjects.Add(newuiobj);
+                }
+                LiveHUDEditorUpdate();
+            }
+            else
+            {
+                if (GUILayout.Button("Add"))
+                {
+                    Tool_QuickStartUI_Object newuiobj = new Tool_QuickStartUI_Object();
+                    _HUD_Tab[_HUD_TabID].HUD_TabOjects.Add(newuiobj);
+                }
+                if (GUILayout.Button("Update"))
+                {
+                    LiveHUDEditorUpdate();
+                }
+            }
+        }
+        else
+            GUILayout.Label("Add or assign canvas to create/add");
     }
 
-
+    //HUD Updator
     void LiveHUDEditorUpdate()
     {
-        for (int i = 0; i < _UITab[_UITabID].HUD_TabOjects.Count; i++)
+        for (int i = 0; i < _HUD_Tab[_HUD_TabID].HUD_TabOjects.Count; i++)
         {
-            if(_UITab[_UITabID].HUD_TabOjects[i].HUD_Object != null)
+            if(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Object != null)
             {
                 //Update HUD
-                HUD_Change_Position(_UITab[_UITabID].HUD_TabOjects[i]);
-                SetSize(_UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform, _UITab[_UITabID].HUD_TabOjects[i].HUD_Size);
-                SetScale(_UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform, _UITab[_UITabID].HUD_TabOjects[i].HUD_Scale);
-                SetOffSet(_UITab[_UITabID].HUD_TabOjects[i].HUD_RectTransform, _UITab[_UITabID].HUD_TabOjects[i].HUD_Offset);
-                _UITab[_UITabID].HUD_TabOjects[i].HUD_Object.name = _UITab[_UITabID].HUD_TabOjects[i].HUD_Name;
+                HUD_Change_Position(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i]);
+                HUD_Set_Size(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_RectTransform, _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Size);
+                HUD_Set_Scale(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_RectTransform, _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Scale);
+                HUD_Set_SetOffSet(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_RectTransform, _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Offset);
+                _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Object.name = _HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Name;
 
-                HUD_TextSize(_UITab[_UITabID].HUD_TabOjects[i]);
+                HUD_TextSize(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i]);
 
                 //Update canvas size / tab size
                 if(_MainCanvasRect == null)
@@ -991,21 +908,21 @@ public class Tool_QuickStart : EditorWindow
 
                 if (_CheckMainCanvasRectSize != _MainCanvasRect.sizeDelta)
                 {
-                    for (int j = 0; j < _UITab.Count; j++)
+                    for (int j = 0; j < _HUD_Tab.Count; j++)
                     {
-                        _UITab[j].HUD_TabParent.GetComponent<RectTransform>().sizeDelta = _MainCanvasRect.sizeDelta;
+                        _HUD_Tab[j].HUD_TabParent.GetComponent<RectTransform>().sizeDelta = _MainCanvasRect.sizeDelta;
                     }
                     _CheckMainCanvasRectSize = _MainCanvasRect.sizeDelta;
                 }
 
                 //Update text size
-                for (int j = 0; j < _UITab[_UITabID].HUD_TabOjects.Count; j++)
+                for (int j = 0; j < _HUD_Tab[_HUD_TabID].HUD_TabOjects.Count; j++)
                 {
-                    if(_UITab[_UITabID].HUD_TabOjects[j].HUD_Type == Tool_QuickStartUI_Object.HUD_Types.Button)
+                    if(_HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Type == Tool_QuickStartUI_Object.HUD_Types.Button)
                     {
-                        for (int o = 0; o < _UITab[_UITabID].HUD_TabOjects[j].HUD_Text.Count; o++)
+                        for (int o = 0; o < _HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Text.Count; o++)
                         {
-                            _UITab[_UITabID].HUD_TabOjects[j].HUD_Text[o].rectTransform.sizeDelta = _UITab[_UITabID].HUD_TabOjects[j].HUD_Size;
+                            _HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Text[o].rectTransform.sizeDelta = _HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Size;
                         }
                         
                     }
@@ -1014,22 +931,20 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-
-
     //HUD Edit
     void HUD_Change_Position(Tool_QuickStartUI_Object obj)
     {
         switch(obj.HUD_Location)
         {
-            case Tool_QuickStartUI_Object.HUD_Locations.TopLeft: SetRect(obj.HUD_RectTransform, "topleft"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.TopMiddle: SetRect(obj.HUD_RectTransform, "topmiddle"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.TopRight: SetRect(obj.HUD_RectTransform, "topright"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.RightMiddle: SetRect(obj.HUD_RectTransform, "rightmiddle"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle: SetRect(obj.HUD_RectTransform, "leftmiddle"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.BottomLeft: SetRect(obj.HUD_RectTransform, "bottomleft"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.BottomMiddle: SetRect(obj.HUD_RectTransform, "bottommiddle"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.BottomRight: SetRect(obj.HUD_RectTransform, "bottomright"); break;
-            case Tool_QuickStartUI_Object.HUD_Locations.Middle: SetRect(obj.HUD_RectTransform, "middle"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.TopLeft: HUD_Set_Rect(obj.HUD_RectTransform, "topleft"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.TopMiddle: HUD_Set_Rect(obj.HUD_RectTransform, "topmiddle"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.TopRight: HUD_Set_Rect(obj.HUD_RectTransform, "topright"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.RightMiddle: HUD_Set_Rect(obj.HUD_RectTransform, "rightmiddle"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.LeftMiddle: HUD_Set_Rect(obj.HUD_RectTransform, "leftmiddle"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.BottomLeft: HUD_Set_Rect(obj.HUD_RectTransform, "bottomleft"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.BottomMiddle: HUD_Set_Rect(obj.HUD_RectTransform, "bottommiddle"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.BottomRight: HUD_Set_Rect(obj.HUD_RectTransform, "bottomright"); break;
+            case Tool_QuickStartUI_Object.HUD_Locations.Middle: HUD_Set_Rect(obj.HUD_RectTransform, "middle"); break;
         }
     }
     void HUD_Change_Type(Tool_QuickStartUI_Object obj)
@@ -1070,7 +985,7 @@ public class Tool_QuickStart : EditorWindow
         HUD_Change_Position(obj);
 
         //Add to tab
-        obj.HUD_Object.transform.SetParent(_UITab[_UITabID].HUD_TabParent.transform);
+        obj.HUD_Object.transform.SetParent(_HUD_Tab[_HUD_TabID].HUD_TabParent.transform);
 
         //Update UI Obj text ref
         obj.HUD_Text.Clear();
@@ -1079,14 +994,6 @@ public class Tool_QuickStart : EditorWindow
             if (obj.HUD_Object.transform.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
                 obj.HUD_Text.Add(obj.HUD_Object.transform.GetChild(i).GetComponent<TextMeshProUGUI>());
         }
-    }
-    void HUD_Change_Name()
-    {
-
-    }
-    void HUD_TextOffset()
-    {
-
     }
     void HUD_TextSize(Tool_QuickStartUI_Object obj)
     {
@@ -1099,14 +1006,14 @@ public class Tool_QuickStart : EditorWindow
     //HUD Create
     GameObject HUD_Create_Text()
     {
-        GameObject newhud_text = HUD_Template();
-        newhud_text.AddComponent<TextMeshProUGUI>();
+        GameObject newhud_text = HUD_Create_Template();
+        newhud_text.AddComponent<TextMeshProUGUI>().text = "New Text";
 
         return newhud_text;
     }
     GameObject HUD_Create_Button()
     {
-        GameObject newhud_button = HUD_Template();
+        GameObject newhud_button = HUD_Create_Template();
 
         newhud_button.AddComponent<CanvasRenderer>();
         Image buttonimage = newhud_button.AddComponent<Image>();
@@ -1118,7 +1025,6 @@ public class Tool_QuickStart : EditorWindow
         GameObject buttontextemplate = new GameObject();
         RectTransform buttontextrect = buttontextemplate.AddComponent<RectTransform>();
         buttontextrect.anchoredPosition = new Vector3(5,0,0);
-        buttontextrect.localScale = new Vector3(1,1,1);
 
         TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
         buttontexttmpro.text = "New Button";
@@ -1475,92 +1381,18 @@ public class Tool_QuickStart : EditorWindow
     }
     GameObject HUD_Create_Bar()
     {
-        GameObject newhud_text = HUD_Template();
+        GameObject newhud_text = HUD_Create_Template();
 
         return newhud_text;
     }
-    GameObject HUD_Template()
+    GameObject HUD_Create_Template()
     {
         GameObject newhudobj = new GameObject();
         newhudobj.AddComponent<RectTransform>();
         newhudobj.transform.SetParent(_MainCanvas.transform);
         return newhudobj;
     }
-
-    //Premade Profiles
-    void HUD_ClearLoaded()
-    {
-        for (int i = 0; i < _UITab.Count; i++)
-        {
-            DestroyImmediate(_UITab[i].HUD_TabParent);
-        }
-        _UITab.Clear();
-        _UITabID = 0;
-    }
-    void HUD_LoadProfile_Default()
-    {
-        HUD_AddTab(); //0 Home
-        HUD_AddTab(); //1 Display
-        HUD_AddTab(); //2 Graphics
-        HUD_AddTab(); //3 Gameplay
-        HUD_AddTab(); //4 Controls
-
-        //============================================================================================= 0 Home
-        Tool_QuickStartUI_Object tab_home_startbutton = new Tool_QuickStartUI_Object();
-        tab_home_startbutton.HUD_Name = "Button_Start";
-        tab_home_startbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
-        tab_home_startbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
-        tab_home_startbutton.HUD_Offset = new Vector3(40, 450, 0);
-        tab_home_startbutton.HUD_Size = new Vector2(700, 100);
-        tab_home_startbutton.HUD_Scale = new Vector3(1, 1, 1);
-
-        Tool_QuickStartUI_Object tab_home_optionsbutton = new Tool_QuickStartUI_Object();
-        tab_home_optionsbutton.HUD_Name = "Button_Options";
-        tab_home_optionsbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
-        tab_home_optionsbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
-        tab_home_optionsbutton.HUD_Offset = new Vector3(40, 330, 0);
-        tab_home_optionsbutton.HUD_Size = new Vector2(700, 100);
-        tab_home_optionsbutton.HUD_Scale = new Vector3(1, 1, 1);
-
-        Tool_QuickStartUI_Object tab_home_quitbutton = new Tool_QuickStartUI_Object();
-        tab_home_quitbutton.HUD_Name = "Button_Quit";
-        tab_home_quitbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
-        tab_home_quitbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
-        tab_home_quitbutton.HUD_Offset = new Vector3(40, 210, 0);
-        tab_home_quitbutton.HUD_Size = new Vector2(700, 100);
-        tab_home_quitbutton.HUD_Scale = new Vector3(1, 1, 1);
-
-        _UITab[0].HUD_TabOjects.Add(tab_home_startbutton);
-        _UITab[0].HUD_TabOjects.Add(tab_home_optionsbutton);
-        _UITab[0].HUD_TabOjects.Add(tab_home_quitbutton);
-        //============================================================================================= 1 Display
-        Tool_QuickStartUI_Object tab_display_title = new Tool_QuickStartUI_Object();
-        tab_display_title.HUD_Name = "Title_Display";
-        tab_display_title.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Text;
-        tab_display_title.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
-        //tab_display_title.HUD_RectTransform.sizeDelta = new Vector2(200, 50);
-        tab_display_title.HUD_Offset = new Vector3(800, 800, 0);
-
-
-
-        _UITab[1].HUD_TabOjects.Add(tab_display_title);
-
-
-        //Update
-        for (int i = 0; i < _UITab.Count; i++)
-        {
-            for (int j = 0; j < _UITab[i].HUD_TabOjects.Count; j++)
-            {
-                _UITab[i].HUD_TabOjects[j].HUD_RectTransform = null;
-                DestroyImmediate(_UITab[i].HUD_TabOjects[j].HUD_Object);
-                HUD_Change_Type(_UITab[i].HUD_TabOjects[j]);
-                _UITab[i].HUD_TabOjects[j].HUD_CheckType = _UITab[i].HUD_TabOjects[j].HUD_Type;
-            }
-        }
-    }
-
-    //Create UIObjects
-    GameObject CreateCanvas()
+    GameObject HUD_Create_Canvas()
     {
         GameObject canvasobj = new GameObject();
         canvasobj.name = "TestCanvas";
@@ -1583,479 +1415,9 @@ public class Tool_QuickStart : EditorWindow
 
         return canvasobj;
     }
-    GameObject Create_Button(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
-    {
-        GameObject buttontemplate = new GameObject();
-        RectTransform buttontransform = buttontemplate.AddComponent<RectTransform>();
 
-        buttontransform.sizeDelta = size;
-        buttontransform.anchoredPosition = pos;
-        
-        SetRect(buttontransform, anchorpos);
-
-        buttontemplate.AddComponent<CanvasRenderer>();
-        Image buttonimage = buttontemplate.AddComponent<Image>();
-        buttonimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        buttonimage.type = Image.Type.Sliced;
-        Button buttonbutton = buttontemplate.AddComponent<Button>();
-        buttonbutton.targetGraphic = buttonimage;
-        buttontemplate.name = name;
-
-        GameObject buttontextemplate = new GameObject();
-        RectTransform buttontextrect = buttontextemplate.AddComponent<RectTransform>();
-
-        buttontextrect.anchoredPosition = new Vector2(pos.x + textoffset, pos.y);
-        buttontextrect.sizeDelta = size;
-        buttontextrect.pivot = new Vector2(0, 0);
-
-        TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
-        buttontexttmpro.text = buttontext;
-        buttontexttmpro.fontSize = textsize;
-        buttontexttmpro.alignment = TextAlignmentOptions.MidlineLeft;
-        buttontexttmpro.color = Color.black;
-
-        buttontextemplate.name = name + "text";
-
-
-
-        buttontextemplate.transform.SetParent(buttontemplate.transform);
-
-        buttontemplate.transform.SetParent(parentobj.transform);
-
-        return buttontemplate;
-    }
-    GameObject Create_Dropdown(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
-    {
-        //Create objects
-        GameObject dropdownobj = new GameObject();
-        GameObject dropdown_label = new GameObject();
-        GameObject dropdown_arrow = new GameObject();
-        GameObject dropdown_template = new GameObject();
-
-        GameObject dropdown_viewport = new GameObject();
-        GameObject dropdown_content = new GameObject();
-        GameObject dropdown_item = new GameObject();
-
-        GameObject dropdown_item_background = new GameObject();
-        GameObject dropdown_item_checkmark = new GameObject();
-        GameObject dropdown_item_label = new GameObject();
-
-        GameObject dropdown_scrollbar = new GameObject();
-        GameObject dropdown_slidingarea = new GameObject();
-        GameObject dropdown_handle = new GameObject();
-
-        dropdown_template.SetActive(false);
-
-        //Set Name
-        dropdownobj.name = name;
-        dropdown_label.name = "Label";
-        dropdown_arrow.name = "Arrow";
-        dropdown_template.name = "Template";
-
-        dropdown_viewport.name = "Viewport";
-        dropdown_content.name = "Content";
-        dropdown_item.name = "Item";
-
-        dropdown_item_background.name = "Item Background";
-        dropdown_item_checkmark.name = "Item Checkmark";
-        dropdown_item_label.name = "Item Label";
-
-        dropdown_scrollbar.name = "Scrollbar";
-        dropdown_slidingarea.name = "Sliding Area";
-        dropdown_handle.name = "Handle";
-
-        //Add RectTransform
-        RectTransform dropdownobjrect = dropdownobj.AddComponent<RectTransform>();
-        RectTransform dropdown_labelrect = dropdown_label.AddComponent<RectTransform>();
-        RectTransform dropdown_arrowrect = dropdown_arrow.AddComponent<RectTransform>();
-        RectTransform dropdown_templaterect = dropdown_template.AddComponent<RectTransform>();
-
-        RectTransform dropdown_viewportrect = dropdown_viewport.AddComponent<RectTransform>();
-        RectTransform dropdown_contentrect = dropdown_content.AddComponent<RectTransform>();
-        RectTransform dropdown_itemrect = dropdown_item.AddComponent<RectTransform>();
-
-        RectTransform dropdown_item_backgroundrect = dropdown_item_background.AddComponent<RectTransform>();
-        RectTransform dropdown_item_checkmarkrect = dropdown_item_checkmark.AddComponent<RectTransform>();
-        RectTransform dropdown_item_labelrect = dropdown_item_label.AddComponent<RectTransform>();
-
-        RectTransform dropdown_scrollbarrect = dropdown_scrollbar.AddComponent<RectTransform>();
-        RectTransform dropdown_slidingarearect = dropdown_slidingarea.AddComponent<RectTransform>();
-        RectTransform dropdown_handlerect = dropdown_handle.AddComponent<RectTransform>();
-
-        //SetParent
-        dropdown_label.transform.SetParent(dropdownobj.transform);
-        dropdown_arrow.transform.SetParent(dropdownobj.transform);
-        dropdown_template.transform.SetParent(dropdownobj.transform);
-
-        dropdown_viewport.transform.SetParent(dropdown_template.transform);
-        dropdown_content.transform.SetParent(dropdown_viewport.transform);
-        dropdown_item.transform.SetParent(dropdown_content.transform);
-
-        dropdown_item_background.transform.SetParent(dropdown_item.transform);
-        dropdown_item_checkmark.transform.SetParent(dropdown_item.transform);
-        dropdown_item_label.transform.SetParent(dropdown_item.transform);
-
-        dropdown_scrollbar.transform.SetParent(dropdown_template.transform);
-        dropdown_slidingarea.transform.SetParent(dropdown_scrollbar.transform);
-        dropdown_handle.transform.SetParent(dropdown_slidingarea.transform);
-
-        //Set Rect dropdownobj
-        dropdownobjrect.sizeDelta = size;
-        dropdownobjrect.anchoredPosition = pos;
-        Image dropdownimage = dropdownobj.AddComponent<Image>();
-        dropdownimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        dropdownimage.type = Image.Type.Sliced;
-        TMP_Dropdown dropdowntmp = dropdownobj.AddComponent<TMP_Dropdown>();
-        SetRect(dropdownobjrect, anchorpos);
-        List<TMP_Dropdown.OptionData> newoptions = new List<TMP_Dropdown.OptionData>();
-
-        TMP_Dropdown.OptionData option1 = new TMP_Dropdown.OptionData();
-        TMP_Dropdown.OptionData option2 = new TMP_Dropdown.OptionData();
-        TMP_Dropdown.OptionData option3 = new TMP_Dropdown.OptionData();
-
-        option1.text = "Option A";
-        option2.text = "Option B";
-        option3.text = "Option C";
-
-        newoptions.Add(option1);
-        newoptions.Add(option2);
-        newoptions.Add(option3);
-
-        dropdowntmp.AddOptions(newoptions);
-
-        //Set Rect Label
-        dropdown_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_labelrect.sizeDelta = new Vector2(25, 6);
-        dropdown_labelrect.anchoredPosition = new Vector4(10, 7);
-
-        //Set Rect Arrow
-        dropdown_arrowrect.anchorMin = new Vector2(1, 0.5f);
-        dropdown_arrowrect.anchorMax = new Vector2(1, 0.5f);
-        dropdown_arrowrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_arrowrect.sizeDelta = new Vector2(20, 20);
-        dropdown_arrowrect.anchoredPosition = new Vector4(-15, 0);
-
-        //Set Rect Template
-        dropdown_templaterect.anchorMin = new Vector2(0, 0);
-        dropdown_templaterect.anchorMax = new Vector2(1, 0);
-        dropdown_templaterect.pivot = new Vector2(0.5f, 1);
-        dropdown_templaterect.sizeDelta = new Vector2(0, 150);
-        dropdown_templaterect.anchoredPosition = new Vector4(0, 2);
-
-        //Set Rect Viewport
-        dropdown_viewportrect.anchorMin = new Vector2(0, 0);
-        dropdown_viewportrect.anchorMax = new Vector2(1, 1);
-        dropdown_viewportrect.pivot = new Vector2(0, 1);
-        dropdown_viewportrect.sizeDelta = new Vector2(18, 15); //NotDy
-        dropdown_viewportrect.anchoredPosition = new Vector4(0, 0);
-
-        //Set Rect Content
-        dropdown_contentrect.anchorMin = new Vector2(0, 1);
-        dropdown_contentrect.anchorMax = new Vector2(1, 1);
-        dropdown_contentrect.pivot = new Vector2(0.5f, 1);
-        dropdown_contentrect.sizeDelta = new Vector2(0, 28);
-        dropdown_contentrect.anchoredPosition = new Vector4(0, 0);
-
-        //Set Rect Item
-        dropdown_itemrect.anchorMin = new Vector2(0, 0.5f);
-        dropdown_itemrect.anchorMax = new Vector2(1, 0.5f);
-        dropdown_itemrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_itemrect.sizeDelta = new Vector2(0, size.y);
-        dropdown_itemrect.anchoredPosition = new Vector4(0, -15); //NotDy
-
-        //Set Rect Item Background
-        dropdown_item_backgroundrect.anchorMin = new Vector2(0,0);
-        dropdown_item_backgroundrect.anchorMax = new Vector2(1, 1);
-        dropdown_item_backgroundrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_item_backgroundrect.sizeDelta = new Vector2(0, 0);
-        dropdown_item_backgroundrect.anchoredPosition = new Vector4(0, 0);
-
-        //Set Rect Item Checkmark
-        dropdown_item_checkmarkrect.anchorMin = new Vector2(0, 0.5f);
-        dropdown_item_checkmarkrect.anchorMax = new Vector2(0, 0.5f);
-        dropdown_item_checkmarkrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_item_checkmarkrect.sizeDelta = new Vector2(20, 20);
-        dropdown_item_checkmarkrect.anchoredPosition = new Vector4(10, 0);
-
-        //Set Rect Item Label
-        dropdown_item_labelrect.anchorMin = new Vector2(0, 0);
-        dropdown_item_labelrect.anchorMax = new Vector2(1, 1);
-        dropdown_item_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_item_labelrect.sizeDelta = new Vector2(10, 1);
-        dropdown_item_labelrect.anchoredPosition = new Vector4(20, 2);
-
-        //Set Rect Scrollbar
-        dropdown_scrollbarrect.anchorMin = new Vector2(1, 0);
-        dropdown_scrollbarrect.anchorMax = new Vector2(1, 1);
-        dropdown_scrollbarrect.pivot = new Vector2(1, 1);
-        dropdown_scrollbarrect.sizeDelta = new Vector2(20, 0);
-        dropdown_scrollbarrect.anchoredPosition = new Vector4(0, 0);
-
-        //Set Rect Sliding Area
-        dropdown_slidingarearect.anchorMin = new Vector2(0, 0);
-        dropdown_slidingarearect.anchorMax = new Vector2(1, 1);
-        dropdown_slidingarearect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_slidingarearect.sizeDelta = new Vector2(10, 10);
-        dropdown_slidingarearect.anchoredPosition = new Vector4(10, 10);
-
-        //Set Rect Handle
-        dropdown_handlerect.anchorMin = new Vector2(0, 0);
-        dropdown_handlerect.anchorMax = new Vector2(1, 0.2f);
-        dropdown_handlerect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_handlerect.sizeDelta = new Vector2(-10, -10);
-        dropdown_handlerect.anchoredPosition = new Vector4(-10, -10);
-
-        //
-        dropdown_arrow.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/DropdownArrow.psd"); ;
-
-        //
-        dropdowntmp.template = dropdown_templaterect;
-        dropdowntmp.captionText = dropdown_label.GetComponent<TextMeshProUGUI>();
-        dropdowntmp.itemText = dropdown_item_label.GetComponent<TextMeshProUGUI>();
-
-        //handle
-        Image dropdown_handleimage = dropdown_handle.AddComponent<Image>();
-        dropdown_handleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd"); ;
-        dropdown_handleimage.type = Image.Type.Sliced;
-
-        //scrollbar
-        Image dropdown_scrollbarimage = dropdown_scrollbar.AddComponent<Image>();
-        dropdown_scrollbarimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd"); ;
-        dropdown_scrollbarimage.type = Image.Type.Sliced;
-        Scrollbar dropdown_scrollbar_scroll = dropdown_scrollbar.AddComponent<Scrollbar>();
-        dropdown_scrollbar_scroll.targetGraphic = dropdown_handleimage;
-        dropdown_scrollbar_scroll.handleRect = dropdown_handlerect;
-        dropdown_scrollbar_scroll.direction = Scrollbar.Direction.BottomToTop;
-
-        //Template
-        Image dropdown_templateimage = dropdown_template.AddComponent<Image>();
-        dropdown_templateimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        dropdown_templateimage.type = Image.Type.Sliced;
-        ScrollRect dropdown_templatescrollrect = dropdown_template.AddComponent<ScrollRect>();
-        dropdown_templatescrollrect.content = dropdown_contentrect;
-        dropdown_templatescrollrect.decelerationRate = 0.135f;
-        dropdown_templatescrollrect.scrollSensitivity = 1;
-        dropdown_templatescrollrect.viewport = dropdown_viewportrect;
-        dropdown_templatescrollrect.movementType = ScrollRect.MovementType.Clamped;
-        dropdown_templatescrollrect.verticalScrollbar = dropdown_scrollbar_scroll;
-        dropdown_templatescrollrect.horizontal = false;
-
-        //viewport
-        Mask dropdown_viewportmask = dropdown_viewport.AddComponent<Mask>();
-        Image dropdown_viewportimage = dropdown_viewport.AddComponent<Image>();
-        dropdown_viewportimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UIMask.psd");
-        dropdown_viewportimage.type = Image.Type.Sliced;
-
-        //Item Background
-        dropdown_item_background.AddComponent<Image>();
-
-        //Item Checkmark
-        dropdown_item_checkmark.AddComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd"); ;
-
-        //Item Label
-        TextMeshProUGUI dropdown_item_labeltmp = dropdown_item_label.AddComponent<TextMeshProUGUI>();
-        dropdown_item_labeltmp.text = "Option A";
-        dropdown_item_labeltmp.color = Color.black;
-
-        //LabelText
-        TextMeshProUGUI dropdown_labeltext = dropdown_label.AddComponent<TextMeshProUGUI>();
-        dropdown_labeltext.alignment = TextAlignmentOptions.MidlineLeft;
-        dropdown_labeltext.color = Color.black;
-        dropdown_labeltext.text = "Option A";
-
-        //Item
-        Toggle dropdown_itemtoggle = dropdown_item.AddComponent<Toggle>();
-        dropdown_itemtoggle.targetGraphic = dropdown_item_background.GetComponent<Image>();
-        dropdown_itemtoggle.graphic = dropdown_item_checkmark.GetComponent<Image>();
-        dropdown_itemtoggle.isOn = true;
-
-        //dropdownobj
-        dropdowntmp.targetGraphic = dropdownimage;
-        dropdowntmp.itemText = dropdown_item_labeltmp;
-
-        //AddToOptions
-        dropdownobj.transform.SetParent(parentobj.transform);
-
-        dropdowntmp.captionText = dropdown_labeltext;
-
-        return dropdownobj;
-    }
-    GameObject Create_Text(GameObject parentobj, string name, Vector2 pos, Vector2 size, string textcontent, float fontsize, Color textcolor)
-    {
-        GameObject newtextobj = new GameObject();
-        RectTransform buttontextrect = newtextobj.AddComponent<RectTransform>();
-        newtextobj.name = name;
-        buttontextrect.sizeDelta = size;
-        buttontextrect.anchoredPosition = pos;
-        SetRect(buttontextrect, "bottomleft");
-
-        TextMeshProUGUI newtext = newtextobj.AddComponent<TextMeshProUGUI>();
-        newtext.text = textcontent;
-        newtext.fontSize = fontsize;
-        newtext.alignment = TextAlignmentOptions.MidlineLeft;
-        newtext.color = textcolor;
-
-        newtext.transform.SetParent(parentobj.transform);
-        return newtextobj;
-    }
-    GameObject Create_Slider(GameObject parentobj, string name, string buttontext, Vector2 pos, Vector2 size, float textoffset, float textsize, string anchorpos)
-    {
-        //Create Objects
-        GameObject newsliderbackground = new GameObject();
-        GameObject newsliderobj = new GameObject();
-        GameObject newsliderfillarea = new GameObject();
-        GameObject newsliderfill = new GameObject();
-        GameObject newsliderslidearea = new GameObject();
-        GameObject newsliderhandle = new GameObject();
-
-        newsliderobj.name = name;
-
-        //Set Parents
-        newsliderbackground.transform.SetParent(newsliderobj.transform);
-        newsliderfill.transform.SetParent(newsliderfillarea.transform);
-        newsliderfillarea.transform.SetParent(newsliderobj.transform);
-        newsliderhandle.transform.SetParent(newsliderslidearea.transform);
-        newsliderslidearea.transform.SetParent(newsliderobj.transform);
-
-        //Add RectTransform
-        RectTransform buttonobjrect = newsliderobj.AddComponent<RectTransform>();
-        RectTransform newsliderbackgroundrect = newsliderbackground.AddComponent<RectTransform>();
-        RectTransform buttonfillarearect = newsliderfillarea.AddComponent<RectTransform>();
-        RectTransform buttonfillrect = newsliderfill.AddComponent<RectTransform>();
-        RectTransform buttonslidearearect = newsliderslidearea.AddComponent<RectTransform>();
-        RectTransform buttonhandlerect = newsliderhandle.AddComponent<RectTransform>();
-
-        //Add Images
-        Image newsliderbackgroundimage = newsliderbackground.AddComponent<Image>();
-        Image newsliderfillimage = newsliderfill.AddComponent<Image>();
-        newsliderfillimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-        newsliderfillimage.type = Image.Type.Sliced;
-        newsliderfillimage.color = Color.grey;
-        Image newsliderhandleimage = newsliderhandle.AddComponent<Image>();
-
-        //Set Rect NewObj
-        buttonobjrect.sizeDelta = size;
-        buttonobjrect.anchoredPosition = pos;
-        SetRect(buttonobjrect, anchorpos);
-        Slider newsliderslider = newsliderobj.AddComponent<Slider>();
-
-        //Set Rect Background
-        newsliderbackgroundrect.anchorMin = new Vector2(0, 0.25f);
-        newsliderbackgroundrect.anchorMax = new Vector2(1, 0.75f);
-        newsliderbackgroundrect.pivot = new Vector2(0.5f, 0.5f);
-        newsliderbackgroundrect.sizeDelta = new Vector2(0, 0);
-        newsliderbackgroundrect.anchoredPosition = new Vector2(0, 0);
-        newsliderbackground.name = "BackGround";
-
-        //Set Rect FillArea
-        buttonfillarearect.anchorMin = new Vector2(0, 0.25f);
-        buttonfillarearect.anchorMax = new Vector2(1, 0.75f);
-        buttonfillarearect.pivot = new Vector2(0.5f, 0.5f);
-        buttonfillarearect.sizeDelta = new Vector2(15, 0);
-        buttonfillarearect.anchoredPosition = new Vector2(5, 0);
-        newsliderfillarea.name = "FillArea";
-
-        //Set Rect Fill
-        buttonfillrect.anchorMin = new Vector2(0, 0.25f);
-        buttonfillrect.anchorMax = new Vector2(1, 0.75f);
-        buttonfillrect.pivot = new Vector2(0.5f, 0.5f);
-        buttonfillrect.sizeDelta = new Vector2(10, 0);
-        buttonfillrect.anchoredPosition = new Vector4(0, 0);
-        newsliderfill.name = "Fill";
-
-        //Set Rect SliderArea
-        buttonslidearearect.anchorMin = new Vector2(0, 0);
-        buttonslidearearect.anchorMax = new Vector2(1, 1);
-        buttonslidearearect.pivot = new Vector2(0.5f, 0.5f);
-        buttonslidearearect.sizeDelta = new Vector2(10, 0);
-        buttonslidearearect.anchoredPosition = new Vector2(10, 0);
-        newsliderslidearea.name = "Handle Slide Area";
-
-        //Set Rect Handle
-        buttonhandlerect.anchorMin = new Vector2(0, 0.25f);
-        buttonhandlerect.anchorMax = new Vector2(1, 0.75f);
-        buttonhandlerect.pivot = new Vector2(0.5f, 0.5f);
-        buttonhandlerect.sizeDelta = new Vector2(20, 0);
-        buttonhandlerect.anchoredPosition = new Vector2(0, 0);
-        newsliderhandleimage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
-        newsliderslider.image = newsliderhandleimage;
-        newsliderslider.fillRect = buttonfillrect;
-        newsliderslider.handleRect = buttonhandlerect;
-        newsliderhandle.name = "Handle";
-
-        newsliderobj.transform.SetParent(parentobj.transform);
-
-        return newsliderobj;
-    }
-    GameObject Create_Tab(GameObject parentobj, string name)
-    {
-        GameObject tab_new = new GameObject();
-        RectTransform tab_newrect = tab_new.AddComponent<RectTransform>();
-        SetRect(tab_newrect, "bottomleft");
-        tab_new.name = name;
-
-        GameObject textobj = Create_Text(tab_new, "Title_" + name, new Vector2(800, 800), new Vector2(1000, 200), name, 100, Color.white);
-
-        switch (name)
-        {
-            case "Display":
-                GameObject button_Resolution = Create_Dropdown(tab_new, "Dropdown_Resolution", "Resolution", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Fullscreen = Create_Button(tab_new, "Button_Fullscreen", "Fullscreen", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Quality = Create_Dropdown(tab_new, "Dropdown_Quality", "Quality", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_VSync = Create_Button(tab_new, "Button_VSync", "VSync", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_MaxFPS = Create_Button(tab_new, "Button_MaxFPS", "MaxFPS", new Vector2(800, 420), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Gamma = Create_Button(tab_new, "Button_Gamma", "Gamma", new Vector2(800, 350), new Vector2(500, 60), 10, 40, "bottomleft");
-                // Resolution
-                // Fullscreen
-                // Quality
-                // V-Sync
-                // Max fps
-                // Gamma
-                break;
-            case "Graphics":
-                GameObject button_Antialiasing = Create_Dropdown(tab_new, "Dropdown_Antialiasing", "Antialiasing", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Shadows = Create_Button(tab_new, "Button_Shadows", "Shadows", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_ViewDistance = Create_Button(tab_new, "Button_ViewDistance", "ViewDistance", new Vector2(800, 560), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_TextureQuality = Create_Button(tab_new, "Dropdown_TextureQuality", "TextureQuality", new Vector2(800, 490), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_ViolageDistance = Create_Button(tab_new, "Button_ViolageDistance", "ViolageDistance", new Vector2(800, 420), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_ViolageDensity = Create_Button(tab_new, "Button_ViolageDensity", "ViolageDensity", new Vector2(800, 350), new Vector2(500, 60), 10, 40, "bottomleft");
-                // Antialiasing
-                // Shadows
-                // ViewDistance
-                // TextureQuality
-                // ViolageDistance
-                // ViolageDensity
-                break;
-            case "Gameplay":
-                GameObject button_SoundEffects = Create_Button(tab_new, "Button_SoundEffects", "SoundEffects", new Vector2(800, 700), new Vector2(500, 60), 10, 40, "bottomleft");
-                GameObject Button_Music = Create_Slider(tab_new, "Slider_Music", "Music", new Vector2(800, 630), new Vector2(500, 60), 10, 40, "bottomleft");
-                // SoundEffects
-                // Music
-                break;
-            case "Controls":
-
-                break;
-            case "Keybinding":
-
-                break;
-        }
-
-
-        tab_new.transform.SetParent(parentobj.transform);
-        tab_new.SetActive(false);
-        return tab_new;
-    }
-    GameObject Create_Bar(GameObject parentobj, string name)
-    {
-        GameObject newbar = new GameObject();
-
-        return newbar;
-    }
-
-
-    void SetRect(RectTransform rect, string anchorpos)
+    //HUD Set
+    void HUD_Set_Rect(RectTransform rect, string anchorpos)
     {
         switch (anchorpos)
         {
@@ -2106,19 +1468,138 @@ public class Tool_QuickStart : EditorWindow
                 break;
         }
     }
-    void SetSize(RectTransform rect, Vector2 size)
+    void HUD_Set_Size(RectTransform rect, Vector2 size)
     {
         rect.sizeDelta = size;
     }
-    void SetScale(RectTransform rect, Vector3 scale)
+    void HUD_Set_Scale(RectTransform rect, Vector3 scale)
     {
         rect.localScale = scale;
     }
-    void SetOffSet(RectTransform rect, Vector3 offset)
+    void HUD_Set_SetOffSet(RectTransform rect, Vector3 offset)
     {
         rect.anchoredPosition = offset;
     }
 
+    //HUD Add
+    void HUD_Add_Tab()
+    {
+        Tool_QuickStartUI_Tab newtab = new Tool_QuickStartUI_Tab();
+        newtab.HUD_TabParent = HUD_Create_Template();
+
+        RectTransform rect_main = _MainCanvas.GetComponent<RectTransform>();
+        RectTransform rect_tab = newtab.HUD_TabParent.GetComponent<RectTransform>();
+
+        rect_tab.sizeDelta = rect_main.sizeDelta;
+        rect_tab.anchoredPosition = new Vector2(0, 0);
+        rect_tab.localScale = new Vector3(1,1,1);
+
+        newtab.HUD_TabParent.name = _HUD_Tab.Count.ToString();
+        _HUD_Tab.Add(newtab);
+    }
+
+    //HUD Profiles
+    void HUD_ClearLoaded()
+    {
+        for (int i = 0; i < _HUD_Tab.Count; i++)
+        {
+            DestroyImmediate(_HUD_Tab[i].HUD_TabParent);
+        }
+        _HUD_Tab.Clear();
+        _HUD_TabID = 0;
+    }
+    void HUD_LoadProfile_Default()
+    {
+        HUD_Add_Tab(); //0 Home
+        HUD_Add_Tab(); //1 Display
+        HUD_Add_Tab(); //2 Graphics
+        HUD_Add_Tab(); //3 Gameplay
+        HUD_Add_Tab(); //4 Controls
+
+        //============================================================================================= 0 Home
+        Tool_QuickStartUI_Object tab_home_startbutton = new Tool_QuickStartUI_Object();
+        tab_home_startbutton.HUD_Name = "Button_Start";
+        tab_home_startbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
+        tab_home_startbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_home_startbutton.HUD_Offset = new Vector3(40, 450, 0);
+        tab_home_startbutton.HUD_Size = new Vector2(500, 100);
+        tab_home_startbutton.HUD_Scale = new Vector3(1, 1, 1);
+
+        Tool_QuickStartUI_Object tab_home_optionsbutton = new Tool_QuickStartUI_Object();
+        tab_home_optionsbutton.HUD_Name = "Button_Options";
+        tab_home_optionsbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
+        tab_home_optionsbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_home_optionsbutton.HUD_Offset = new Vector3(40, 330, 0);
+        tab_home_optionsbutton.HUD_Size = new Vector2(500, 100);
+        tab_home_optionsbutton.HUD_Scale = new Vector3(1, 1, 1);
+
+        Tool_QuickStartUI_Object tab_home_quitbutton = new Tool_QuickStartUI_Object();
+        tab_home_quitbutton.HUD_Name = "Button_Quit";
+        tab_home_quitbutton.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Button;
+        tab_home_quitbutton.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_home_quitbutton.HUD_Offset = new Vector3(40, 210, 0);
+        tab_home_quitbutton.HUD_Size = new Vector2(500, 100);
+        tab_home_quitbutton.HUD_Scale = new Vector3(1, 1, 1);
+
+        _HUD_Tab[0].HUD_TabOjects.Add(tab_home_startbutton);
+        _HUD_Tab[0].HUD_TabOjects.Add(tab_home_optionsbutton);
+        _HUD_Tab[0].HUD_TabOjects.Add(tab_home_quitbutton);
+        //============================================================================================= 1 Display
+        Tool_QuickStartUI_Object tab_display_title = new Tool_QuickStartUI_Object();
+        tab_display_title.HUD_Name = "Title_Display";
+        tab_display_title.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Text;
+        tab_display_title.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_display_title.HUD_Offset = new Vector3(800, 800, 0);
+
+        Tool_QuickStartUI_Object tab_display_resolution = new Tool_QuickStartUI_Object();
+        tab_display_resolution.HUD_Name = "Dropdown_Resolution";
+        tab_display_resolution.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Dropdown;
+        tab_display_resolution.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_display_resolution.HUD_Size = new Vector2(500,60);
+        tab_display_resolution.HUD_Offset = new Vector3(800, 700, 0);
+        Tool_QuickStartUI_Object tab_display_resolution_text = new Tool_QuickStartUI_Object();
+        tab_display_resolution_text.HUD_Name = "Text_Resolution";
+        tab_display_resolution_text.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Text;
+        tab_display_resolution_text.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_display_resolution_text.HUD_Offset = new Vector3(600, 700, 0);
+
+        Tool_QuickStartUI_Object tab_display_quality = new Tool_QuickStartUI_Object();
+        tab_display_quality.HUD_Name = "Dropdown_Resolution";
+        tab_display_quality.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Dropdown;
+        tab_display_quality.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_display_quality.HUD_Size = new Vector2(500, 60);
+        tab_display_quality.HUD_Offset = new Vector3(800, 630, 0);
+
+        Tool_QuickStartUI_Object tab_display_fullscreen = new Tool_QuickStartUI_Object();
+        tab_display_fullscreen.HUD_Name = "Dropown_Windowmode";
+        tab_display_fullscreen.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Dropdown;
+        tab_display_fullscreen.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
+        tab_display_fullscreen.HUD_Size = new Vector2(500, 60);
+        tab_display_fullscreen.HUD_Offset = new Vector3(800, 560, 0);
+
+        _HUD_Tab[1].HUD_TabOjects.Add(tab_display_title);
+        _HUD_Tab[1].HUD_TabOjects.Add(tab_display_resolution);
+        _HUD_Tab[1].HUD_TabOjects.Add(tab_display_resolution_text);
+        _HUD_Tab[1].HUD_TabOjects.Add(tab_display_quality);
+        _HUD_Tab[1].HUD_TabOjects.Add(tab_display_fullscreen);
+
+
+        //Update
+        for (int i = 0; i < _HUD_Tab.Count; i++)
+        {
+            _HUD_TabID = i;
+            for (int j = 0; j < _HUD_Tab[i].HUD_TabOjects.Count; j++)
+            {
+                _HUD_Tab[i].HUD_TabOjects[j].HUD_RectTransform = null;
+                DestroyImmediate(_HUD_Tab[i].HUD_TabOjects[j].HUD_Object);
+                HUD_Change_Type(_HUD_Tab[i].HUD_TabOjects[j]);
+                _HUD_Tab[i].HUD_TabOjects[j].HUD_CheckType = _HUD_Tab[i].HUD_TabOjects[j].HUD_Type;
+            }
+        }
+        _HUD_TabID = 0;
+    }
+
+    //Set Script Refs
     void Set_SettingsHandler()
     {
         if (ScriptExist("SettingsHandler"))
@@ -2185,7 +1666,7 @@ public class Tool_QuickStartUI_Object
     public string HUD_Name;
     public Vector3 HUD_Offset;
     public Vector2 HUD_Size = new Vector2(100,25);
-    public Vector3 HUD_Scale = new Vector3(4,4,4);
+    public Vector3 HUD_Scale = new Vector3(1,1,1);
     public float HUD_TextFontSize = 16;
 
     //Other
