@@ -1140,8 +1140,8 @@ public class Tool_QuickStart : EditorWindow
         dropdown_labelrect.anchorMin = new Vector2(0, 0);
         dropdown_labelrect.anchorMax = new Vector2(1, 1);
         dropdown_labelrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_labelrect.sizeDelta = new Vector2(25, 6);
-        dropdown_labelrect.anchoredPosition = new Vector4(10, 7);
+        dropdown_labelrect.sizeDelta = new Vector2(0, 0);
+        dropdown_labelrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Arrow
         dropdown_arrowrect.anchorMin = new Vector2(1, 0.5f);
@@ -1161,7 +1161,7 @@ public class Tool_QuickStart : EditorWindow
         dropdown_viewportrect.anchorMin = new Vector2(0, 0);
         dropdown_viewportrect.anchorMax = new Vector2(1, 1);
         dropdown_viewportrect.pivot = new Vector2(0, 1);
-        dropdown_viewportrect.sizeDelta = new Vector2(18, 15); //NotDy
+        dropdown_viewportrect.sizeDelta = new Vector2(0, 0);
         dropdown_viewportrect.anchoredPosition = new Vector4(0, 0);
 
         //Set Rect Content
