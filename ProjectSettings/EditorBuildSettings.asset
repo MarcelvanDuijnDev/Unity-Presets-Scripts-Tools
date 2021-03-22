@@ -4,5 +4,29 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_2D_Platformer.unity
+    guid: 75e963a760d802f419ec0cfabe070089
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_2D_TopDown.unity
+    guid: 9653c74113fc4ee4fabc2d8a60c388af
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_3D_FPS.unity
+    guid: 01e073b2b4f85ca4083719271748700f
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_3D_Platformer.unity
+    guid: ceefbd81761fbc94db5e4890334c3717
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_3D_ThirdPerson.unity
+    guid: 703704f3d210f9e40929edb5ad87fd4b
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_3D_TopDown.unity
+    guid: 351f224ce4e69a245952fa2cbf30b902
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_Interaction.unity
+    guid: baa4dfbc311db9749b80b86bfe0093b3
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_Vehicles.unity
+    guid: 58a8e69117c60ab4297d66eb47f54e63
   m_configObjects: {}

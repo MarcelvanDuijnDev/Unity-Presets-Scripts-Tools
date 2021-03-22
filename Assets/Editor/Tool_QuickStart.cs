@@ -651,7 +651,7 @@ public class Tool_QuickStart : EditorWindow
         }
         if (ScriptExist("Movement_CC_FirstPerson"))
         {
-            string UniType = "Movement_CC";
+            string UniType = "Movement_CC_FirstPerson";
             Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
             playerobj.AddComponent(UnityType);
         }
