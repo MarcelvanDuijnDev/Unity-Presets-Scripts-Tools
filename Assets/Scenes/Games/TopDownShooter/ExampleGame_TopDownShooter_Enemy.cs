@@ -5,15 +5,19 @@ using UnityEngine.AI;
 
 public class ExampleGame_TopDownShooter_Enemy : MonoBehaviour
 {
+    [SerializeField] private float _MaxHealth;
     [SerializeField] private GameObject _DieEffect;
-
+    private float _Health;
     private NavMeshAgent _Nav;
     private GameObject _PlayerObj;
-    private Health _Health;
+
+    void OnEnable()
+    {
+        _Health = _MaxHealth;
+    }
 
     void Start()
     {
-        _Health = GetComponent<Health>();
         _PlayerObj = GameObject.Find("Player");
         _Nav = this.gameObject.GetComponent<NavMeshAgent>();
     }
@@ -25,7 +29,8 @@ public class ExampleGame_TopDownShooter_Enemy : MonoBehaviour
 
     public void DoDamage(float damageAmount)
     {
-        if (_Health.GetCurrentHealth() <= 0)
+        _Health -= damageAmount;
+        if (_Health <= 0)
         {
             GameObject.Find("GameHandler").GetComponent<ExampleGame_TopDownShooter>().AddScore(100);
             this.gameObject.SetActive(false);

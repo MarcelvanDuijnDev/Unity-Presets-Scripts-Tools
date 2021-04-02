@@ -103,9 +103,9 @@ GameObject:
   - component: {fileID: 4721056472610712}
   - component: {fileID: 65946883010946102}
   - component: {fileID: 54650094834856582}
-  - component: {fileID: 744148065609749132}
+  - component: {fileID: 258919920567239748}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: TopDown_Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -118,7 +118,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1430887316569186}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children:
@@ -156,7 +156,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &744148065609749132
+--- !u!114 &258919920567239748
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -165,11 +165,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1430887316569186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b4597b9d603979439390598c0307fb4, type: 3}
+  m_Script: {fileID: 11500000, guid: fe9b6231aaab7ef43ab9bcf9e04aeebd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Speed: 20
+  _Speed: 35
   _Damage: 10
+  _BulletObj: {fileID: 1447378340273046}
+  _DisableScript: {fileID: 3357566239039117356}
+  _Particle: {fileID: 198373305409928044}
 --- !u!1 &1447378340273046
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,6 +266,7 @@ GameObject:
   - component: {fileID: 4176900372496230}
   - component: {fileID: 198373305409928044}
   - component: {fileID: 199186038482950652}
+  - component: {fileID: 3357566239039117356}
   m_Layer: 0
   m_Name: Explosion_Bullet
   m_TagString: Untagged
@@ -5064,3 +5068,16 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &3357566239039117356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767197965840892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a762a2d5f1957124da64f08aaeb8f2cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Object: {fileID: 1430887316569186}
