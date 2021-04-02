@@ -14,9 +14,13 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "ExampleTag")
+        if(other.tag == "Enemy")
         {
             other.GetComponent<Health>().DoDamage(_Damage);
+            gameObject.SetActive(false);
+        }
+        if(other.tag == "Wall")
+        {
             gameObject.SetActive(false);
         }
     }

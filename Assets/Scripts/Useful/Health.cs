@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Health : MonoBehaviour
 {
     [SerializeField] private float _MaxHealth = 100;
+
+    [SerializeField] private UnityEvent _OnDeath;
 
     private float _CurrentHealth;
 
@@ -19,6 +22,7 @@ public class Health : MonoBehaviour
         if(_CurrentHealth <= 0)
         {
             _CurrentHealth = 0;
+            _OnDeath.Invoke();
             gameObject.SetActive(false);
         }
     }
