@@ -170,6 +170,9 @@ public class InteractionHandler : MonoBehaviour
             case Interactable.InteractableType.Button:
                 _Interactable.PressButtonNegative();
                 break;
+            case Interactable.InteractableType.UIButton:
+                _Interactable.PressUIButton();
+                break;
         }
     }
     private void OnActive()

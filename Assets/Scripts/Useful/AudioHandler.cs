@@ -13,10 +13,14 @@ public class AudioHandler : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private List<AudioHandler_Sound> _Sound = new List<AudioHandler_Sound>();
 
+    public static AudioHandler Audio_Handler;
+
     private string _CurrentScene;
 
     void Start()
     {
+        Audio_Handler = this;
+
         //PlayOnStart
         for (int i = 0; i < _Sound.Count; i++)
         {
@@ -38,7 +42,7 @@ public class AudioHandler : MonoBehaviour
             }
             if (_Sound[i].AudioEffects.FadeIn)
             {
-                _Sound[i].Settings.AudioSource.volume = 0;
+                _Sound[i].Settings.AudioSource.volume = 1;
                 _Sound[i].AudioEffects.FadeInSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeInDuration;
             }
             if (_Sound[i].AudioEffects.FadeOut)
@@ -150,6 +154,24 @@ public class AudioHandler : MonoBehaviour
                 AudioHandler_PlayTrack(i);
         }
     }
+    public void StopTrack(string trackname)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+                _Sound[i].Settings.AudioSource.Stop();
+        }
+    }
+    public string Get_Track_AudioFileName(string trackname)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+                return _Sound[i].Settings.AudioClip.name;
+        }
+        return "No AudioClip detected";
+    }
+
     private void AudioHandler_PlayTrack(int trackid)
     {
         _Sound[trackid].Settings.AudioSource.Play();
@@ -196,7 +218,7 @@ public class AudioHandler_Settings
 
     [Header("AudioSource")]
     public AudioSource AudioSource;
-    public bool CreateAudioSource;
+    public bool CreateAudioSource = true;
 }
 
 [System.Serializable]

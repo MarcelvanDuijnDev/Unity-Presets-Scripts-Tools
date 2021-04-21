@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Interactable : MonoBehaviour
 {
-    public enum InteractableType {Move, Door, SetLight, SetLightNegative, Lever, Button, Item }
+    public enum InteractableType { Move, Door, SetLight, SetLightNegative, Lever, Button, Item, UIButton }
     public InteractableType _Type;
 
-    private enum AxisOptions {x,y,z}
+    private enum AxisOptions { x, y, z }
     [SerializeField] private AxisOptions _AxisOption = AxisOptions.x;
 
     [SerializeField] private bool _InvertMouse = false;
@@ -34,7 +35,9 @@ public class Interactable : MonoBehaviour
     [SerializeField] private UnityEvent _OnLowEvent = null;
     [Header("OnNeutral")]
     [SerializeField] private UnityEvent _OnNeutral = null;
-    
+    [Header("Trigger")]
+    [SerializeField] private UnityEvent _OnTrigger = null;
+
 
     private Vector3 velocity = Vector3.zero;
     private Rigidbody _RB;
@@ -47,7 +50,7 @@ public class Interactable : MonoBehaviour
         _DefaultLocalPosition = transform.localPosition;
         _DefaultPosition = transform.position;
         _RB = GetComponent<Rigidbody>();
-        if(_Type == InteractableType.SetLight || _Type == InteractableType.SetLightNegative)
+        if (_Type == InteractableType.SetLight || _Type == InteractableType.SetLightNegative)
         {
             if (_Light_StartOff)
                 _Light.SetActive(false);
@@ -63,7 +66,7 @@ public class Interactable : MonoBehaviour
             UpdateButton();
         }
 
-        if(_MovingBack)
+        if (_MovingBack)
         {
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, _DefaultLocalPosition, 10 * Time.deltaTime);
             if (transform.localPosition == _DefaultLocalPosition)
@@ -171,6 +174,10 @@ public class Interactable : MonoBehaviour
     {
         return _ItemInfo;
     }
+    public void PressUIButton()
+    {
+        _OnTrigger.Invoke();
+    }
     private void HandleRotation(Transform effectedtransform, Vector2 mousemovement, Vector2 minmaxangle, float speed, float angle)
     {
         if (_InvertMouse)
@@ -218,7 +225,7 @@ public class Interactable : MonoBehaviour
                     if (transform.localPosition.x > _DefaultLocalPosition.x - _ButtonPressDepth)
                         transform.localPosition -= new Vector3(_Speed, 0, 0) * Time.deltaTime;
                     else
-                    { 
+                    {
                         transform.localPosition = new Vector3(_DefaultLocalPosition.x - _ButtonPressDepth - 0.001f, transform.localPosition.y, transform.localPosition.z);
                         _OnLowEvent.Invoke();
                     }
@@ -228,7 +235,7 @@ public class Interactable : MonoBehaviour
                     if (transform.localPosition.x < _DefaultLocalPosition.x + _ButtonPressDepth)
                         transform.localPosition += new Vector3(_Speed, 0, 0) * Time.deltaTime;
                     else
-                    { 
+                    {
                         transform.localPosition = new Vector3(_DefaultLocalPosition.x + _ButtonPressDepth, transform.localPosition.y, transform.localPosition.z);
                         _OnHighEvent.Invoke();
                     }
@@ -241,7 +248,7 @@ public class Interactable : MonoBehaviour
                     if (transform.localPosition.y > _DefaultLocalPosition.y - _ButtonPressDepth)
                         transform.localPosition -= new Vector3(0, _Speed, 0) * Time.deltaTime;
                     else
-                    { 
+                    {
                         transform.localPosition = new Vector3(_DefaultLocalPosition.x, _DefaultLocalPosition.y - _ButtonPressDepth - 0.001f, _DefaultLocalPosition.z);
                         _OnLowEvent.Invoke();
                     }
@@ -273,7 +280,7 @@ public class Interactable : MonoBehaviour
                     if (transform.localPosition.z < _DefaultLocalPosition.z + _ButtonPressDepth)
                         transform.localPosition += new Vector3(0, 0, _Speed) * Time.deltaTime;
                     else
-                    { 
+                    {
                         transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, _DefaultLocalPosition.z + _ButtonPressDepth);
                         _OnHighEvent.Invoke();
                     }
