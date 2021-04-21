@@ -13,13 +13,13 @@ public class AudioHandler : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private List<AudioHandler_Sound> _Sound = new List<AudioHandler_Sound>();
 
-    public static AudioHandler Audio_Handler;
+    public static AudioHandler AUDIO;
 
     private string _CurrentScene;
 
     void Start()
     {
-        Audio_Handler = this;
+        AUDIO = this;
 
         //PlayOnStart
         for (int i = 0; i < _Sound.Count; i++)
