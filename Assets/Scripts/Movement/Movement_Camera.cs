@@ -10,16 +10,21 @@ public class Movement_Camera : MonoBehaviour
     [Header("Options")]
     [SerializeField] private CameraOptionsPos _CameraOptionPos = CameraOptionsPos.Follow;
     [SerializeField] private CameraOptionsRot _CameraOptionRot = CameraOptionsRot.Follow;
+
     [Header("Settings - Position")]
     [SerializeField] private Vector3 _OffsetPosition = new Vector3(0,12,-4);
-    [SerializeField] private bool _UseOffsetYAsDefaultHeight = true;
+
     [Header("Settings - Rotation")]
     [SerializeField] private Vector3 _OffsetRotation = Vector3.zero;
+
     [Header("Settings")]
     [SerializeField] private float _Speed = 1000;
 
     [Header("Other")]
     [SerializeField] private Transform _Target = null;
+    [SerializeField] private bool _LockAxis_X = false;
+    [SerializeField] private bool _LockAxis_Y = false;
+    [SerializeField] private bool _LockAxis_Z = false;
 
     private Vector3 _TargetPosition;
     private float _ScreenShakeDuration;
@@ -33,19 +38,24 @@ public class Movement_Camera : MonoBehaviour
         }
 
         //Update Target Location
-        if (_UseOffsetYAsDefaultHeight)
-            _TargetPosition = new Vector3(_Target.transform.position.x + _OffsetPosition.x, _OffsetPosition.y, _Target.transform.position.z + _OffsetPosition.z);
-        else
-            _TargetPosition = new Vector3(_Target.transform.position.x + _OffsetPosition.x, _Target.transform.position.y + _OffsetPosition.y, _Target.transform.position.z + _OffsetPosition.z);
+        float x_axis = _Target.transform.position.x + _OffsetPosition.x;
+        float y_axis = _Target.transform.position.y + _OffsetPosition.y;
+        float z_axis = _Target.transform.position.z + _OffsetPosition.z;
+
+        if (_LockAxis_X)
+            x_axis = _OffsetPosition.x;
+        if (_LockAxis_Y)
+            y_axis = _OffsetPosition.y;
+        if (_LockAxis_Z)
+            z_axis = _OffsetPosition.z;
+
+        _TargetPosition = new Vector3(x_axis, y_axis, z_axis);
 
         // Movement
         switch (_CameraOptionPos)
         {
             case CameraOptionsPos.Follow:
-                if (_UseOffsetYAsDefaultHeight)
-                    transform.position = Vector3.MoveTowards(transform.position, _TargetPosition, _Speed * Time.deltaTime);
-                else
-                    transform.position = _TargetPosition;
+                transform.position = Vector3.MoveTowards(transform.position, _TargetPosition, _Speed * Time.deltaTime);
                 break;
         }
 

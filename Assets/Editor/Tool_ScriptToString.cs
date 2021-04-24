@@ -13,6 +13,7 @@ public class Tool_ScriptToString : EditorWindow
     string _CustomCommandCheck;
 
     private Vector2 _ScrollPos = new Vector2();
+    private bool _ToggleKeywords = false;
 
     [MenuItem("Tools/Convert Script to String")]
     public static void ShowWindow()
@@ -25,8 +26,11 @@ public class Tool_ScriptToString : EditorWindow
         if (GUILayout.Button("Convert", GUILayout.Height(30)))
             _ScriptOutput = ConvertScriptToString();
 
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
         Display_InputOutput();
+        Show_Keywords();
         Display_TextEditor();
+        EditorGUILayout.EndScrollView();
     }
 
     private void Display_InputOutput()
@@ -42,16 +46,22 @@ public class Tool_ScriptToString : EditorWindow
         GUILayout.Space(20);
     }
 
-    private void Display_TextEditor()
+    private void Show_Keywords()
     {
         //TextEditor Info
         GUILayout.Label("Use Custom Keywords to fix lines that should not be included into the commend. \n" +
             "Sometimes it leaves code after the command, you can addit it by adding a keyword below." +
             "The x on the left shows the lines that contain a comment.");
-        GUILayout.Space(20);
 
-        //TextEditor
+        GUILayout.Space(20);
+        GUILayout.BeginHorizontal();
         GUILayout.Label("Custom Keywords: ", EditorStyles.boldLabel);
+        if (GUILayout.Button("Add common keywords", GUILayout.Width(200)))
+        {
+            AddCommonKeywords();
+        }
+        GUILayout.EndHorizontal();
+
         _CustomCommandCheck = EditorGUILayout.TextField("", _CustomCommandCheck);
         if (GUILayout.Button("AddKeyword"))
         {
@@ -59,24 +69,30 @@ public class Tool_ScriptToString : EditorWindow
                 Debug.Log("Enter a keyword");
             else
             {
-                _CustomCommandCheckKeywords.Add(_CustomCommandCheck);
+                Add_Keyword(_CustomCommandCheck);
                 _CustomCommandCheck = "";
                 _ScriptOutput = ConvertScriptToString();
             }
-        }
-        for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)
-        {
-            GUILayout.BeginHorizontal("box");
-            GUILayout.Label(_CustomCommandCheckKeywords[i]);
-            if (GUILayout.Button("Remove", GUILayout.Width(100)))
-            {
-                _CustomCommandCheckKeywords.RemoveAt(i);
-                _CustomCommandCheck = "";
-                _ScriptOutput = ConvertScriptToString();
-            }
-            GUILayout.EndHorizontal();
         }
 
+        _ToggleKeywords = EditorGUILayout.Foldout(_ToggleKeywords, "Show Keywords");
+
+        if (_ToggleKeywords)
+            for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)
+            {
+                GUILayout.BeginHorizontal("box");
+                GUILayout.Label(_CustomCommandCheckKeywords[i]);
+                if (GUILayout.Button("Remove", GUILayout.Width(100)))
+                {
+                    _CustomCommandCheckKeywords.Remove(_CustomCommandCheckKeywords[i]);
+                    _CustomCommandCheck = "";
+                    _ScriptOutput = ConvertScriptToString();
+                }
+                GUILayout.EndHorizontal();
+            }
+    }
+    private void Display_TextEditor()
+    {
         //Preview
         List<string> output = new List<string>();
         List<string> output2 = new List<string>();
@@ -110,8 +126,6 @@ public class Tool_ScriptToString : EditorWindow
             }
         }
 
-        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
-
         for (int i = 0; i < output2.Count; i++)
         {
             GUILayout.BeginHorizontal();
@@ -127,8 +141,6 @@ public class Tool_ScriptToString : EditorWindow
             EditorGUILayout.TextField("", output2[i]);
             GUILayout.EndHorizontal();
         }
-
-        EditorGUILayout.EndScrollView();
     }
 
     private string ConvertScriptToString()
@@ -182,52 +194,6 @@ public class Tool_ScriptToString : EditorWindow
                     commentcheck = false;
                 }
 
-                if (i + 6 < textedit.Count)
-                {
-                    //if
-                    if (textedit[i] + textedit[i + 1] == "if")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                    //for
-                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] == "for")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                    //switch
-                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] == "switch")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                    //case
-                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] == "case")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                    //public
-                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] == "public")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                    //private
-                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] + textedit[i + 6] == "private")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                    //void
-                    if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] == "void")
-                    {
-                        scriptasstring += "\\n";
-                        commentcheck = false;
-                    }
-                }
-
                 for (int j = 0; j < _CustomCommandCheckKeywords.Count; j++)
                 {
                     if(_CustomCommandCheckKeywords[j].Length < textedit.Count)
@@ -249,9 +215,8 @@ public class Tool_ScriptToString : EditorWindow
             }
 
             scriptasstring += textedit[i];
-
             //Endings check
-            if (i + 1 < textedit.Count)
+            if (i + 2 < textedit.Count)
             {
                 if (textedit[i + 1] == "\"")
                 {
@@ -278,8 +243,36 @@ public class Tool_ScriptToString : EditorWindow
                 }
             }
         }
-
         scriptasstring += "\"";
+
         return scriptasstring;
+    }
+
+    private void AddCommonKeywords()
+    {
+        Add_Keyword("float");
+        Add_Keyword("double");
+        Add_Keyword("int");
+        Add_Keyword("void");
+        Add_Keyword("for");
+        Add_Keyword("switch");
+        Add_Keyword("private");
+        Add_Keyword("public");
+        Add_Keyword("[Header(");
+        Add_Keyword("case");
+
+        _ScriptOutput = ConvertScriptToString();
+    }
+    private void Add_Keyword(string keyword)
+    {
+        bool exist = false;
+        for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)
+        {
+            if (_CustomCommandCheckKeywords[i] == keyword)
+                exist = true;
+        }
+
+        if (!exist)
+            _CustomCommandCheckKeywords.Add(keyword);
     }
 }
