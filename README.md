@@ -86,6 +86,7 @@ Feel free to use/copy files from this project._
 - [DontDestory.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/DontDestroy.cs)
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/DoEvent.cs)
 - [OnCollision.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/OnCollision.cs)
+- [OnCollision2D.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/OnCollision2D.cs)
 - [PosToPos.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/PosToPos.cs)
 - [Rotation.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/Rotation.cs)
 
@@ -96,6 +97,7 @@ Feel free to use/copy files from this project._
 
 # Other
 - [MVD_Namespace.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
+- [3D Models](https://github.com/MarcelvanDuijnDev/UnityPresets/tree/main/Assets/Art/Models)
 
 # License & Copyright
 Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/LICENSE)
