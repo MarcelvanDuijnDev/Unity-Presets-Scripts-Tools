@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEditor.SceneManagement;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor;
@@ -11,11 +13,13 @@ using TMPro;
 
 public class Tool_QuickStart : EditorWindow
 {
-    //Menu / Settings
-    int _MenuID = 0;        // QuickStart/Scripts
+    //Navigation
+    int _WindowID = 0;      // Default/FileFinder/ScriptToString/MapEditor
+    int _MenuID = 0;        // QuickStart/Scripts/QuickUI
     int _DimensionID = 0;   // 2D/3D
     int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
+    bool _SelectWindow = false;
 
     //Scripts
     Tool_QuickStart_Script[] QuickStart_Scripts = new Tool_QuickStart_Script[] {
@@ -36,7 +40,7 @@ public class Tool_QuickStart : EditorWindow
         new Tool_QuickStart_Script("Health",                "Health",                       "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class Health : MonoBehaviour {     [SerializeField] private float _MaxHealth = 100;\n      private float _CurrentHealth;\n      private void OnEnable()     {         _CurrentHealth = _MaxHealth;\n     }\n      public void DoDamage(float damageamount)     {         _CurrentHealth -= damageamount;\n         if(_CurrentHealth <= 0)         {             _CurrentHealth = 0;\n             gameObject.SetActive(false);\n         }\n     }\n      public float GetCurrentHealth()     {         return _CurrentHealth;\n     }\n     public float GetMaxHealth()     {         return GetMaxHealth();\n     }\n }\n "),
         new Tool_QuickStart_Script("Interactable",          "Interaction",                  "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEngine.Events;\n  public class Interactable : MonoBehaviour {     public enum InteractableType {Move, Door, SetLight, SetLightNegative, Lever, Button, Item }\n     public InteractableType _Type;\n      private enum AxisOptions {x,y,z}\n     [SerializeField] private AxisOptions _AxisOption = AxisOptions.x;\n      [SerializeField] private bool _InvertMouse = false;\n      [Header(\"Type - Light\")]\n     [SerializeField] private GameObject _Light = null;\n     [SerializeField] private bool _Light_StartOff = false;\n     [Header(\"Type - Lever/Door\")]\n     [SerializeField] private Transform _LeverRotationPoint = null;     [SerializeField] private Vector2 _LeverMinMaxRotation = Vector2.zero;     [SerializeField] private float _CompleteDeathZone = 0;     [Header(\"Type - Button\")\n]\n     [SerializeField] private float _ButtonPressDepth = 0;\n     private bool _ButtonPressed;\n     [Header(\"Type - Item\")]\n     [SerializeField] private string _ItemInfo = \"\";\n     [Header(\"Speed\")]\n     [SerializeField] private float _Speed = 1;\n      [Header(\"OnHigh\")]\n     [SerializeField] private UnityEvent _OnHighEvent = null;\n     [Header(\"OnLow\")]\n     [SerializeField] private UnityEvent _OnLowEvent = null;\n     [Header(\"OnNeutral\")]\n     [SerializeField] private UnityEvent _OnNeutral = null;\n           private Vector3 velocity = Vector3.zero;\n     private Rigidbody _RB;\n     private Vector3 _DefaultLocalPosition;\n     private Vector3 _DefaultPosition;\n     private bool _MovingBack;\n      private void Start()     {         _DefaultLocalPosition = transform.localPosition;         _DefaultPosition = transform.position;         _RB = GetComponent<Rigidbody>()\n;\n         if(_Type == InteractableType.SetLight || _Type == InteractableType.SetLightNegative)         {             if (_Light_StartOff)                 _Light.SetActive(false);\n             else                 _Light.SetActive(true);\n         }\n     }\n      private void Update()     {         if (_Type == InteractableType.Button)         {             UpdateButton();\n         }\n          if(_MovingBack)         {             transform.localPosition = Vector3.MoveTowards(transform.localPosition, _DefaultLocalPosition, 10 * Time.deltaTime)\n;\n             if (transform.localPosition == _DefaultLocalPosition)\n                 _MovingBack = false;\n         }\n     }\n      public InteractableType Type()     {         return _Type;\n     }\n      public void GotoPickupPoint(Transform point)\n     {         _RB.velocity = Vector3.zero;\n         transform.position = Vector3.SmoothDamp(transform.position, point.position, ref velocity, 0.2f)\n;\n         transform.rotation = Quaternion.RotateTowards(transform.rotation, point.rotation, 5f)\n;\n     }\n     public void SetVelocity(Vector3 velocity)     {         _RB.velocity = velocity;\n     }\n     public void TrowObject(Transform transformtrow)\n     {         GetComponent<Rigidbody>().AddForce(transformtrow.forward * 5000)\n;\n     }\n     public void OpenDoor()     {         float mouseY = Input.GetAxis(\"Mouse Y\");\n         float angle = 0;\n         switch (_AxisOption)         {             case AxisOptions.x:                 angle = _LeverRotationPoint.localEulerAngles.x;\n                 break;\n             case AxisOptions.y:                 angle = _LeverRotationPoint.localEulerAngles.y;\n                 break;\n             case AxisOptions.z:                 angle = _LeverRotationPoint.localEulerAngles.z;\n                 break;\n         }\n         angle = (angle > 180) ? angle - 360 : angle;\n          HandleRotation(_LeverRotationPoint, new Vector2(0, mouseY), _LeverMinMaxRotation, 1.2f, angle);\n     }\n     public void MoveLever()     {         float mouseY = Input.GetAxis(\"Mouse Y\");\n         float angle = 0;\n         switch (_AxisOption)         {             case AxisOptions.x:                 angle = _LeverRotationPoint.localEulerAngles.x;\n                 break;\n             case AxisOptions.y:                 angle = _LeverRotationPoint.localEulerAngles.y;\n                 break;\n             case AxisOptions.z:                 angle = _LeverRotationPoint.localEulerAngles.z;\n                 break;\n         }\n         angle = (angle > 180) ? angle - 360 : angle;\n          HandleRotation(_LeverRotationPoint, new Vector2(0, mouseY), _LeverMinMaxRotation, 1.2f, angle);\n          //Check         \nif (angle < _LeverMinMaxRotation.x + _CompleteDeathZone)         {             _OnLowEvent.Invoke();\n         }\n         if (angle > _LeverMinMaxRotation.y - _CompleteDeathZone)         {             _OnHighEvent.Invoke();\n         }\n         if (angle > _LeverMinMaxRotation.x + _CompleteDeathZone && angle < _LeverMinMaxRotation.y - _CompleteDeathZone)         {             _OnNeutral.Invoke();\n         }\n     }\n     public void PressButton(bool option)     {         _ButtonPressed = true;\n     }\n     public void PressButtonNegative()     {         _ButtonPressed = !_ButtonPressed;\n     }\n     public void SetLight(bool option)     {         _Light.SetActive(option);\n     }\n     public void SetLightNegative()     {         if (_Light.activeSelf)             _Light.SetActive(false);\n         else             _Light.SetActive(true);\n     }\n     public void ReturnToDefaultPos()     {         _MovingBack = true;\n     }\n     public string GetItemInfo()     {         return _ItemInfo;\n     }\n     private void HandleRotation(Transform effectedtransform, Vector2 mousemovement, Vector2 minmaxangle, float speed, float angle)\n     {         if (_InvertMouse)         {             mousemovement.x = mousemovement.x * -2;\n             mousemovement.y = mousemovement.y * -2;\n         }\n          switch (_AxisOption)         {             case AxisOptions.x:                 effectedtransform.localEulerAngles += new Vector3((mousemovement.x + mousemovement.y)\n * speed, 0, 0);\n                  if (angle < minmaxangle.x)                     effectedtransform.localEulerAngles = new Vector3(minmaxangle.x + 0.5f, 0, 0)\n;\n                 if (angle > minmaxangle.y)                     effectedtransform.localEulerAngles = new Vector3(minmaxangle.y - 0.5f, 0, 0)\n;\n                 break;\n             case AxisOptions.y:                 effectedtransform.localEulerAngles += new Vector3(0, (mousemovement.x + mousemovement.y)\n * speed, 0);\n                  if (angle < minmaxangle.x)                     effectedtransform.localEulerAngles = new Vector3(0, minmaxangle.x + 0.5f, 0)\n;\n                 if (angle > minmaxangle.y)                     effectedtransform.localEulerAngles = new Vector3(0, minmaxangle.y - 0.5f, 0)\n;\n                 break;\n             case AxisOptions.z:                 effectedtransform.localEulerAngles += new Vector3(0, 0, (mousemovement.x + mousemovement.y)\n * speed);\n                  if (angle < minmaxangle.x)                     effectedtransform.localEulerAngles = new Vector3(0, 0, minmaxangle.x + 0.5f)\n;\n                 if (angle > minmaxangle.y)                     effectedtransform.localEulerAngles = new Vector3(0, 0, minmaxangle.y - 0.5f)\n;\n                 break;\n         }\n     }\n      private void UpdateButton()     {         switch (_AxisOption)         {             case AxisOptions.x:                 if (_ButtonPressed)                 {                     if (transform.localPosition.x > _DefaultLocalPosition.x - _ButtonPressDepth)\n                         transform.localPosition -= new Vector3(_Speed, 0, 0)\n * Time.deltaTime;\n                     else                     {                          transform.localPosition = new Vector3(_DefaultLocalPosition.x - _ButtonPressDepth - 0.001f, transform.localPosition.y, transform.localPosition.z)\n;\n                         _OnLowEvent.Invoke();\n                     }\n                 }\n                 else                 {                     if (transform.localPosition.x < _DefaultLocalPosition.x + _ButtonPressDepth)\n                         transform.localPosition += new Vector3(_Speed, 0, 0)\n * Time.deltaTime;\n                     else                     {                          transform.localPosition = new Vector3(_DefaultLocalPosition.x + _ButtonPressDepth, transform.localPosition.y, transform.localPosition.z)\n;\n                         _OnHighEvent.Invoke();\n                     }\n                  }\n                 break;\n             case AxisOptions.y:                 if (_ButtonPressed)                 {                     if (transform.localPosition.y > _DefaultLocalPosition.y - _ButtonPressDepth)\n                         transform.localPosition -= new Vector3(0, _Speed, 0)\n * Time.deltaTime;\n                     else                     {                          transform.localPosition = new Vector3(_DefaultLocalPosition.x, _DefaultLocalPosition.y - _ButtonPressDepth - 0.001f, _DefaultLocalPosition.z)\n;\n                         _OnLowEvent.Invoke();\n                     }\n                 }\n                 else                 {                     if (transform.localPosition.y < _DefaultLocalPosition.y)\n                         transform.localPosition += new Vector3(0, _Speed, 0)\n * Time.deltaTime;\n                     else                     {                         transform.localPosition = _DefaultLocalPosition;                         _OnHighEvent.Invoke()\n;\n                     }\n                 }\n                 break;\n             case AxisOptions.z:                 if (_ButtonPressed)                 {                     if (transform.localPosition.z > _DefaultLocalPosition.z - _ButtonPressDepth)\n                         transform.localPosition -= new Vector3(0, 0, _Speed)\n * Time.deltaTime;\n                     else                     {                         transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, _DefaultLocalPosition.z - _ButtonPressDepth - 0.001f)\n;\n                         _OnLowEvent.Invoke();\n                     }\n                 }\n                 else                 {                     if (transform.localPosition.z < _DefaultLocalPosition.z + _ButtonPressDepth)\n                         transform.localPosition += new Vector3(0, 0, _Speed)\n * Time.deltaTime;\n                     else                     {                          transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, _DefaultLocalPosition.z + _ButtonPressDepth)\n;\n                         _OnHighEvent.Invoke();\n                     }\n                 }\n                 break;\n         }\n     }\n }\n "),
         new Tool_QuickStart_Script("InteractionHandler",    "Interaction_Handler",          "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEngine.UI;\n using TMPro;\n  public class InteractionHandler : MonoBehaviour {     [SerializeField] private Image _Cursor = null;\n     [SerializeField] private LayerMask _LayerMask = 0;\n     [SerializeField] private Transform _Head = null;     [Header(\"Pickup\")\n]\n     [SerializeField] private GameObject _PickupPoint = null;\n     [SerializeField] private Vector2 _PickupMinMaxRange = Vector2.zero;\n     [SerializeField] private float _Range = 0;\n     [Header(\"Item\")]\n     [SerializeField] private Transform _ItemPreviewPoint = null;     [SerializeField] private TextMeshProUGUI _ItemInfoText = null;      private string _ItemInfo;      private Vector3 _PickupPointPosition;     private Vector3 _CalcVelocity;     private Vector3 _PrevPosition;      private GameObject _ActiveObject;     private GameObject _CheckObject;     private Interactable _Interactable;      private bool _Interacting;     private bool _Previewing;      private Movement_CC _CCS; //Script that handles rotation      \nvoid Start()\n     {         _CCS = GetComponent<Movement_CC>();\n         _PickupPointPosition.z = _PickupMinMaxRange.x;\n     }\n      void Update()     {         if (!_Interacting)         {             RaycastHit hit;\n              if (Physics.Raycast(_Head.position, _Head.TransformDirection(Vector3.forward)\n, out hit, _Range, _LayerMask))             {                 Debug.DrawRay(_Head.position, _Head.TransformDirection(Vector3.forward)\n * hit.distance, Color.yellow);\n                  _ActiveObject = hit.transform.gameObject;                  _Cursor.color = Color.white;             }\n             else             {                 Debug.DrawRay(_Head.position, _Head.TransformDirection(Vector3.forward)\n * _Range, Color.white);\n                 _Cursor.color = Color.red;\n                  _ActiveObject = null;\n                 _CheckObject = null;\n             }\n              if (_ActiveObject != _CheckObject)             {                 _Interactable = _ActiveObject.GetComponent<Interactable>();\n                 _CheckObject = _ActiveObject;\n             }\n         }\n          if(_ActiveObject != null)         {             if (_Interactable._Type != Interactable.InteractableType.Item)             {                 //OnDown                 \nif (Input.GetMouseButtonDown(0))                     OnDown();\n                  if (_Interacting)                 {                     //OnUp                     \nif (Input.GetMouseButtonUp(0))                         OnUp();\n                      //OnActive                     \nOnActive();\n                 }\n             }\n             else             {                 if (!_Previewing)                 {                     //Start Preview                     \nif (Input.GetKeyDown(KeyCode.E))                     {                         _ItemInfo = _Interactable.GetItemInfo();\n                         _CCS.LockRotation(true);\n                         _Previewing = true;\n                     }\n                 }\n                 else                 {                     _ActiveObject.transform.position = _ItemPreviewPoint.position;                     _Interactable.gameObject.transform.eulerAngles += new Vector3(-Input.GetAxis(\"Mouse Y\")\n, Input.GetAxis(\"Mouse X\"), 0);\n                      //Reset Preview                     \nif (Input.GetKeyDown(KeyCode.E))                     {                         _ItemInfo = \"\";\n                         _CCS.LockRotation(false);\n                         _Interactable.ReturnToDefaultPos();\n                         _Previewing = false;\n                     }\n                 }\n             }\n         }\n          _ItemInfoText.text = _ItemInfo;\n     }\n      void FixedUpdate()     {         if (_Interacting)         {             OnActiveFixed();\n             OnActiveFixed();\n         }\n     }\n      private void OnUp()     {         _Interacting = false;\n         switch (_Interactable._Type)         {             case Interactable.InteractableType.Lever:                 _CCS.LockRotation(false);\n                 break;\n             case Interactable.InteractableType.Door:                 _CCS.LockRotation(false);\n                 break;\n             case Interactable.InteractableType.Move:                 _Interactable.SetVelocity(_CalcVelocity);\n                 break;\n         }\n     }\n     private void OnDown()     {         _Interacting = true;\n          //OnClick         \nswitch (_Interactable._Type)         {             case Interactable.InteractableType.SetLight:                 _Interactable.SetLight(true);\n                 break;\n             case Interactable.InteractableType.SetLightNegative:                 _Interactable.SetLightNegative();\n                 break;\n             case Interactable.InteractableType.Move:                 _PickupPoint.transform.rotation = _ActiveObject.transform.rotation;                 _PickupPointPosition.z = Vector3.Distance(_Head.position, _ActiveObject.transform.position)\n;\n                 break;\n             case Interactable.InteractableType.Lever:                 _CCS.LockRotation(true);\n                 _PickupPointPosition.z = Vector3.Distance(_Head.position, _ActiveObject.transform.position)\n;\n                 break;\n             case Interactable.InteractableType.Door:                 _CCS.LockRotation(true);\n                 break;\n             case Interactable.InteractableType.Button:                 _Interactable.PressButtonNegative();\n                 break;\n         }\n     }\n     private void OnActive()     {         switch (_Interactable._Type)         {             case Interactable.InteractableType.Move:                 if (_PickupPointPosition.z < _PickupMinMaxRange.y && Input.mouseScrollDelta.y > 0)                     _PickupPointPosition.z += Input.mouseScrollDelta.y * 0.5f;\n                 if (_PickupPointPosition.z > _PickupMinMaxRange.x && Input.mouseScrollDelta.y < 0)                     _PickupPointPosition.z += Input.mouseScrollDelta.y * 0.5f;\n                  if(Input.GetMouseButtonDown(1))                 {                     _Interactable.TrowObject(_Head.transform)\n;\n                     OnUp();\n                 }\n                 break;\n             case Interactable.InteractableType.Door:                 _Interactable.OpenDoor();\n                 break;\n             case Interactable.InteractableType.Lever:                 _Interactable.MoveLever();\n                 break;\n         }\n          if (Vector3.Distance(_Head.transform.position, _ActiveObject.transform.position)\n > _Range)         {             _Interacting = false;\n             OnUp();\n         }\n     }\n      private void OnActiveFixed()     {         switch (_Interactable._Type)         {             case Interactable.InteractableType.Move:                 _Interactable.GotoPickupPoint(_PickupPoint.transform)\n;\n                  _PickupPoint.transform.localPosition = _PickupPointPosition;                  _CalcVelocity = (_ActiveObject.transform.position - _PrevPosition)\n / Time.deltaTime;\n                 _PrevPosition = _ActiveObject.transform.position;                 break;         }\n     }\n }"),
-        new Tool_QuickStart_Script("InteractWithPhysics",   "Interact_Physics",             "wip",        "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class InteractWithPhysics : MonoBehaviour {      void OnControllerColliderHit(ControllerColliderHit hit)     {         Rigidbody body = hit.collider.attachedRigidbody;\n         if (body != null && !body.isKinematic)              body.velocity += hit.controller.velocity;\n     }\n }\n "),
+        new Tool_QuickStart_Script("InteractWithPhysics",   "Interact_Physics",             "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class InteractWithPhysics : MonoBehaviour {      void OnControllerColliderHit(ControllerColliderHit hit)     {         Rigidbody body = hit.collider.attachedRigidbody;\n         if (body != null && !body.isKinematic)              body.velocity += hit.controller.velocity;\n     }\n }\n "),
         new Tool_QuickStart_Script("Inventory",             "Inventory",                    "wip",        "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEngine.UI;\n  public class Inventory : MonoBehaviour {     [Header(\"Inventory\")]\n     [SerializeField] private int[] _Inventory;\n     [SerializeField] private Image[] _InventoryVisuals;\n      [Header(\"Items\")]\n     [SerializeField] private List<InventoryItems> _Items = new List<InventoryItems>();\n      private void Start()     {         _Inventory = new int[_InventoryVisuals.Length];\n     }\n      public void AddItem(GameObject addobj)     {         for (int i = 0; i < _Inventory.Length; i++)\n         {             if(_Inventory[i] == 0)             {                 for (int j = 0; j < _Items.Count; j++)\n                 {                     if(addobj == _Items[j].Item_Prefab)                     {                         _Inventory[i] = j + 1;\n                     }\n                 }\n             }\n         }\n     }\n }\n   [System.Serializable] public class InventoryItems {     public GameObject Item_Prefab;\n     public Sprite Item_Sprite;\n }"),
         new Tool_QuickStart_Script("LightEffects",          "Light_Effect",                 "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class LightEffects : MonoBehaviour {     public enum LightEffectOptions { Flickering, Off, On }\n;\n      [Header(\"Settings\")]\n     [SerializeField] private LightEffectOptions _LightEffectOption = LightEffectOptions.Flickering;\n     [SerializeField] private Vector2 _MinMaxIncrease = new Vector2(0.8f, 1.2f);\n     [Range(0.01f, 100)] [SerializeField] private float _EffectStrength = 50;\n      Queue<float> _LightFlickerQ;\n     private float _LastSum = 0;\n     private Light _Light;\n     private float _LightIntensity = 0;\n      public void Reset()     {         if (_LightEffectOption == LightEffectOptions.Flickering)         {             _LightFlickerQ.Clear();\n             _LastSum = 0;\n         }\n     }\n      void Start()     {         _Light = GetComponent<Light>();\n         _LightIntensity = _Light.intensity;\n         _LightFlickerQ = new Queue<float>(Mathf.RoundToInt(_EffectStrength));\n     }\n      void Update()     {         switch(_LightEffectOption)         {             case LightEffectOptions.Flickering:                 while (_LightFlickerQ.Count >= _EffectStrength)                     _LastSum -= _LightFlickerQ.Dequeue();\n                  float newVal = Random.Range(_LightIntensity * _MinMaxIncrease.x, _LightIntensity * _MinMaxIncrease.y);\n                 _LightFlickerQ.Enqueue(newVal);\n                 _LastSum += newVal;\n                 _Light.intensity = _LastSum / (float)_LightFlickerQ.Count;\n                 break;\n             case LightEffectOptions.Off:                 _Light.intensity = 0;\n                 break;\n             case LightEffectOptions.On:                 _Light.intensity = _LightIntensity = _MinMaxIncrease.x;\n                 break;\n         }\n      }\n      public void SetEffect(LightEffectOptions options)     {         _LightEffectOption = options;\n     }\n }"),
         new Tool_QuickStart_Script("LoadScenes",            "Load_Scenes",                  "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEngine.SceneManagement;\n  public class LoadScenes : MonoBehaviour {     public void Action_LoadScene(int sceneid)     {         SceneManager.LoadScene(sceneid);\n     }\n     public void Action_LoadScene(string scenename)     {         SceneManager.LoadScene(scenename);\n     }\n      public void Action_ReloadScene()     {         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);\n     }\n      public void Action_QuitApplication()     {         Application.Quit();\n     }\n }\n "),
@@ -62,7 +66,7 @@ public class Tool_QuickStart : EditorWindow
         new Tool_QuickStart_Script("Shooting",              "Shooting",                     "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class Shooting : MonoBehaviour {     [Header(\"Settings\")]\n     [SerializeField] ObjectPool _ObjectPool = null;\n     [SerializeField] private GameObject _BulletPrefab = null;\n     [SerializeField] private GameObject _ShootPoint = null;\n      [Header(\"Semi\")]\n     [SerializeField] private int _SemiAutomaticBulletAmount = 3;\n     [SerializeField] private float _SemiShootSpeed = 0.2f;\n     [Header(\"Automatic\")]\n     [SerializeField] private float _SecondsBetweenShots = 0.5f;\n      private enum ShootModes { SingleShot, SemiAutomatic, Automatic }\n     [SerializeField] private ShootModes _ShootMode = ShootModes.SingleShot;\n      private bool _CheckSingleShot;\n     private float _Timer;\n     private bool _LockShooting;\n      void Update()     {         if (Input.GetMouseButton(0))         {             switch (_ShootMode)             {                 case ShootModes.SingleShot:                     if (!_CheckSingleShot)                         Shoot();\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.SemiAutomatic:                     if (!_CheckSingleShot && !_LockShooting)                         StartCoroutine(SemiShot());\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.Automatic:                     _Timer += 1 * Time.deltaTime;\n                     if (_Timer >= _SecondsBetweenShots)                     {                         Shoot();\n                         _Timer = 0;\n                     }\n                     break;\n             }\n         }\n         if (Input.GetMouseButtonUp(0))         {             _CheckSingleShot = false;\n         }\n     }\n      IEnumerator SemiShot()     {         _LockShooting = true;\n         for (int i = 0; i < _SemiAutomaticBulletAmount; i++)\n         {             Shoot();\n             yield return new WaitForSeconds(_SemiShootSpeed);\n         }\n         _LockShooting = false;\n     }\n      void Shoot()     {        GameObject bullet = _ObjectPool.GetObject(_BulletPrefab, true);\n         bullet.SetActive(true);\n         bullet.transform.position = _ShootPoint.transform.position;         bullet.transform.rotation = _ShootPoint.transform.rotation;     }\n }\n "),
         new Tool_QuickStart_Script("ShootingRayCast",       "Shooting",                     "stable",     "using System.Collections;\n using System.Collections.Generic;\n using System.Threading;\n using UnityEngine;\n  public class ShootingRayCast : MonoBehaviour {     [Header(\"Settings\")]\n     [SerializeField] private float _Damage = 20;\n     [SerializeField] private float _ShootDistance = 50;\n     [SerializeField] private string _EnemyTag = \"Enemy\";\n      [Header(\"Semi\")]\n     [SerializeField] private int _SemiAutomaticBulletAmount = 3;\n     [SerializeField] private float _SemiShootSpeed = 0.2f;\n     [Header(\"Automatic\")]\n     [SerializeField] private float _SecondsBetweenShots = 0.5f;\n      private enum ShootModes {SingleShot, SemiAutomatic, Automatic }\n     [SerializeField] private ShootModes _ShootMode = ShootModes.SingleShot;\n      private bool _CheckSingleShot;\n     private float _Timer;\n     private bool _LockShooting;\n      void Update()     {         if (Input.GetMouseButton(0))         {             switch (_ShootMode)             {                 case ShootModes.SingleShot:                     if (!_CheckSingleShot)                         Shoot();\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.SemiAutomatic:                     if (!_CheckSingleShot && !_LockShooting)                         StartCoroutine(SemiShot());\n                     _CheckSingleShot = true;\n                     break;\n                 case ShootModes.Automatic:                     _Timer += 1 * Time.deltaTime;\n                     if(_Timer >= _SecondsBetweenShots)                     {                         Shoot();\n                         _Timer = 0;\n                     }\n                     break;\n             }\n         }\n         if(Input.GetMouseButtonUp(0))         {             _CheckSingleShot = false;\n         }\n     }\n      IEnumerator SemiShot()     {         _LockShooting = true;\n         for (int i = 0; i < _SemiAutomaticBulletAmount; i++)\n         {             Shoot();\n             yield return new WaitForSeconds(_SemiShootSpeed);\n         }\n         _LockShooting = false;\n     }\n      void Shoot()     {         RaycastHit hit;\n         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward)\n, out hit, _ShootDistance))             if (hit.transform.tag == _EnemyTag)\n             {                 hit.transform.GetComponent<Health>()\n.DoDamage(_Damage);\n             }\n     }\n }"),
         new Tool_QuickStart_Script("StringFormats",         "String_Format",                "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using TMPro;\n  public class StringFormats : MonoBehaviour {     private enum FormatOptions {DigitalTime }\n;\n     [SerializeField] private FormatOptions _FormatOption = FormatOptions.DigitalTime;\n     [SerializeField] private TextMeshProUGUI _ExampleText = null;\n      private float _Timer;\n      void Update()     {         _Timer += 1 * Time.deltaTime;\n          switch (_FormatOption)         {             case FormatOptions.DigitalTime:                 _ExampleText.text = string.Format(\"{0:00}\n:{1:00}\n:{2:00}\\n\", Mathf.Floor(_Timer / 3600), Mathf.Floor((_Timer / 60) % 60), _Timer % 60);\n                 break;\n }\n     }\n }\n "),
-        new Tool_QuickStart_Script("Tool_CreateHexagonGrid","Tool_Editor",                  "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEditor;\n  public class Tool_CreateHexagonGrid : EditorWindow {     private GameObject _CenterObj;\n     private List<GameObject> _ObjSaved = new List<GameObject>();\n     private int _TotalObjects = 100;\n      //Hex     \nprivate int _HexLengthX = 10, _HexLengthZ = 10;\n     private float _HexSize = 1;\n     private float _DistanceBetween = 1;\n      private bool _Center = true;\n     private bool _Invert = false;\n      [MenuItem(\"Tools/CreateHexagonGrid\")]     static void Init()     {         Tool_CreateHexagonGrid window = (Tool_CreateHexagonGrid)EditorWindow.GetWindow(typeof(Tool_CreateHexagonGrid));\n         window.Show();\n     }\n      void OnGUI()     {          GUILayout.BeginVertical(\"Box\");\n         _CenterObj = (GameObject)EditorGUILayout.ObjectField(\"Center Object\", _CenterObj, typeof(GameObject), true);\n         GUILayout.EndVertical();\n          GUILayout.BeginVertical(\"Box\");\n         _HexSize = EditorGUILayout.FloatField(\"Size: \", _HexSize);\n         _HexLengthX = EditorGUILayout.IntField(\"Collom: \", _HexLengthX);\n         _HexLengthZ = EditorGUILayout.IntField(\"Row: \", _HexLengthZ);\n          GUILayout.BeginHorizontal(\"Box\");\n         if (GUILayout.Button(\"Calculate Total Objects\"))             _TotalObjects = _HexLengthX * _HexLengthZ;\n         EditorGUILayout.LabelField(\"Total: \" + _TotalObjects.ToString());\n         GUILayout.EndHorizontal();\n          _Center = EditorGUILayout.Toggle(\"Center\", _Center);\n         _Invert = EditorGUILayout.Toggle(\"Invert: \", _Invert);\n         _DistanceBetween = EditorGUILayout.FloatField(\"Distance Between: \", _DistanceBetween);\n         GUILayout.EndVertical();\n          GUILayout.BeginVertical(\"Box\");\n         if (GUILayout.Button(\"Create\"))         {             if (_CenterObj != null)             {                 if (_ObjSaved.Count > 0)                 {                     for (int i = 0; i < _ObjSaved.Count; i++)\n                     {                         DestroyImmediate(_ObjSaved[i]);\n                     }\n                     _ObjSaved.Clear();\n                 }\n                  Vector3 objPos = _CenterObj.transform.position;                 CreateHexagon(new Vector3(_HexLengthX, 0, _HexLengthZ)\n);\n                 SetParent();\n             }\n             else             {                 Debug.Log(\"Center Object not selected!\");\n             }\n         }\n          if (GUILayout.Button(\"Destroy\"))         {             if (_CenterObj != null)             {                 for (int i = 0; i < _ObjSaved.Count; i++)\n                 {                     DestroyImmediate(_ObjSaved[i]);\n                 }\n                 _ObjSaved.Clear();\n                   int childs = _CenterObj.transform.childCount;                 for (int i = childs -1; i >= 0; i--)\n                 {                     DestroyImmediate(_CenterObj.transform.GetChild(i)\n.gameObject);\n                 }\n             }\n             else             {                 Debug.Log(\"Center Object not selected!\");\n             }\n     }\n          if (GUILayout.Button(\"Confirm\"))         {             _ObjSaved.Clear();\n         }\n         GUILayout.EndVertical();\n     }\n      void CreateHexagon(Vector3 dimentsions)     {         Vector3 objPos = _CenterObj.transform.position;         if (_Center && !_Invert)\n         {             objPos.x -= dimentsions.x * 0.5f * 1.7321f * _HexSize;\n             objPos.z -= dimentsions.z * 0.5f * -1.5f * _HexSize;\n         }\n         if (_Center && _Invert)         {             objPos.x -= dimentsions.x * 0.5f * 1.7321f * _HexSize;\n             objPos.z += dimentsions.z * 0.5f * -1.5f * _HexSize;\n         }\n          for (int xas = 0; xas < dimentsions.x; xas++)\n         {             CreateHax(new Vector3(objPos.x + 1.7321f  * _HexSize * _DistanceBetween * xas, objPos.y, objPos.z));\n             for (int zas = 1; zas < dimentsions.z; zas++)\n             {                 float offset = 0;\n                 if (zas % 2 == 1)                 {                     offset = 0.86605f * _HexSize * _DistanceBetween;\n                 }\n                 else                 {                     offset = 0;\n                 }\n                 if (!_Invert)                 {                     CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas - offset, objPos.y, objPos.z + -1.5f * _HexSize * _DistanceBetween * zas));\n                 }\n                 else                 {                     CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas - offset, objPos.y, objPos.z + +1.5f * _HexSize * _DistanceBetween * zas));\n                 }\n             }\n         }\n     }\n     void CreateHax(Vector3 positions)     {         Vector3 objPos = _CenterObj.transform.position;          GameObject gridObj = GameObject.CreatePrimitive(PrimitiveType.Cube)\n;\n         gridObj.transform.position = new Vector3(positions.x, positions.y, positions.z)\n;\n          DestroyImmediate(gridObj.GetComponent<BoxCollider>());\n          float size = _HexSize;\n         float width = Mathf.Sqrt(3) * size;\n         float height = size * 2f;\n         Mesh mesh = new Mesh();\n         Vector3[] vertices = new Vector3[7];\n          for (int i = 0; i < 6; i++)\n         {             float angle_deg = 60 * i - 30;\n             float angle_rad = Mathf.Deg2Rad * angle_deg;\n              vertices[i + 1] = new Vector3(size * Mathf.Cos(angle_rad), 0f, size * Mathf.Sin(angle_rad));\n         }\n         mesh.vertices = vertices;\n          mesh.triangles = new int[]         {             2,1,0,             3,2,0,             4,3,0,             5,4,0,             6,5,0,             1,6,0         }\n;\n          Vector2[] uv = new Vector2[7];\n         for (int i = 0; i < 7; i++)\n         {             uv[i] = new Vector2(                 (vertices[i].x + -width * .5f) * .5f / size,                 (vertices[i].z + -height * .5f) * .5f / size);\n         }\n          mesh.uv = uv;\n         gridObj.GetComponent<MeshFilter>().sharedMesh = mesh;\n          _ObjSaved.Add(gridObj);\n     }\n      void SetParent()     {         for (int i = 0; i < _ObjSaved.Count; i++)\n         {             _ObjSaved[i].transform.parent = _CenterObj.transform;         }\n     }\n }"),
+        new Tool_QuickStart_Script("Tool_CreateHexagonMesh","Tool_Editor",                  "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEditor;\n  public class Tool_CreateHexagonGrid : EditorWindow {     private GameObject _CenterObj;\n     private List<GameObject> _ObjSaved = new List<GameObject>();\n     private int _TotalObjects = 100;\n      //Hex     \nprivate int _HexLengthX = 10, _HexLengthZ = 10;\n     private float _HexSize = 1;\n     private float _DistanceBetween = 1;\n      private bool _Center = true;\n     private bool _Invert = false;\n      [MenuItem(\"Tools/CreateHexagonGrid\")]     static void Init()     {         Tool_CreateHexagonGrid window = (Tool_CreateHexagonGrid)EditorWindow.GetWindow(typeof(Tool_CreateHexagonGrid));\n         window.Show();\n     }\n      void OnGUI()     {          GUILayout.BeginVertical(\"Box\");\n         _CenterObj = (GameObject)EditorGUILayout.ObjectField(\"Center Object\", _CenterObj, typeof(GameObject), true);\n         GUILayout.EndVertical();\n          GUILayout.BeginVertical(\"Box\");\n         _HexSize = EditorGUILayout.FloatField(\"Size: \", _HexSize);\n         _HexLengthX = EditorGUILayout.IntField(\"Collom: \", _HexLengthX);\n         _HexLengthZ = EditorGUILayout.IntField(\"Row: \", _HexLengthZ);\n          GUILayout.BeginHorizontal(\"Box\");\n         if (GUILayout.Button(\"Calculate Total Objects\"))             _TotalObjects = _HexLengthX * _HexLengthZ;\n         EditorGUILayout.LabelField(\"Total: \" + _TotalObjects.ToString());\n         GUILayout.EndHorizontal();\n          _Center = EditorGUILayout.Toggle(\"Center\", _Center);\n         _Invert = EditorGUILayout.Toggle(\"Invert: \", _Invert);\n         _DistanceBetween = EditorGUILayout.FloatField(\"Distance Between: \", _DistanceBetween);\n         GUILayout.EndVertical();\n          GUILayout.BeginVertical(\"Box\");\n         if (GUILayout.Button(\"Create\"))         {             if (_CenterObj != null)             {                 if (_ObjSaved.Count > 0)                 {                     for (int i = 0; i < _ObjSaved.Count; i++)\n                     {                         DestroyImmediate(_ObjSaved[i]);\n                     }\n                     _ObjSaved.Clear();\n                 }\n                  Vector3 objPos = _CenterObj.transform.position;                 CreateHexagon(new Vector3(_HexLengthX, 0, _HexLengthZ)\n);\n                 SetParent();\n             }\n             else             {                 Debug.Log(\"Center Object not selected!\");\n             }\n         }\n          if (GUILayout.Button(\"Destroy\"))         {             if (_CenterObj != null)             {                 for (int i = 0; i < _ObjSaved.Count; i++)\n                 {                     DestroyImmediate(_ObjSaved[i]);\n                 }\n                 _ObjSaved.Clear();\n                   int childs = _CenterObj.transform.childCount;                 for (int i = childs -1; i >= 0; i--)\n                 {                     DestroyImmediate(_CenterObj.transform.GetChild(i)\n.gameObject);\n                 }\n             }\n             else             {                 Debug.Log(\"Center Object not selected!\");\n             }\n     }\n          if (GUILayout.Button(\"Confirm\"))         {             _ObjSaved.Clear();\n         }\n         GUILayout.EndVertical();\n     }\n      void CreateHexagon(Vector3 dimentsions)     {         Vector3 objPos = _CenterObj.transform.position;         if (_Center && !_Invert)\n         {             objPos.x -= dimentsions.x * 0.5f * 1.7321f * _HexSize;\n             objPos.z -= dimentsions.z * 0.5f * -1.5f * _HexSize;\n         }\n         if (_Center && _Invert)         {             objPos.x -= dimentsions.x * 0.5f * 1.7321f * _HexSize;\n             objPos.z += dimentsions.z * 0.5f * -1.5f * _HexSize;\n         }\n          for (int xas = 0; xas < dimentsions.x; xas++)\n         {             CreateHax(new Vector3(objPos.x + 1.7321f  * _HexSize * _DistanceBetween * xas, objPos.y, objPos.z));\n             for (int zas = 1; zas < dimentsions.z; zas++)\n             {                 float offset = 0;\n                 if (zas % 2 == 1)                 {                     offset = 0.86605f * _HexSize * _DistanceBetween;\n                 }\n                 else                 {                     offset = 0;\n                 }\n                 if (!_Invert)                 {                     CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas - offset, objPos.y, objPos.z + -1.5f * _HexSize * _DistanceBetween * zas));\n                 }\n                 else                 {                     CreateHax(new Vector3(objPos.x + 1.7321f * _HexSize * _DistanceBetween * xas - offset, objPos.y, objPos.z + +1.5f * _HexSize * _DistanceBetween * zas));\n                 }\n             }\n         }\n     }\n     void CreateHax(Vector3 positions)     {         Vector3 objPos = _CenterObj.transform.position;          GameObject gridObj = GameObject.CreatePrimitive(PrimitiveType.Cube)\n;\n         gridObj.transform.position = new Vector3(positions.x, positions.y, positions.z)\n;\n          DestroyImmediate(gridObj.GetComponent<BoxCollider>());\n          float size = _HexSize;\n         float width = Mathf.Sqrt(3) * size;\n         float height = size * 2f;\n         Mesh mesh = new Mesh();\n         Vector3[] vertices = new Vector3[7];\n          for (int i = 0; i < 6; i++)\n         {             float angle_deg = 60 * i - 30;\n             float angle_rad = Mathf.Deg2Rad * angle_deg;\n              vertices[i + 1] = new Vector3(size * Mathf.Cos(angle_rad), 0f, size * Mathf.Sin(angle_rad));\n         }\n         mesh.vertices = vertices;\n          mesh.triangles = new int[]         {             2,1,0,             3,2,0,             4,3,0,             5,4,0,             6,5,0,             1,6,0         }\n;\n          Vector2[] uv = new Vector2[7];\n         for (int i = 0; i < 7; i++)\n         {             uv[i] = new Vector2(                 (vertices[i].x + -width * .5f) * .5f / size,                 (vertices[i].z + -height * .5f) * .5f / size);\n         }\n          mesh.uv = uv;\n         gridObj.GetComponent<MeshFilter>().sharedMesh = mesh;\n          _ObjSaved.Add(gridObj);\n     }\n      void SetParent()     {         for (int i = 0; i < _ObjSaved.Count; i++)\n         {             _ObjSaved[i].transform.parent = _CenterObj.transform;         }\n     }\n }"),
         new Tool_QuickStart_Script("Tool_ScriptToString",   "Tool_Editor",                  "wip",        "using System.Collections;\n using System.Collections.Generic;\n using System.Linq;\n using UnityEditor;\n using UnityEngine;\n  public class Tool_ScriptToString : EditorWindow {     string _ScriptInput = \"\";\n     string _ScriptOutput = \"\";\n      List<string> _CustomCommandCheckKeywords = new List<string>();\n     string _CustomCommandCheck;\n      private Vector2 _ScrollPos = new Vector2();\n      [MenuItem(\"Tools/Convert Script to String\")]     public static void ShowWindow()     {         EditorWindow.GetWindow(typeof(Tool_ScriptToString));\n     }\n      void OnGUI()     {         //Convert         \nif (GUILayout.Button(\"Convert\", GUILayout.Height(30)))         {             _ScriptOutput = ConvertScriptToString();\n         }\n          GUILayout.Space(20);\n          //Input         \nGUILayout.Label(\"Input: \", EditorStyles.boldLabel);\n         _ScriptInput = EditorGUILayout.TextField(\"\", _ScriptInput);\n          //Output         \nGUILayout.Label(\"Output: \", EditorStyles.boldLabel);\n         EditorGUILayout.TextField(\"\", _ScriptOutput);\n          GUILayout.Space(20);\n          GUILayout.Label(\"Use Custom Keywords to fix lines that should not be included into the commend. \n\" +             \"The x on the left shows the lines that contain a comment.\");\n          GUILayout.Space(20);\n          //Other Settings         \nGUILayout.Label(\"Custom Keywords: \", EditorStyles.boldLabel);\n         _CustomCommandCheck = EditorGUILayout.TextField(\"\", _CustomCommandCheck);\n         if (GUILayout.Button(\"AddKeyword\"))         {             _CustomCommandCheckKeywords.Add(_CustomCommandCheck);\n             _CustomCommandCheck = \"\";\n             _ScriptOutput = ConvertScriptToString();\n         }\n         for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)\n         {             GUILayout.BeginHorizontal(\"box\");\n             GUILayout.Label(_CustomCommandCheckKeywords[i]);\n             if (GUILayout.Button(\"Remove\", GUILayout.Width(100)))             {                 _CustomCommandCheckKeywords.RemoveAt(i);\n             }\n             GUILayout.EndHorizontal();\n         }\n          //Preview         \nList<string> output = new List<string>();\n         List<string> output2 = new List<string>();\n          for (int i = 0; i < _ScriptOutput.Length; i++)\n         {             output.Add(System.Convert.ToString(_ScriptOutput[i]));\n         }\n          int begincalc = 0;\n         int endcalc = 0;\n          for (int i = 0; i < output.Count; i++)\n         {             if(i + 1 < output.Count)             {                 if(output[i] + output[i + 1] == \"\\n\")                 {                     endcalc = i;\n                     string addstring = \"\";\n                     for (int j = 0; j < endcalc - begincalc; j++)\n                     {                         addstring += output[begincalc + j];\n                     }\n                     addstring += output[endcalc] + output[endcalc + 1];\n                      output2.Add(addstring);\n                     endcalc = endcalc + 1;\n                     begincalc = endcalc + 1;\n                 }\n             }\n         }\n          _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);\n          for (int i = 0; i < output2.Count; i++)\n         {             GUILayout.BeginHorizontal();\n             if(output2[i].Contains(\"//\"))             {                 Editor\nGUILayout.TextField(\"\", \"x\", GUILayout.MaxWidth(15));\n             }\n             else             {                 EditorGUILayout.TextField(\"\", \"\", GUILayout.MaxWidth(15));\n             }\n              EditorGUILayout.TextField(\"\", output2[i]);\n             GUILayout.EndHorizontal();\n         }\n                  EditorGUILayout.EndScrollView();\n     }\n      private string ConvertScriptToString()     {         _ScriptOutput = \"\";\n         string scriptasstring = \"\\\"\";\n          //Split / add to array         \nList<string> textedit = new List<string>();\n          for (int i = 0; i < _ScriptInput.Length; i++)\n         {             textedit.Add(System.Convert.ToString(_ScriptInput[i]));\n         }\n          bool headercheck = false;\n         bool forcheck = false;         bool commentcheck = false;          for (int i = 0; i < textedit.Count; i++)\n         {             //Header check             \nif (i + 7 < textedit.Count)             {                 if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] + textedit[i + 6] + textedit[i + 7] == \"[Header(\")                     headercheck = true;\n             }\n              //For check             \nif(i + 2 < textedit.Count)             {                 if(textedit[i]\n + textedit[i+1] + textedit[i + 2] == \"for\")\n                 {                     forcheck = true;                 }\n             }\n              //Comment check             \nif (i + 1 < textedit.Count)\n             {                 if (textedit[i] + textedit[i + 1] == \"//\" || textedit[i] + textedit[i + 1] == \"/*\")                     commentcheck = true;\n             }\n              //Comment /* + *\n/             if (commentcheck)             {                 if (textedit[i - 1] + textedit[i] == \"*/\")                 {                     scriptasstring += \"\\n\";\n                     commentcheck = false;\n                 }\n                  if (i + 6 < textedit.Count)                 {                     //\nif                     if (textedit[i] + textedit[i + 1] == \"if\")                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                     //\nfor                     if (textedit[i] + textedit[i + 1] + textedit[i + 2] == \"for\")\n                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                     //\nswitch                     if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] == \"switch\")                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                     //\ncase                     if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] == \"case\")                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                     //\npublic                     if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] == \"public\")                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                     //\nprivate                     if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] + textedit[i + 6] == \"private\")                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                     //\nvoid                     if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] == \"void\")                     {                         scriptasstring += \"\\n\";\n                         commentcheck = false;\n                     }\n                 }\n                  for (int j = 0; j < _CustomCommandCheckKeywords.Count; j++)\n                 {                     if(_CustomCommandCheckKeywords[j].Length < textedit.Count)                     {                         string check = \"\";\n                          for (int o = 0; o < _CustomCommandCheckKeywords[j].Length; o++)\n                         {                             check += textedit[i + o];\n                         }\n                                                  if(check == _CustomCommandCheckKeywords[j])                         {                             scriptasstring += \"\\n\";\n                             commentcheck = false;\n                         }\n                     }\n                 }\n             }\n              scriptasstring += textedit[i];\n              //Endings check             \nif (i + 1 < textedit.Count)             {                 if (textedit[i + 1] == \"\\\"\")                 {                     scriptasstring += \"\\\";\n                 }\n                  if (textedit[i] == \"}\\n\")                 {                     scriptasstring += \"\\n\";\n                 }\n                 if (textedit[i] == \";\\n\" && !forcheck)\n                 {                     scriptasstring += \"\\n\";\n                 }\n                 if(textedit[i] == \"]\" && headercheck)                 {                     scriptasstring += \"\\n\";\n                     headercheck = false;\n                 }\n                 if (textedit[i] == \")\" && forcheck)\n                 {                     scriptasstring += \"\\n\";\n                     forcheck = false;                 }\n             }\n         }\n          scriptasstring += \"\\\"\";         return scriptasstring;     }\n }\n "),
         new Tool_QuickStart_Script("Turret",                "Turret_Shooting",              "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n  public class Turret : MonoBehaviour {     [Header(\"Settings\")]\n     [SerializeField] private Vector2 _MinMaxRange = Vector2.zero;\n     [SerializeField] private float _SecondsBetweenShots = 2;\n     [SerializeField] private float _Damage = 25;\n     [SerializeField] private GameObject _ShootPart = null;\n     [SerializeField] private string _Tag = \"Enemy\";\n          private float _Timer;\n     private GameObject _Target;\n      void Update()     {         if (_Target != null)         {             _ShootPart.transform.LookAt(_Target.transform.position)\n;\n             _Timer += 1 * Time.deltaTime;\n             if (_Timer >= _SecondsBetweenShots)             {                 _Target.GetComponent<Health>().DoDamage(_Damage);\n                 _Timer = 0;\n             }\n         }\n         else         {             _ShootPart.transform.rotation = Quaternion.Euler(90, 0, 0)\n;\n         }\n          _Target = FindEnemy();\n     }\n      public GameObject FindEnemy()     {         GameObject[] m_Targets = GameObject.FindGameObjectsWithTag(_Tag);\n         GameObject closest = null;\n         float distance = Mathf.Infinity;\n         Vector3 position = transform.position;          _MinMaxRange.x = _MinMaxRange.x * _MinMaxRange.x;         _MinMaxRange.y = _MinMaxRange.y * _MinMaxRange.y;         foreach (GameObject target in m_Targets)\n         {             Vector3 diff = target.transform.position - position;             float curDistance = diff.sqrMagnitude;             if (curDistance < distance && curDistance >= _MinMaxRange.x && curDistance <= _MinMaxRange.y)\n             {                 closest = target;\n                 distance = curDistance;\n             }\n         }\n         return closest;\n     }\n }"),
         new Tool_QuickStart_Script("UIEffects",             "UI_Effect",                    "stable",     "using System.Collections;\n using System.Collections.Generic;\n using UnityEngine;\n using UnityEngine.EventSystems;\n  public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {     private enum UIEffectOptions { Grow, Shrink }\n     [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n     [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f,1f,1.1f);\n     [SerializeField] private float _IncreaseSpeed = 1;\n      private Vector3 _OriginalSize;\n     private bool _MouseOver;\n      void Start()     {         _OriginalSize = transform.localScale;     }\n      void Update()\n     {         switch (_UIEffect)         {             case UIEffectOptions.Grow:                 if (_MouseOver)                 {                     if (transform.localScale.y < _MinDefaultMaxSize.z)\n                         transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed)\n * Time.deltaTime;\n                 }\n                 else                     if (transform.localScale.y > _OriginalSize.y)\n                     transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed)\n * Time.deltaTime;\n                 else                     transform.localScale = new Vector3(_OriginalSize.y, _OriginalSize.z, _OriginalSize.z)\n;\n                 break;\n             case UIEffectOptions.Shrink:                 if (_MouseOver)                 {                     if (transform.localScale.y > _MinDefaultMaxSize.x)\n                         transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed)\n * Time.deltaTime;\n                 }\n                 else                    if (transform.localScale.y < _OriginalSize.x)\n                     transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed)\n * Time.deltaTime;\n                 else                     transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z)\n;\n                 break;\n         }\n     }\n      public void OnPointerEnter(PointerEventData eventData)     {         _MouseOver = true;\n     }\n      public void OnPointerExit(PointerEventData eventData)     {         _MouseOver = false;\n     }\n }")
@@ -76,6 +80,7 @@ public class Tool_QuickStart : EditorWindow
     //Search
     string _Search_Script = "";
     string _Search_Tag = "";
+    string[] _Project_Scripts = new string[0];
     bool _Search_QuickStartScripts_Toggle = true;
     bool _Searcg_ProjectScripts_Toggle = false;
     int _Search_ProjectScripts_Results = 0;
@@ -99,63 +104,128 @@ public class Tool_QuickStart : EditorWindow
     RectTransform _MainCanvasRect;
     Vector2 _CheckMainCanvasRectSize;
 
+    //FileFinder (FF)
+    string _FF_Type = "";
+    string _FF_Search = "";
+    int _FF_Results = 0;
+    int _FF_Total = 0;
+
+    //Script To String (STS)
+    string _STS_ScriptInput = "";
+    string _STS_ScriptOutput = "";
+    string _STS_CustomCommandCheck = "";
+    private bool _STS_ToggleKeywords = false;
+    List<string> _STS_CustomCommandCheckKeywords = new List<string>();
+
+    //Map Editor (ME)
+    #region MapEditor
+    //Prefab Array
+    private GameObject[] _ME_Prefabs = new GameObject[0];
+    private string[] _ME_SearchResults = new string[0];
+
+    //Array Options
+    private string _ME_SearchPrefab = "";
+    private bool _ME_HideNames = true;
+    private float _ME_ButtonSize = 1, _ME_CollomLength = 4;
+
+    //Array Selection
+    private int _ME_SelectedID = 99999999, _ME_CheckSelectedID = 999999999;
+
+    //Options
+    private bool _ME_HideOptions = true;
+    private int _ME_OptionsStates = 0, _ME_PlacementStates = 0;
+
+    //Placement Option
+    private float _ME_PaintSpeed = 1, _ME_PaintTimer = 0;
+    private bool _ME_SnapPosActive = false;
+
+    //Onscene Options
+    private bool _ME_ShowOptionsInScene;
+    private int _ME_InScene_SelectedID;
+
+    //Position
+    private Vector3 _ME_MousePos, _ME_SnapPos, _ME_ObjectPos;
+    private Vector2 _ME_GridSize = new Vector2(1, 1);
+
+    //Rotation/Size
+    private float _ME_Rotation, _ME_Size = 1;
+    private bool _ME_RandomRot = false;
+
+    //Check Buttons Event
+    private bool _ME_MouseDown, _ME_ShiftDown, _ME_CtrlDown, _ME_ClickMenu;
+
+    //Placement
+    private GameObject _ME_ParentObj, _ME_ExampleObj;
+
+    //Other
+    private Vector2 _ME_ScrollPos1, _ME_ClickPos;
+    private Texture2D[] _ME_PrefabIcon = new Texture2D[0];
+    #endregion
+
+
     [MenuItem("Tools/Tool_QuickStart")]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(Tool_QuickStart));
     }
 
+    //Menu
     void OnGUI()
     {
-        //Menu Type
-        _MenuID = GUILayout.Toolbar(_MenuID, new string[] { "QuickStart", "Scripts", "QuickUI (wip)" });
-
-        if (_MenuID == 0)
-            Menu_QuickStart();
-        else if (_MenuID == 1)
-            Menu_Scripts();
-        else
-            Menu_UI();
-    }
-
-    //UI
-    void Menu_UI()
-    {
         GUILayout.BeginHorizontal();
-        _MainCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _MainCanvas, typeof(GameObject), true);
-        if (_MainCanvas == null)
+        if (GUILayout.Button("=", GUILayout.Width(20)))
         {
-            if (GUILayout.Button("Search"))
-            {
-                _MainCanvas = GameObject.FindObjectOfType<Canvas>().gameObject;
-                HUD_Add_Tab();
-            }
-            if (GUILayout.Button("Create"))
-            {
-                _MainCanvas = HUD_Create_Canvas();
-                HUD_Add_Tab();
-            }
+            _SelectWindow = !_SelectWindow;
+        }
+        if (_SelectWindow)
+        {
+            GUILayout.Label("Navigation");
+            GUILayout.EndHorizontal();
+
+            if (GUILayout.Button("Home", GUILayout.Height(50))) { _WindowID = 0; _SelectWindow = false; }
+            if (GUILayout.Button("FileFinder (wip)", GUILayout.Height(50))) { _WindowID = 1; _SelectWindow = false; }
+            if (GUILayout.Button("Script to String", GUILayout.Height(50))) { _WindowID = 2; _SelectWindow = false; }
+            if (GUILayout.Button("MapEditor", GUILayout.Height(50))) { _WindowID = 3; _SelectWindow = false; }
         }
         else
         {
-            if (GUILayout.Button("Delete"))
-                if (_MainCanvas != null)
-                {
-                    DestroyImmediate(_MainCanvas);
-                    _HUDTab.Clear();
-                    _CheckMainCanvasRectSize = Vector2.zero;
-                    _MainCanvasRect = null;
-                    _MainCanvas = null;
-                }
-        }
-        GUILayout.EndHorizontal();
+            switch (_WindowID)
+            {
+                case 0: //Default
+                        //Menu Type
+                    _MenuID = GUILayout.Toolbar(_MenuID, new string[] { "QuickStart", "Scripts", "QuickUI (wip)" });
+                    GUILayout.EndHorizontal();
 
-        //LiveEditor
-        if (_MainCanvas != null)
-            HUD_Editor();
+                    switch (_MenuID)
+                    {
+                        case 0: //QuickStart
+                            Menu_QuickStart();
+                            break;
+                        case 1: //Scripts
+                            Menu_Scripts();
+                            break;
+                        case 2: //QuickUI
+                            Menu_QuickUI();
+                            break;
+                    }
+                    break;
+                case 1: //FileFinder
+                    GUILayout.EndHorizontal();
+                    FileFinder();
+                    break;
+                case 2: //ScriptToString
+                    GUILayout.EndHorizontal();
+                    ScriptToString_Menu();
+                    break;
+                case 3: //MapEditor
+                    GUILayout.EndHorizontal();
+                    MapEditor_Menu();
+                    break;
+            }
+        }
     }
 
-    //Menu QuickStart
+    //Home > QuickStart : Menu
     void Menu_QuickStart()
     {
         //FirstSearch
@@ -318,188 +388,7 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //Menu Scripts
-    void Menu_Scripts()
-    {
-        //Refresh
-        if (GUILayout.Button("Refresh"))
-            SearchScripts();
-
-        //Search Options
-        _Search_Script = EditorGUILayout.TextField("Search: ", _Search_Script);
-        _Search_Tag = EditorGUILayout.TextField("SearchTag: ", _Search_Tag);
-        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
-
-        //Quickstart Scripts
-        _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ") In Project: " + _Search_InProject_Results.ToString());
-        if (_Search_QuickStartScripts_Toggle)
-        {
-            _Search_Results = 0;
-            _Search_InProject_Results = 0;
-            for (int i = 0; i < QuickStart_Scripts.Length; i++)
-            {
-                if (_Search_Script == "" || QuickStart_Scripts[i].ScriptName.ToLower().Contains(_Search_Script.ToLower()))
-                {
-                    if (QuickStart_Scripts[i].ScriptTag.ToLower().Contains(_Search_Tag.ToLower()) || QuickStart_Scripts[i].ScriptTag == "" || QuickStart_Scripts[i].ScriptTag == null)
-                    {
-                        //Update results
-                        _Search_Results++;
-
-                        //Set color
-                        if (QuickStart_Scripts[i].Exist)
-                        {
-                            GUI.backgroundColor = new Color(0, 1, 0);
-                            _Search_InProject_Results++;
-                        }
-                        else
-                            GUI.backgroundColor = new Color(1, 0, 0);
-
-                        //Script
-                        EditorGUILayout.BeginHorizontal("Box");
-                        EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel);
-                        EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptState, EditorStyles.miniLabel, GUILayout.Width(50));
-                        EditorGUI.BeginDisabledGroup(QuickStart_Scripts[i].Exist);
-                        if (GUILayout.Button("Add", GUILayout.Width(50)))
-                            AddScript(i);
-                        EditorGUI.EndDisabledGroup();
-                        EditorGUILayout.EndHorizontal();
-                    }
-                }
-            }
-        }
-
-        GUI.backgroundColor = Color.white;
-
-        //ProjectScripts
-        _Searcg_ProjectScripts_Toggle = EditorGUILayout.Foldout(_Searcg_ProjectScripts_Toggle, "Project" + "     ||     Results(" + _Search_ProjectScripts_Results.ToString() + "/" + _Search_ProjectScripts_Total.ToString() + ")");
-        if (_Searcg_ProjectScripts_Toggle)
-        {
-            _Search_ProjectScripts_Results = 0;
-
-            string[] search_results = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
-            _Search_ProjectScripts_Total = search_results.Length;
-            for (int i = 0; i < search_results.Length; i++)
-            {
-                if (_Search_Script == "" || search_results[i].ToLower().Contains(_Search_Script.ToLower()))
-                {
-                    //Update results
-                    _Search_ProjectScripts_Results++;
-
-                    //Script
-                    EditorGUILayout.BeginHorizontal("Box");
-                    EditorGUILayout.LabelField(search_results[i], EditorStyles.boldLabel);
-                    if (GUILayout.Button("Select", GUILayout.Width(50)))
-                        Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(search_results[i]);
-                    EditorGUILayout.EndHorizontal();
-                }
-            }
-        }
-        EditorGUILayout.EndScrollView();
-    }
-
-    //Search Scripts
-    void ScriptStatus(string name)
-    {
-        int scriptid = 999;
-        for (int i = 0; i < QuickStart_Scripts.Length; i++)
-        {
-            if (name == QuickStart_Scripts[i].ScriptName)
-            {
-                scriptid = i;
-                continue;
-            }
-        }
-
-        if (scriptid != 999)
-        {
-            if (QuickStart_Scripts[scriptid].Exist)
-            { GUI.backgroundColor = new Color(0, 1, 0); }
-            else
-                GUI.backgroundColor = new Color(1, 0, 0);
-
-            EditorGUILayout.BeginHorizontal("Box");
-            GUILayout.Label(name + ".cs");
-            EditorGUI.BeginDisabledGroup(QuickStart_Scripts[scriptid].Exist);
-            if (GUILayout.Button("Add", GUILayout.Width(50)))
-            {
-                AddScript(scriptid);
-            }
-            EditorGUI.EndDisabledGroup();
-            EditorGUILayout.EndHorizontal();
-        }else
-        {
-            GUI.backgroundColor = Color.black;
-            EditorGUILayout.BeginHorizontal("Box");
-            GUILayout.Label(name + ".cs");
-            EditorGUI.BeginDisabledGroup(true);
-            if (GUILayout.Button("Add", GUILayout.Width(50))){ }
-            EditorGUI.EndDisabledGroup();
-            EditorGUILayout.EndHorizontal();
-        }
-    }
-    void SearchScripts()
-    {
-        bool[] checkexist = new bool[QuickStart_Scripts.Length];
-
-        for (int i = 0; i < QuickStart_Scripts.Length; i++)
-        {
-            string[] search_results = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
-            for (int o = 0; o < search_results.Length; o++)
-            {
-                if (search_results[o].Contains(QuickStart_Scripts[i].ScriptName))
-                    checkexist[i] = true;
-            }
-        }
-
-        for (int i = 0; i < QuickStart_Scripts.Length; i++)
-        {
-            QuickStart_Scripts[i].Exist = checkexist[i];
-        }
-    }
-    bool ScriptExist(string name)
-    {
-        int scriptid = 0;
-        for (int i = 0; i < QuickStart_Scripts.Length; i++)
-        {
-            if (name == QuickStart_Scripts[i].ScriptName)
-            {
-                scriptid = i;
-                continue;
-            }
-        }
-        return QuickStart_Scripts[scriptid].Exist;
-    }
-
-    //Add Scripts
-    void AddScriptsMultiple(string[] ids)
-    {
-        for (int i = 0; i < ids.Length; i++)
-        {
-            for (int o = 0; o < QuickStart_Scripts.Length; o++)
-            {
-                if (ids[i] == QuickStart_Scripts[o].ScriptName)
-                {
-                    AddScript(o);
-                }
-            }
-        }
-    }
-    void AddScript(int id)
-    {
-        SearchScripts();
-        if (!QuickStart_Scripts[id].Exist)
-        {
-            using (StreamWriter sw = new StreamWriter(string.Format(Application.dataPath + "/" + QuickStart_Scripts[id].ScriptName + ".cs",
-                                               new object[] { QuickStart_Scripts[id].ScriptName.Replace(" ", "") })))
-            {
-                sw.Write(QuickStart_Scripts[id].ScriptCode);
-            }
-        }
-        AssetDatabase.Refresh();
-        SearchScripts();
-    }
-
-    //Create scene
+    //Home > QuickStart : CreateScene
     void CreateTemplate()
     {
         if (_CreateSceneOptions == 0)
@@ -574,7 +463,7 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //Create Objects 3D / Set scripts
+    //Home > QuickStart : Create Objects 3D / Set scripts
     void CreateObjects_3D_FPS(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
         //Setup Level
@@ -689,7 +578,7 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //Create Object 2D / Set scripts
+    //Home > QuickStart : Create Object 2D / Set scripts
     void CreateObjects_2D_Platformer(GameObject playerobj, GameObject groundobj, GameObject cameraobj)
     {
         groundobj.transform.localScale = new Vector3(25, 1, 1);
@@ -729,7 +618,256 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //HUD Editor
+
+    //Home > Scripts
+    void Menu_Scripts()
+    {
+        //Refresh
+        if (GUILayout.Button("Refresh"))
+            SearchScripts();
+
+        //Search Options
+        _Search_Script = EditorGUILayout.TextField("Search: ", _Search_Script);
+        _Search_Tag = EditorGUILayout.TextField("SearchTag: ", _Search_Tag);
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
+
+        //Quickstart Scripts
+        _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ") In Project: " + _Search_InProject_Results.ToString());
+        if (_Search_QuickStartScripts_Toggle)
+        {
+            _Search_Results = 0;
+            _Search_InProject_Results = 0;
+            for (int i = 0; i < QuickStart_Scripts.Length; i++)
+            {
+                if (_Search_Script == "" || QuickStart_Scripts[i].ScriptName.ToLower().Contains(_Search_Script.ToLower()))
+                {
+                    if (QuickStart_Scripts[i].ScriptTag.ToLower().Contains(_Search_Tag.ToLower()) || QuickStart_Scripts[i].ScriptTag == "" || QuickStart_Scripts[i].ScriptTag == null)
+                    {
+                        //Update results
+                        _Search_Results++;
+
+                        //Set color
+                        if (QuickStart_Scripts[i].Exist)
+                        {
+                            GUI.backgroundColor = new Color(0, 1, 0);
+                            _Search_InProject_Results++;
+                        }
+                        else
+                            GUI.backgroundColor = new Color(1, 0, 0);
+
+                        //Script
+                        EditorGUILayout.BeginHorizontal("Box");
+
+                        if (Screen.width <= 325)
+                            EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 130));
+                        else
+                            EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 180));
+
+                        if (Screen.width > 325)
+                            EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptState, EditorStyles.miniLabel, GUILayout.Width(50));
+
+                        //Select Script
+                        if (!QuickStart_Scripts[i].Exist)
+                        {
+                            EditorGUI.BeginDisabledGroup(true);
+                            if (GUILayout.Button("Select", GUILayout.Width(50)))
+                                Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(QuickStart_Scripts[i].ScriptPath);
+                            EditorGUI.EndDisabledGroup();
+                        }
+                        else
+                        {
+                            if (GUILayout.Button("Select", GUILayout.Width(50)))
+                                Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(QuickStart_Scripts[i].ScriptPath);
+                        }
+
+                        //Add Script
+                        EditorGUI.BeginDisabledGroup(QuickStart_Scripts[i].Exist);
+                        if (GUILayout.Button("Add", GUILayout.Width(50)))
+                            AddScript(i);
+                        EditorGUI.EndDisabledGroup();
+                        EditorGUILayout.EndHorizontal();
+                    }
+                }
+            }
+        }
+
+        GUI.backgroundColor = Color.white;
+
+        //ProjectScripts
+        _Searcg_ProjectScripts_Toggle = EditorGUILayout.Foldout(_Searcg_ProjectScripts_Toggle, "Project" + "     ||     Results(" + _Search_ProjectScripts_Results.ToString() + "/" + _Search_ProjectScripts_Total.ToString() + ")");
+        if (_Searcg_ProjectScripts_Toggle)
+        {
+            _Search_ProjectScripts_Results = 0;
+
+            _Search_ProjectScripts_Total = _Project_Scripts.Length;
+            for (int i = 0; i < _Project_Scripts.Length; i++)
+            {
+                if (_Search_Script == "" || _Project_Scripts[i].ToLower().Contains(_Search_Script.ToLower()))
+                {
+                    //Update results
+                    _Search_ProjectScripts_Results++;
+
+                    //Script
+                    EditorGUILayout.BeginHorizontal("Box");
+                    EditorGUILayout.LabelField(_Project_Scripts[i], EditorStyles.boldLabel);
+                    if (GUILayout.Button("Select", GUILayout.Width(50)))
+                        Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(_Project_Scripts[i]);
+                    EditorGUILayout.EndHorizontal();
+                }
+            }
+        }
+        EditorGUILayout.EndScrollView();
+    }
+
+    //Home > Scripts : Search
+    void ScriptStatus(string name)
+    {
+        int scriptid = 999;
+        for (int i = 0; i < QuickStart_Scripts.Length; i++)
+        {
+            if (name == QuickStart_Scripts[i].ScriptName)
+            {
+                scriptid = i;
+                continue;
+            }
+        }
+
+        if (scriptid != 999)
+        {
+            if (QuickStart_Scripts[scriptid].Exist)
+            { GUI.backgroundColor = new Color(0, 1, 0); }
+            else
+                GUI.backgroundColor = new Color(1, 0, 0);
+
+            EditorGUILayout.BeginHorizontal("Box");
+            GUILayout.Label(name + ".cs");
+            EditorGUI.BeginDisabledGroup(QuickStart_Scripts[scriptid].Exist);
+            if (GUILayout.Button("Add", GUILayout.Width(50)))
+            {
+                AddScript(scriptid);
+            }
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+        }
+        else
+        {
+            GUI.backgroundColor = Color.black;
+            EditorGUILayout.BeginHorizontal("Box");
+            GUILayout.Label(name + ".cs");
+            EditorGUI.BeginDisabledGroup(true);
+            if (GUILayout.Button("Add", GUILayout.Width(50))) { }
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+        }
+    }
+    void SearchScripts()
+    {
+        //QuickStart Scripts
+        bool[] checkexist = new bool[QuickStart_Scripts.Length];
+
+        for (int i = 0; i < QuickStart_Scripts.Length; i++)
+        {
+            string[] search_results = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
+            for (int o = 0; o < search_results.Length; o++)
+            {
+                if (search_results[o].ToLower().Contains(QuickStart_Scripts[i].ScriptName.ToLower()))
+                {
+                    checkexist[i] = true;
+                    QuickStart_Scripts[i].ScriptPath = search_results[o];
+                }
+            }
+        }
+
+        for (int i = 0; i < QuickStart_Scripts.Length; i++)
+        {
+            QuickStart_Scripts[i].Exist = checkexist[i];
+        }
+
+        //Scripts Project
+        _Project_Scripts = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
+    }
+    bool ScriptExist(string name)
+    {
+        int scriptid = 0;
+        for (int i = 0; i < QuickStart_Scripts.Length; i++)
+        {
+            if (name == QuickStart_Scripts[i].ScriptName)
+            {
+                scriptid = i;
+                continue;
+            }
+        }
+        return QuickStart_Scripts[scriptid].Exist;
+    }
+
+    //Home > Scripts : Add
+    void AddScriptsMultiple(string[] ids)
+    {
+        for (int i = 0; i < ids.Length; i++)
+        {
+            for (int o = 0; o < QuickStart_Scripts.Length; o++)
+            {
+                if (ids[i] == QuickStart_Scripts[o].ScriptName)
+                {
+                    AddScript(o);
+                }
+            }
+        }
+    }
+    void AddScript(int id)
+    {
+        SearchScripts();
+        if (!QuickStart_Scripts[id].Exist)
+        {
+            using (StreamWriter sw = new StreamWriter(string.Format(Application.dataPath + "/" + QuickStart_Scripts[id].ScriptName + ".cs",
+                                               new object[] { QuickStart_Scripts[id].ScriptName.Replace(" ", "") })))
+            {
+                sw.Write(QuickStart_Scripts[id].ScriptCode);
+            }
+        }
+        AssetDatabase.Refresh();
+        SearchScripts();
+    }
+
+
+    //Home > QuickUI : Menu
+    void Menu_QuickUI()
+    {
+        GUILayout.BeginHorizontal();
+        _MainCanvas = (GameObject)EditorGUILayout.ObjectField("Canvas", _MainCanvas, typeof(GameObject), true);
+        if (_MainCanvas == null)
+        {
+            if (GUILayout.Button("Search"))
+            {
+                _MainCanvas = GameObject.FindObjectOfType<Canvas>().gameObject;
+                HUD_Add_Tab();
+            }
+            if (GUILayout.Button("Create"))
+            {
+                _MainCanvas = HUD_Create_Canvas();
+                HUD_Add_Tab();
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("Delete"))
+                if (_MainCanvas != null)
+                {
+                    DestroyImmediate(_MainCanvas);
+                    _HUDTab.Clear();
+                    _CheckMainCanvasRectSize = Vector2.zero;
+                    _MainCanvasRect = null;
+                    _MainCanvas = null;
+                }
+        }
+        GUILayout.EndHorizontal();
+
+        //LiveEditor
+        if (_MainCanvas != null)
+            HUD_Editor();
+    }
+
+    //Home > QuickUI : HUD Editor
     void HUD_Editor()
     {
         HUD_Editor_Profile();
@@ -862,7 +1000,7 @@ public class Tool_QuickStart : EditorWindow
             GUILayout.Label("Add or assign canvas to create/add");
     }
 
-    //HUD Updator
+    //Home > QuickUI : HUD Updator
     void LiveHUDEditorUpdate()
     {
         for (int i = 0; i < _HUDTab[_HUDTabID].HUD_TabOjects.Count; i++)
@@ -906,7 +1044,7 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //HUD Edit
+    //Home > QuickUI : HUD Edit
     void HUD_Change_Position(Tool_QuickStartUI_Object obj)
     {
         switch(obj.HUD_Location)
@@ -978,7 +1116,7 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
-    //HUD Create
+    //Home > QuickUI : HUD Create
     GameObject HUD_Create_Text()
     {
         GameObject newhud_text = HUD_Create_Template();
@@ -1397,7 +1535,7 @@ public class Tool_QuickStart : EditorWindow
         return canvasobj;
     }
 
-    //HUD Set
+    //Home > QuickUI : HUD Set
     void HUD_Set_Rect(RectTransform rect, string anchorpos)
     {
         switch (anchorpos)
@@ -1462,7 +1600,7 @@ public class Tool_QuickStart : EditorWindow
         rect.anchoredPosition = offset;
     }
 
-    //HUD Add
+    //Home > QuickUI : HUD Add
     void HUD_Add_Tab()
     {
         Tool_QuickStartUI_Tab newtab = new Tool_QuickStartUI_Tab();
@@ -1479,7 +1617,7 @@ public class Tool_QuickStart : EditorWindow
         _HUDTab.Add(newtab);
     }
 
-    //HUD Profiles
+    //Home > QuickUI : HUD Profiles
     void HUD_ClearLoaded()
     {
         for (int i = 0; i < _HUDTab.Count; i++)
@@ -1579,7 +1717,7 @@ public class Tool_QuickStart : EditorWindow
         _HUDTabID = 0;
     }
 
-    //Set Script Refs
+    //Home > QuickUI : Set Script Refs
     void Set_SettingsHandler()
     {
         if (ScriptExist("SettingsHandler"))
@@ -1629,6 +1767,733 @@ public class Tool_QuickStart : EditorWindow
             settingshandlerobj.name = "SettingsHandler";
         }
     }
+
+
+    //FileFinder
+    void FileFinder()
+    {
+        _FF_Search = EditorGUILayout.TextField("Search:", _FF_Search);
+        _FF_Type = EditorGUILayout.TextField("Type:", _FF_Type);
+        GUILayout.Label("(" + _FF_Results + "/" + _FF_Total + ")");
+
+        _FF_Results = 0;
+        _FF_Total = 0;
+
+        string[] search_results = System.IO.Directory.GetFiles("Assets/", "*" + _FF_Type, System.IO.SearchOption.AllDirectories);
+
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
+        for (int i = 0; i < search_results.Length; i++)
+        {
+            if (search_results[i].ToLower().Contains(_FF_Search.ToLower()))
+            {
+                GUILayout.BeginHorizontal("Box");
+                GUILayout.Label(search_results[i], GUILayout.Width(Screen.width - 80));
+                if(GUILayout.Button("Select", GUILayout.Width(50)))
+                {
+                    Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(search_results[i]);
+                }
+                GUILayout.EndHorizontal();
+                _FF_Results++;
+            }
+            _FF_Total++;
+        }
+        EditorGUILayout.EndScrollView();
+    }
+
+
+    //Script To String
+    void ScriptToString_Menu()
+    {
+        if (GUILayout.Button("Convert", GUILayout.Height(30)))
+            _STS_ScriptOutput = STS_ConvertScriptToString();
+
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
+        STS_InputOutput();
+        STS_Show_Keywords();
+        STS_Display_TextEditor();
+        EditorGUILayout.EndScrollView();
+    }
+    private void STS_InputOutput()
+    {
+        GUILayout.Space(20);
+        //Input
+        GUILayout.Label("Input: ", EditorStyles.boldLabel);
+        _STS_ScriptInput = EditorGUILayout.TextField("", _STS_ScriptInput, GUILayout.Width(Screen.width -5));
+
+        //Output
+        GUILayout.Label("Output: ", EditorStyles.boldLabel);
+        EditorGUILayout.TextField("", _STS_ScriptOutput, GUILayout.Width(Screen.width - 5));
+        GUILayout.Space(20);
+    }
+    private void STS_Show_Keywords()
+    {
+        //TextEditor Info
+        GUILayout.Label("Use Custom Keywords to fix lines that should not be included into the commend. \n" +
+            "Sometimes it leaves code after the command, you can addit it by adding a keyword below." +
+            "The x on the left shows the lines that contain a comment.");
+
+        GUILayout.Space(20);
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Custom Keywords: ", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 160));
+        if (GUILayout.Button("Add common keywords", GUILayout.Width(150)))
+        {
+            STS_AddCommonKeywords();
+        }
+        GUILayout.EndHorizontal();
+
+        _STS_CustomCommandCheck = EditorGUILayout.TextField("", _STS_CustomCommandCheck, GUILayout.Width(Screen.width - 5));
+        if (GUILayout.Button("AddKeyword", GUILayout.Width(Screen.width - 5)))
+        {
+            if (_STS_CustomCommandCheck == "")
+                Debug.Log("Enter a keyword");
+            else
+            {
+                STS_Add_Keyword(_STS_CustomCommandCheck);
+                _STS_CustomCommandCheck = "";
+                _STS_ScriptOutput = STS_ConvertScriptToString();
+            }
+        }
+
+        _STS_ToggleKeywords = EditorGUILayout.Foldout(_STS_ToggleKeywords, "Show Keywords");
+
+        if (_STS_ToggleKeywords)
+            for (int i = 0; i < _STS_CustomCommandCheckKeywords.Count; i++)
+            {
+                GUILayout.BeginHorizontal("box");
+                GUILayout.Label(_STS_CustomCommandCheckKeywords[i]);
+                if (GUILayout.Button("Remove", GUILayout.Width(100)))
+                {
+                    _STS_CustomCommandCheckKeywords.Remove(_STS_CustomCommandCheckKeywords[i]);
+                    _STS_CustomCommandCheck = "";
+                    _STS_ScriptOutput = STS_ConvertScriptToString();
+                }
+                GUILayout.EndHorizontal();
+            }
+    }
+    private void STS_Display_TextEditor()
+    {
+        //Preview
+        List<string> output = new List<string>();
+        List<string> output2 = new List<string>();
+
+        for (int i = 0; i < _STS_ScriptOutput.Length; i++)
+        {
+            output.Add(System.Convert.ToString(_STS_ScriptOutput[i]));
+        }
+
+        int begincalc = 0;
+        int endcalc = 0;
+
+        for (int i = 0; i < output.Count; i++)
+        {
+            if (i + 1 < output.Count)
+            {
+                if (output[i] + output[i + 1] == "\\n")
+                {
+                    endcalc = i;
+                    string addstring = "";
+                    for (int j = 0; j < endcalc - begincalc; j++)
+                    {
+                        addstring += output[begincalc + j];
+                    }
+                    addstring += output[endcalc] + output[endcalc + 1];
+
+                    output2.Add(addstring);
+                    endcalc = endcalc + 1;
+                    begincalc = endcalc + 1;
+                }
+            }
+        }
+
+        for (int i = 0; i < output2.Count; i++)
+        {
+            GUILayout.BeginHorizontal();
+            if (output2[i].Contains("//"))
+            {
+                EditorGUILayout.TextField("", "x", GUILayout.MaxWidth(15));
+            }
+            else
+            {
+                EditorGUILayout.TextField("", "", GUILayout.MaxWidth(15));
+            }
+
+            EditorGUILayout.TextField("", output2[i]);
+            GUILayout.EndHorizontal();
+        }
+    }
+    private void STS_AddCommonKeywords()
+    {
+        STS_Add_Keyword("float");
+        STS_Add_Keyword("double");
+        STS_Add_Keyword("int");
+        STS_Add_Keyword("void");
+        STS_Add_Keyword("for");
+        STS_Add_Keyword("switch");
+        STS_Add_Keyword("private");
+        STS_Add_Keyword("public");
+        STS_Add_Keyword("[Header(");
+        STS_Add_Keyword("case");
+        STS_Add_Keyword("if");
+
+        _STS_ScriptOutput = STS_ConvertScriptToString();
+    }
+    private void STS_Add_Keyword(string keyword)
+    {
+        bool exist = false;
+        for (int i = 0; i < _STS_CustomCommandCheckKeywords.Count; i++)
+        {
+            if (_STS_CustomCommandCheckKeywords[i] == keyword)
+                exist = true;
+        }
+
+        if (!exist)
+            _STS_CustomCommandCheckKeywords.Add(keyword);
+    }
+    private string STS_ConvertScriptToString()
+    {
+        _STS_ScriptOutput = "";
+        string scriptasstring = "\"";
+
+        //Split / add to array
+        List<string> textedit = new List<string>();
+
+        for (int i = 0; i < _STS_ScriptInput.Length; i++)
+        {
+            textedit.Add(System.Convert.ToString(_STS_ScriptInput[i]));
+        }
+
+        bool headercheck = false;
+        bool forcheck = false;
+        bool commentcheck = false;
+
+        for (int i = 0; i < textedit.Count; i++)
+        {
+            //Header check
+            if (i + 7 < textedit.Count)
+            {
+                if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] + textedit[i + 6] + textedit[i + 7] == "[Header(")
+                    headercheck = true;
+            }
+
+            //For check
+            if (i + 2 < textedit.Count)
+            {
+                if (textedit[i] + textedit[i + 1] + textedit[i + 2] == "for")
+                {
+                    forcheck = true;
+                }
+            }
+
+            //Comment check
+            if (i + 1 < textedit.Count)
+            {
+                if (textedit[i] + textedit[i + 1] == "//" || textedit[i] + textedit[i + 1] == "/*")
+                    commentcheck = true;
+            }
+
+            //Comment /* + */
+            if (commentcheck)
+            {
+                if (textedit[i - 1] + textedit[i] == "*/")
+                {
+                    scriptasstring += "\\n";
+                    commentcheck = false;
+                }
+
+                for (int j = 0; j < _STS_CustomCommandCheckKeywords.Count; j++)
+                {
+                    if (_STS_CustomCommandCheckKeywords[j].Length < textedit.Count)
+                    {
+                        string check = "";
+
+                        for (int o = 0; o < _STS_CustomCommandCheckKeywords[j].Length; o++)
+                        {
+                            check += textedit[i + o];
+                        }
+
+                        if (check == _STS_CustomCommandCheckKeywords[j])
+                        {
+                            scriptasstring += "\\n";
+                            commentcheck = false;
+                        }
+                    }
+                }
+            }
+
+            scriptasstring += textedit[i];
+            //Endings check
+            if (i + 2 < textedit.Count)
+            {
+                if (textedit[i + 1] == "\"")
+                {
+                    scriptasstring += "\\";
+                }
+
+                if (textedit[i] == "}")
+                {
+                    scriptasstring += "\\n";
+                }
+                if (textedit[i] == ";" && !forcheck)
+                {
+                    scriptasstring += "\\n";
+                }
+                if (textedit[i] == "]" && headercheck)
+                {
+                    scriptasstring += "\\n";
+                    headercheck = false;
+                }
+                if (textedit[i] == ")" && forcheck)
+                {
+                    scriptasstring += "\\n";
+                    forcheck = false;
+                }
+            }
+        }
+        scriptasstring += "\"";
+
+        return scriptasstring;
+    }
+
+
+    //MapEditor
+    void MapEditor_Menu()
+    {
+        GUILayout.BeginVertical("Box");
+
+        //Refresh/Info
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Refresh", GUILayout.Width(80)))
+        {
+            ME_FixPreview();
+            ME_Load_Prefabs();
+        }
+        GUILayout.Label("Loaded objects: " + _ME_SearchResults.Length);
+        GUILayout.EndHorizontal();
+
+        //Windows
+        ME_ObjectView_Header();
+        ME_ObjectView_Objects();
+        ME_ObjectView_Options();
+
+        GUILayout.EndVertical();
+    }
+    private void ME_ObjectView_Header()
+    {
+        GUILayout.BeginHorizontal();
+        _ME_OptionsStates = GUILayout.Toolbar(_ME_OptionsStates, new string[] { "Icon", "Text" });
+        _ME_ButtonSize = EditorGUILayout.Slider(_ME_ButtonSize, 0.25f, 2);
+        if (!_ME_HideNames)
+        {
+            if (GUILayout.Button("Hide Names", GUILayout.Width(100)))
+                _ME_HideNames = true;
+        }
+        else
+        {
+            if (GUILayout.Button("Show Names", GUILayout.Width(100)))
+                _ME_HideNames = false;
+        }
+        GUILayout.EndHorizontal();
+        _ME_SearchPrefab = EditorGUILayout.TextField("Search: ", _ME_SearchPrefab);
+    }
+    private void ME_ObjectView_Objects()
+    {
+        Color defaultColor = GUI.backgroundColor;
+        GUILayout.BeginVertical("Box");
+        float calcWidth = 100 * _ME_ButtonSize;
+        _ME_CollomLength = position.width / calcWidth;
+        int x = 0;
+        int y = 0;
+
+        //Show/Hide Options
+        if (_ME_HideOptions)
+            _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 109));
+        else
+        {
+            if (_ME_PlacementStates == 0)
+                _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 235));
+            else
+                _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 253));
+        }
+
+        //Object Icons
+        for (int i = 0; i < _ME_SearchResults.Length; i++)
+        {
+            if (_ME_Prefabs[i] != null && _ME_Prefabs[i].name.ToLower().Contains(_ME_SearchPrefab.ToLower()))
+            {
+                if (_ME_OptionsStates == 0) //Icons
+                {
+                    //Select Color
+                    if (_ME_SelectedID == i) { GUI.backgroundColor = new Color(0, 1, 0); } else { GUI.backgroundColor = new Color(1, 0, 0); }
+
+                    //Create Button
+                    GUIContent content = new GUIContent();
+                    content.image = _ME_PrefabIcon[i];
+                    GUI.skin.button.imagePosition = ImagePosition.ImageAbove;
+                    if (!_ME_HideNames)
+                        content.text = _ME_Prefabs[i].name;
+                    if (GUI.Button(new Rect(x * 100 * _ME_ButtonSize, y * 100 * _ME_ButtonSize, 100 * _ME_ButtonSize, 100 * _ME_ButtonSize), content))
+                        if (_ME_SelectedID == i) { _ME_SelectedID = 99999999; _ME_CheckSelectedID = 99999999; DestroyImmediate(_ME_ExampleObj); } else { _ME_SelectedID = i; }
+
+                    //Reset Button Position
+                    x++;
+                    if (x >= _ME_CollomLength - 1)
+                    {
+                        y++;
+                        x = 0;
+                    }
+                    GUI.backgroundColor = defaultColor;
+                }
+                else //Text Buttons
+                {
+                    if (_ME_SelectedID == i) { GUI.backgroundColor = new Color(0, 1, 0); } else { GUI.backgroundColor = defaultColor; }
+                    if (GUILayout.Button(_ME_Prefabs[i].name))
+                        if (_ME_SelectedID == i) { _ME_SelectedID = 99999999; _ME_CheckSelectedID = 99999999; DestroyImmediate(_ME_ExampleObj); } else { _ME_SelectedID = i; }
+                    GUI.backgroundColor = defaultColor;
+                }
+            }
+        }
+        if (_ME_OptionsStates == 0)
+        {
+            GUILayout.Space(y * 100 * _ME_ButtonSize + 100);
+        }
+        GUILayout.EndScrollView();
+        GUILayout.EndVertical();
+    }
+    private void ME_ObjectView_Options()
+    {
+        GUILayout.BeginVertical("Box");
+        if (!_ME_HideOptions)
+        {
+            //Paint Options
+            GUILayout.BeginVertical("Box");
+            _ME_PlacementStates = GUILayout.Toolbar(_ME_PlacementStates, new string[] { "Click", "Paint" });
+            if (_ME_PlacementStates == 1)
+                _ME_PaintSpeed = EditorGUILayout.FloatField("Paint Speed: ", _ME_PaintSpeed);
+            //Parent Options
+            GUILayout.BeginHorizontal();
+            _ME_ParentObj = (GameObject)EditorGUILayout.ObjectField("Parent Object: ", _ME_ParentObj, typeof(GameObject), true);
+            if (_ME_ParentObj != null)
+                if (GUILayout.Button("Clean Parent"))
+                    ME_CleanParent();
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+
+            //Grid Options
+            GUILayout.BeginVertical("Box");
+            _ME_GridSize = EditorGUILayout.Vector2Field("Grid Size: ", _ME_GridSize);
+            _ME_RandomRot = EditorGUILayout.Toggle("Random Rotation: ", _ME_RandomRot);
+            _ME_SnapPosActive = EditorGUILayout.Toggle("Use Grid: ", _ME_SnapPosActive);
+            GUILayout.EndVertical();
+        }
+        //Hide/Show Options
+        if (_ME_HideOptions)
+        {
+            if (GUILayout.Button("Show Options"))
+                _ME_HideOptions = false;
+        }
+        else
+        {
+            if (GUILayout.Button("Hide Options"))
+                _ME_HideOptions = true;
+        }
+        GUILayout.EndVertical();
+    }
+
+    //Load/Fix
+    void ME_Load_Prefabs()
+    {
+        _ME_SearchResults = System.IO.Directory.GetFiles("Assets/", "*.prefab", System.IO.SearchOption.AllDirectories);
+        _ME_Prefabs = new GameObject[_ME_SearchResults.Length];
+        _ME_PrefabIcon = new Texture2D[_ME_SearchResults.Length];
+
+        for (int i = 0; i < _ME_SearchResults.Length; i++)
+        {
+            UnityEngine.Object prefab = null;
+            prefab = AssetDatabase.LoadAssetAtPath(_ME_SearchResults[i], typeof(GameObject));
+            _ME_Prefabs[i] = prefab as GameObject;
+            _ME_PrefabIcon[i] = AssetPreview.GetAssetPreview(_ME_Prefabs[i]);
+        }
+    }
+    void ME_FixPreview()
+    {
+        ME_Load_Prefabs();
+        _ME_SearchResults = System.IO.Directory.GetFiles("Assets/", "*.prefab", System.IO.SearchOption.AllDirectories);
+
+        for (int i = 0; i < _ME_SearchResults.Length; i++)
+        {
+            if (_ME_PrefabIcon[i] == null)
+                AssetDatabase.ImportAsset(_ME_SearchResults[i]);
+        }
+        ME_Load_Prefabs();
+    }
+
+    //Create Prefab/Clean Parent
+    void ME_CreatePrefab(Vector3 createPos)
+    {
+        GameObject createdObj = PrefabUtility.InstantiatePrefab(_ME_Prefabs[_ME_SelectedID]) as GameObject;
+        createdObj.transform.position = createPos;
+        createdObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
+
+        if (_ME_ParentObj == null)
+        {
+            _ME_ParentObj = new GameObject();
+            _ME_ParentObj.name = "MapEditor_Parent";
+        }
+
+        createdObj.transform.parent = _ME_ParentObj.transform;
+        if (_ME_SnapPosActive)
+            createdObj.transform.position = _ME_SnapPos;
+        else
+            createdObj.transform.position = _ME_MousePos;
+        if (_ME_RandomRot)
+            createdObj.transform.rotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
+        else
+            createdObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+    }
+    void ME_CleanParent()
+    {
+        int childAmount = _ME_ParentObj.transform.childCount;
+        int childCalc = childAmount - 1;
+        for (int i = 0; i < childAmount; i++)
+        {
+            DestroyImmediate(_ME_ParentObj.transform.GetChild(childCalc).gameObject);
+            childCalc -= 1;
+        }
+    }
+
+    //Enable/Disable
+    void OnEnable()
+    {
+        SceneView.duringSceneGui += this.OnSceneGUI;
+        SceneView.duringSceneGui += this.OnScene;
+    }
+    void OnDisable()
+    {
+        SceneView.duringSceneGui -= this.OnSceneGUI;
+        SceneView.duringSceneGui -= this.OnScene;
+        DestroyImmediate(_ME_ExampleObj);
+    }
+
+    //OnSceneGUI
+    void OnSceneGUI(SceneView sceneView)
+    {
+        Event e = Event.current;
+        Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+        RaycastHit hitInfo;
+
+        if (Physics.Raycast(worldRay, out hitInfo))
+        {
+            //Check MousePosition
+            _ME_MousePos = hitInfo.point;
+
+            //Create Example Object
+            if (_ME_SelectedID <= _ME_Prefabs.Length)
+            {
+                if (_ME_CheckSelectedID != _ME_SelectedID)
+                {
+                    DestroyImmediate(_ME_ExampleObj);
+                    _ME_ExampleObj = Instantiate(_ME_Prefabs[_ME_SelectedID], hitInfo.point, Quaternion.identity);
+                    _ME_ExampleObj.layer = LayerMask.NameToLayer("Ignore Raycast");
+                    for (int i = 0; i < _ME_ExampleObj.transform.childCount; i++)
+                    {
+                        _ME_ExampleObj.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                        for (int o = 0; o < _ME_ExampleObj.transform.GetChild(i).childCount; o++)
+                        {
+                            _ME_ExampleObj.transform.GetChild(i).GetChild(o).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                        }
+                    }
+                    _ME_ExampleObj.name = "Example Object";
+                    _ME_CheckSelectedID = _ME_SelectedID;
+                }
+            }
+
+            //Set Example Object Position + Rotation
+            if (_ME_ExampleObj != null)
+            {
+                _ME_ExampleObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+                _ME_ExampleObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
+                if (!e.shift && !e.control)
+                {
+                    if (!_ME_SnapPosActive)
+                    { _ME_ExampleObj.transform.position = hitInfo.point; }
+                    else
+                    { _ME_ExampleObj.transform.position = _ME_SnapPos; }
+                }
+            }
+
+            //Check Buttons Pressed
+            if (!Event.current.alt && _ME_SelectedID != 99999999)
+            {
+                if (Event.current.type == EventType.Layout)
+                    HandleUtility.AddDefaultControl(0);
+
+                //Mouse Button 0 Pressed
+                if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+                {
+                    _ME_MouseDown = true;
+                    _ME_PaintTimer = _ME_PaintSpeed;
+                    if (e.mousePosition.y <= 20)
+                        _ME_ClickMenu = true;
+                }
+
+                //Mouse Button 0 Released
+                if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
+                {
+                    _ME_MouseDown = false;
+                    _ME_ClickMenu = false;
+                }
+
+                //Check Shift
+                if (e.shift)
+                    _ME_ShiftDown = true;
+                else
+                    _ME_ShiftDown = false;
+
+                //Check Ctrl
+                if (e.control)
+                    _ME_CtrlDown = true;
+                else
+                    _ME_CtrlDown = false;
+
+                if (e.shift || e.control)
+                {
+                    if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+                        _ME_ClickPos = Event.current.mousePosition;
+                }
+
+                //Place Object
+                if (!_ME_ShiftDown && !_ME_CtrlDown && !_ME_ClickMenu)
+                {
+                    if (_ME_PlacementStates == 0)
+                    {
+                        if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+                            ME_CreatePrefab(hitInfo.point);
+                    }
+                    else
+                    {
+                        float timer1Final = _ME_PaintSpeed;
+                        if (_ME_MouseDown)
+                        {
+                            _ME_PaintTimer += 1 * Time.deltaTime;
+                            if (_ME_PaintTimer >= timer1Final)
+                            {
+                                ME_CreatePrefab(hitInfo.point);
+                                _ME_PaintTimer = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Draw obj location
+            if (_ME_SelectedID != 99999999)
+            {
+                //Draw Red Cross + Sphere on object location
+                Handles.color = new Color(1, 0, 0);
+                Handles.DrawLine(new Vector3(hitInfo.point.x - 0.3f, hitInfo.point.y, hitInfo.point.z), new Vector3(hitInfo.point.x + 0.3f, hitInfo.point.y, hitInfo.point.z));
+                Handles.DrawLine(new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z - 0.3f), new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z + 0.3f));
+                if (_ME_SnapPosActive)
+                {
+                    Handles.SphereHandleCap(1, new Vector3(_ME_SnapPos.x, hitInfo.point.y, _ME_SnapPos.z), Quaternion.identity, 0.1f, EventType.Repaint);
+                }
+                else
+                    Handles.SphereHandleCap(1, new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z), Quaternion.identity, 0.1f, EventType.Repaint);
+
+                //Check Snap Position
+                if (_ME_SnapPosActive)
+                {
+                    Vector2 calc = new Vector2(_ME_MousePos.x / _ME_GridSize.x, _ME_MousePos.z / _ME_GridSize.y);
+                    Vector2 calc2 = new Vector2(Mathf.RoundToInt(calc.x) * _ME_GridSize.x, Mathf.RoundToInt(calc.y) * _ME_GridSize.y);
+
+                    _ME_SnapPos = new Vector3(calc2.x, _ME_MousePos.y, calc2.y);
+
+                    //Draw Grid
+                    Handles.color = new Color(0, 1, 0);
+                    float lineLength = 0;
+                    if (_ME_GridSize.x > _ME_GridSize.y)
+                        lineLength = _ME_GridSize.x + 1;
+                    else
+                        lineLength = _ME_GridSize.y + 1;
+
+                    for (int hor = 0; hor < 3; hor++)
+                    {
+                        Handles.DrawLine(new Vector3(calc2.x - lineLength, hitInfo.point.y, calc2.y - _ME_GridSize.y + _ME_GridSize.y * hor), new Vector3(calc2.x + lineLength, hitInfo.point.y, calc2.y - _ME_GridSize.y + _ME_GridSize.y * hor));
+                    }
+                    for (int ver = 0; ver < 3; ver++)
+                    {
+                        Handles.DrawLine(new Vector3(calc2.x - _ME_GridSize.x + _ME_GridSize.x * ver, hitInfo.point.y, calc2.y - lineLength), new Vector3(calc2.x - _ME_GridSize.x + _ME_GridSize.x * ver, hitInfo.point.y, calc2.y + lineLength));
+                    }
+                }
+            }
+        }
+    }
+
+    //OnScene
+    void OnScene(SceneView sceneView)
+    {
+        //InScene Option Bar
+        Handles.BeginGUI();
+        if (_ME_ShowOptionsInScene)
+        {
+            //Option Bar
+            GUI.Box(new Rect(0, 0, Screen.width, 22), GUIContent.none);
+            _ME_InScene_SelectedID = GUI.Toolbar(new Rect(22, 1, Screen.width / 2 - 30, 20), _ME_InScene_SelectedID, new string[] { "Settings", "Placement", "Transform", "Grid" });
+            switch (_ME_InScene_SelectedID)
+            {
+                case 0: //Settings
+                    GUI.Label(new Rect(Screen.width / 2 - 5, 3, 50, 20), "Parent: ");
+                    _ME_ParentObj = (GameObject)EditorGUI.ObjectField(new Rect(Screen.width / 2 + 50, 1, 150, 20), _ME_ParentObj, typeof(GameObject), true);
+                    if (GUI.Button(new Rect(Screen.width - 110, 1, 90, 20), "Clean Parent"))
+                    {
+                        ME_CleanParent();
+                    }
+                    break;
+                case 1: //Placement
+                    _ME_PlacementStates = GUI.Toolbar(new Rect(Screen.width / 2 - 5, 1, 100, 20), _ME_PlacementStates, new string[] { "Click", "Paint" });
+                    _ME_PaintSpeed = EditorGUI.FloatField(new Rect(Screen.width / 2 + 185, 1, 50, 20), _ME_PaintSpeed);
+                    GUI.Label(new Rect(Screen.width / 2 + 100, 3, 500, 20), "Paint speed: ");
+                    break;
+                case 2: //Transform
+                    _ME_Size = EditorGUI.FloatField(new Rect(Screen.width / 2 + 125, 1, 100, 20), _ME_Size);
+                    break;
+                case 3: //Grid
+                    GUI.Label(new Rect(Screen.width / 2 + 80, 3, 100, 20), "Grid Size: ");
+                    _ME_GridSize.x = EditorGUI.FloatField(new Rect(Screen.width / 2 + 150, 1, 50, 20), _ME_GridSize.x);
+                    _ME_GridSize.y = EditorGUI.FloatField(new Rect(Screen.width / 2 + 200, 1, 50, 20), _ME_GridSize.y);
+                    GUI.Label(new Rect(Screen.width / 2, 3, 100, 20), "Enable: ");
+                    _ME_SnapPosActive = EditorGUI.Toggle(new Rect(Screen.width / 2 + 50, 3, 20, 20), _ME_SnapPosActive);
+                    break;
+            }
+        }
+
+        //Hotkeys Resize / Rotate
+        //Shift+MouseDown = Resize
+        if (_ME_ShiftDown && _ME_MouseDown)
+        {
+            _ME_Size = EditorGUI.Slider(new Rect(_ME_ClickPos.x - 15, _ME_ClickPos.y - 10, 50, 20), _ME_Size, 0.01f, 1000000);
+            GUI.Label(new Rect(_ME_ClickPos.x - 50, _ME_ClickPos.y - 10, 500, 20), "Size: ");
+        }
+        //Ctrl+MouseDown = Rotate
+        if (_ME_CtrlDown && _ME_MouseDown)
+        {
+            _ME_Rotation = EditorGUI.Slider(new Rect(_ME_ClickPos.x - 15, _ME_ClickPos.y - 10, 50, 20), _ME_Rotation, -1000000, 1000000);
+            GUI.Label(new Rect(_ME_ClickPos.x - 80, _ME_ClickPos.y - 10, 500, 20), "Rotation: ");
+        }
+
+        //Inscene Show OptionButton
+        GUI.color = new Color(1f, 1f, 1f, 1f);
+        if (!_ME_ShowOptionsInScene)
+        {
+            if (GUI.Button(new Rect(1, 1, 20, 20), " +"))
+                _ME_ShowOptionsInScene = true;
+        }
+        else
+        {
+            if (GUI.Button(new Rect(1, 1, 20, 20), " -"))
+                _ME_ShowOptionsInScene = false;
+        }
+        Handles.EndGUI();
+    }
 }
 
 public class Tool_QuickStartUI_Tab
@@ -1668,6 +2533,7 @@ public class Tool_QuickStart_Script
     private string _Script_Tag;
     private string _Script_State;
     private string _Script_Code;
+    private string _Script_Path;
 
     public bool Exist;
 
@@ -1675,6 +2541,7 @@ public class Tool_QuickStart_Script
     public string ScriptTag { get { return _Script_Tag; } }
     public string ScriptState { get { return _Script_State; } }
     public string ScriptCode { get { return _Script_Code; } }
+    public string ScriptPath { get { return _Script_Path; } set { _Script_Path = value; } }
 
     public Tool_QuickStart_Script(string name, string tags, string state, string code)
     {

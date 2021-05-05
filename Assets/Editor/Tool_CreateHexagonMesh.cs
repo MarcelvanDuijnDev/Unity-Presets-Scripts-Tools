@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class Tool_CreateHexagonGrid : EditorWindow
+public class Tool_CreateHexagonMesh : EditorWindow
 {
     private GameObject _CenterObj;
     private List<GameObject> _ObjSaved = new List<GameObject>();
@@ -20,7 +20,7 @@ public class Tool_CreateHexagonGrid : EditorWindow
     [MenuItem("Tools/CreateHexagonGrid")]
     static void Init()
     {
-        Tool_CreateHexagonGrid window = (Tool_CreateHexagonGrid)EditorWindow.GetWindow(typeof(Tool_CreateHexagonGrid));
+        Tool_CreateHexagonMesh window = (Tool_CreateHexagonMesh)EditorWindow.GetWindow(typeof(Tool_CreateHexagonMesh));
         window.Show();
     }
 

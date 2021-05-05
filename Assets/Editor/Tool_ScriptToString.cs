@@ -260,6 +260,7 @@ public class Tool_ScriptToString : EditorWindow
         Add_Keyword("public");
         Add_Keyword("[Header(");
         Add_Keyword("case");
+        Add_Keyword("if");
 
         _ScriptOutput = ConvertScriptToString();
     }
