@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1726775221233178547}
   - component: {fileID: 6611489986221308200}
   - component: {fileID: 6006106365813658618}
+  - component: {fileID: 9000044553231951588}
   m_Layer: 0
   m_Name: Shrine_Gate_1
   m_TagString: Untagged
@@ -81,3 +82,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &9000044553231951588
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5509166407147615943}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -4812262216459127822, guid: 8c35132b68898d348973d936c0737b2e, type: 3}

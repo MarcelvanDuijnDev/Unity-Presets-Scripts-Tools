@@ -150,6 +150,7 @@ public class Tool_QuickStart : EditorWindow
     //Rotation/Size
     private float _ME_Rotation, _ME_Size = 1;
     private bool _ME_RandomRot = false;
+    private Vector2 _ME_PrevMousePos = new Vector3(0,0,0);
 
     //Check Buttons Event
     private bool _ME_MouseDown, _ME_ShiftDown, _ME_CtrlDown, _ME_ClickMenu;
@@ -160,10 +161,11 @@ public class Tool_QuickStart : EditorWindow
     //Other
     private Vector2 _ME_ScrollPos1, _ME_ClickPos;
     private Texture2D[] _ME_PrefabIcon = new Texture2D[0];
+    private bool _ME_FirstLoad = true;
     #endregion
 
 
-    [MenuItem("Tools/Tool_QuickStart")]
+    [MenuItem("Tools/Tool_QuickStart %q")]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(Tool_QuickStart));
@@ -182,10 +184,10 @@ public class Tool_QuickStart : EditorWindow
             GUILayout.Label("Navigation");
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Home", GUILayout.Height(50))) { _WindowID = 0; _SelectWindow = false; }
-            if (GUILayout.Button("FileFinder (wip)", GUILayout.Height(50))) { _WindowID = 1; _SelectWindow = false; }
-            if (GUILayout.Button("Script to String", GUILayout.Height(50))) { _WindowID = 2; _SelectWindow = false; }
-            if (GUILayout.Button("MapEditor", GUILayout.Height(50))) { _WindowID = 3; _SelectWindow = false; }
+            if (GUILayout.Button("Home", GUILayout.Height(50))) { _WindowID = 0; _SelectWindow = false; ChangeTab(); }
+            if (GUILayout.Button("FileFinder (wip)", GUILayout.Height(50))) { _WindowID = 1; _SelectWindow = false; ChangeTab(); }
+            if (GUILayout.Button("Script to String", GUILayout.Height(50))) { _WindowID = 2; _SelectWindow = false; ChangeTab(); }
+            if (GUILayout.Button("MapEditor", GUILayout.Height(50))) { _WindowID = 3; _SelectWindow = false; ChangeTab(); }
         }
         else
         {
@@ -2058,14 +2060,22 @@ public class Tool_QuickStart : EditorWindow
     //MapEditor
     void MapEditor_Menu()
     {
+        if (_ME_FirstLoad)
+        {
+            ME_Load_Prefabs();
+            _ME_FirstLoad = false;
+        }
         GUILayout.BeginVertical("Box");
 
         //Refresh/Info
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Refresh", GUILayout.Width(80)))
         {
-            ME_FixPreview();
             ME_Load_Prefabs();
+        }
+        if (GUILayout.Button("Fix", GUILayout.Width(80)))
+        {
+            ME_FixPreview();
         }
         GUILayout.Label("Loaded objects: " + _ME_SearchResults.Length);
         GUILayout.EndHorizontal();
@@ -2106,13 +2116,13 @@ public class Tool_QuickStart : EditorWindow
 
         //Show/Hide Options
         if (_ME_HideOptions)
-            _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 109));
+            _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 125));
         else
         {
             if (_ME_PlacementStates == 0)
-                _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 235));
+                _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 266));
             else
-                _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 253));
+                _ME_ScrollPos1 = GUILayout.BeginScrollView(_ME_ScrollPos1, GUILayout.Width(position.width - 20), GUILayout.Height(position.height - 285));
         }
 
         //Object Icons
@@ -2277,151 +2287,154 @@ public class Tool_QuickStart : EditorWindow
     //OnSceneGUI
     void OnSceneGUI(SceneView sceneView)
     {
-        Event e = Event.current;
-        Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-        RaycastHit hitInfo;
-
-        if (Physics.Raycast(worldRay, out hitInfo))
+        if (_WindowID == 3)
         {
-            //Check MousePosition
-            _ME_MousePos = hitInfo.point;
+            Event e = Event.current;
+            Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            RaycastHit hitInfo;
 
-            //Create Example Object
-            if (_ME_SelectedID <= _ME_Prefabs.Length)
+            if (Physics.Raycast(worldRay, out hitInfo))
             {
-                if (_ME_CheckSelectedID != _ME_SelectedID)
+                //Check MousePosition
+                _ME_MousePos = hitInfo.point;
+
+                //Create Example Object
+                if (_ME_SelectedID <= _ME_Prefabs.Length)
                 {
-                    DestroyImmediate(_ME_ExampleObj);
-                    _ME_ExampleObj = Instantiate(_ME_Prefabs[_ME_SelectedID], hitInfo.point, Quaternion.identity);
-                    _ME_ExampleObj.layer = LayerMask.NameToLayer("Ignore Raycast");
-                    for (int i = 0; i < _ME_ExampleObj.transform.childCount; i++)
+                    if (_ME_CheckSelectedID != _ME_SelectedID)
                     {
-                        _ME_ExampleObj.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-                        for (int o = 0; o < _ME_ExampleObj.transform.GetChild(i).childCount; o++)
+                        DestroyImmediate(_ME_ExampleObj);
+                        _ME_ExampleObj = Instantiate(_ME_Prefabs[_ME_SelectedID], hitInfo.point, Quaternion.identity);
+                        _ME_ExampleObj.layer = LayerMask.NameToLayer("Ignore Raycast");
+                        for (int i = 0; i < _ME_ExampleObj.transform.childCount; i++)
                         {
-                            _ME_ExampleObj.transform.GetChild(i).GetChild(o).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                            _ME_ExampleObj.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                            for (int o = 0; o < _ME_ExampleObj.transform.GetChild(i).childCount; o++)
+                            {
+                                _ME_ExampleObj.transform.GetChild(i).GetChild(o).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                            }
                         }
+                        _ME_ExampleObj.name = "Example Object";
+                        _ME_CheckSelectedID = _ME_SelectedID;
                     }
-                    _ME_ExampleObj.name = "Example Object";
-                    _ME_CheckSelectedID = _ME_SelectedID;
-                }
-            }
-
-            //Set Example Object Position + Rotation
-            if (_ME_ExampleObj != null)
-            {
-                _ME_ExampleObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
-                _ME_ExampleObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
-                if (!e.shift && !e.control)
-                {
-                    if (!_ME_SnapPosActive)
-                    { _ME_ExampleObj.transform.position = hitInfo.point; }
-                    else
-                    { _ME_ExampleObj.transform.position = _ME_SnapPos; }
-                }
-            }
-
-            //Check Buttons Pressed
-            if (!Event.current.alt && _ME_SelectedID != 99999999)
-            {
-                if (Event.current.type == EventType.Layout)
-                    HandleUtility.AddDefaultControl(0);
-
-                //Mouse Button 0 Pressed
-                if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-                {
-                    _ME_MouseDown = true;
-                    _ME_PaintTimer = _ME_PaintSpeed;
-                    if (e.mousePosition.y <= 20)
-                        _ME_ClickMenu = true;
                 }
 
-                //Mouse Button 0 Released
-                if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
+                //Set Example Object Position + Rotation
+                if (_ME_ExampleObj != null)
                 {
-                    _ME_MouseDown = false;
-                    _ME_ClickMenu = false;
+                    _ME_ExampleObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+                    _ME_ExampleObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
+                    if (!e.shift && !e.control)
+                    {
+                        if (!_ME_SnapPosActive)
+                        { _ME_ExampleObj.transform.position = hitInfo.point; }
+                        else
+                        { _ME_ExampleObj.transform.position = _ME_SnapPos; }
+                    }
                 }
 
-                //Check Shift
-                if (e.shift)
-                    _ME_ShiftDown = true;
-                else
-                    _ME_ShiftDown = false;
-
-                //Check Ctrl
-                if (e.control)
-                    _ME_CtrlDown = true;
-                else
-                    _ME_CtrlDown = false;
-
-                if (e.shift || e.control)
+                //Check Buttons Pressed
+                if (!Event.current.alt && _ME_SelectedID != 99999999)
                 {
+                    if (Event.current.type == EventType.Layout)
+                        HandleUtility.AddDefaultControl(0);
+
+                    //Mouse Button 0 Pressed
                     if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-                        _ME_ClickPos = Event.current.mousePosition;
-                }
+                    {
+                        _ME_MouseDown = true;
+                        _ME_PaintTimer = _ME_PaintSpeed;
+                        if (e.mousePosition.y <= 20)
+                            _ME_ClickMenu = true;
+                    }
 
-                //Place Object
-                if (!_ME_ShiftDown && !_ME_CtrlDown && !_ME_ClickMenu)
-                {
-                    if (_ME_PlacementStates == 0)
+                    //Mouse Button 0 Released
+                    if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
+                    {
+                        _ME_MouseDown = false;
+                        _ME_ClickMenu = false;
+                    }
+
+                    //Check Shift
+                    if (e.shift)
+                        _ME_ShiftDown = true;
+                    else
+                        _ME_ShiftDown = false;
+
+                    //Check Ctrl
+                    if (e.control)
+                        _ME_CtrlDown = true;
+                    else
+                        _ME_CtrlDown = false;
+
+                    if (e.shift || e.control)
                     {
                         if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-                            ME_CreatePrefab(hitInfo.point);
+                            _ME_ClickPos = Event.current.mousePosition;
                     }
-                    else
+
+                    //Place Object
+                    if (!_ME_ShiftDown && !_ME_CtrlDown && !_ME_ClickMenu)
                     {
-                        float timer1Final = _ME_PaintSpeed;
-                        if (_ME_MouseDown)
+                        if (_ME_PlacementStates == 0)
                         {
-                            _ME_PaintTimer += 1 * Time.deltaTime;
-                            if (_ME_PaintTimer >= timer1Final)
-                            {
+                            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
                                 ME_CreatePrefab(hitInfo.point);
-                                _ME_PaintTimer = 0;
+                        }
+                        else
+                        {
+                            float timer1Final = _ME_PaintSpeed;
+                            if (_ME_MouseDown)
+                            {
+                                _ME_PaintTimer += 1 * Time.deltaTime;
+                                if (_ME_PaintTimer >= timer1Final)
+                                {
+                                    ME_CreatePrefab(hitInfo.point);
+                                    _ME_PaintTimer = 0;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // Draw obj location
-            if (_ME_SelectedID != 99999999)
-            {
-                //Draw Red Cross + Sphere on object location
-                Handles.color = new Color(1, 0, 0);
-                Handles.DrawLine(new Vector3(hitInfo.point.x - 0.3f, hitInfo.point.y, hitInfo.point.z), new Vector3(hitInfo.point.x + 0.3f, hitInfo.point.y, hitInfo.point.z));
-                Handles.DrawLine(new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z - 0.3f), new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z + 0.3f));
-                if (_ME_SnapPosActive)
+                // Draw obj location
+                if (_ME_SelectedID != 99999999)
                 {
-                    Handles.SphereHandleCap(1, new Vector3(_ME_SnapPos.x, hitInfo.point.y, _ME_SnapPos.z), Quaternion.identity, 0.1f, EventType.Repaint);
-                }
-                else
-                    Handles.SphereHandleCap(1, new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z), Quaternion.identity, 0.1f, EventType.Repaint);
-
-                //Check Snap Position
-                if (_ME_SnapPosActive)
-                {
-                    Vector2 calc = new Vector2(_ME_MousePos.x / _ME_GridSize.x, _ME_MousePos.z / _ME_GridSize.y);
-                    Vector2 calc2 = new Vector2(Mathf.RoundToInt(calc.x) * _ME_GridSize.x, Mathf.RoundToInt(calc.y) * _ME_GridSize.y);
-
-                    _ME_SnapPos = new Vector3(calc2.x, _ME_MousePos.y, calc2.y);
-
-                    //Draw Grid
-                    Handles.color = new Color(0, 1, 0);
-                    float lineLength = 0;
-                    if (_ME_GridSize.x > _ME_GridSize.y)
-                        lineLength = _ME_GridSize.x + 1;
-                    else
-                        lineLength = _ME_GridSize.y + 1;
-
-                    for (int hor = 0; hor < 3; hor++)
+                    //Draw Red Cross + Sphere on object location
+                    Handles.color = new Color(1, 0, 0);
+                    Handles.DrawLine(new Vector3(hitInfo.point.x - 0.3f, hitInfo.point.y, hitInfo.point.z), new Vector3(hitInfo.point.x + 0.3f, hitInfo.point.y, hitInfo.point.z));
+                    Handles.DrawLine(new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z - 0.3f), new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z + 0.3f));
+                    if (_ME_SnapPosActive)
                     {
-                        Handles.DrawLine(new Vector3(calc2.x - lineLength, hitInfo.point.y, calc2.y - _ME_GridSize.y + _ME_GridSize.y * hor), new Vector3(calc2.x + lineLength, hitInfo.point.y, calc2.y - _ME_GridSize.y + _ME_GridSize.y * hor));
+                        Handles.SphereHandleCap(1, new Vector3(_ME_SnapPos.x, hitInfo.point.y, _ME_SnapPos.z), Quaternion.identity, 0.1f, EventType.Repaint);
                     }
-                    for (int ver = 0; ver < 3; ver++)
+                    else
+                        Handles.SphereHandleCap(1, new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z), Quaternion.identity, 0.1f, EventType.Repaint);
+
+                    //Check Snap Position
+                    if (_ME_SnapPosActive)
                     {
-                        Handles.DrawLine(new Vector3(calc2.x - _ME_GridSize.x + _ME_GridSize.x * ver, hitInfo.point.y, calc2.y - lineLength), new Vector3(calc2.x - _ME_GridSize.x + _ME_GridSize.x * ver, hitInfo.point.y, calc2.y + lineLength));
+                        Vector2 calc = new Vector2(_ME_MousePos.x / _ME_GridSize.x, _ME_MousePos.z / _ME_GridSize.y);
+                        Vector2 calc2 = new Vector2(Mathf.RoundToInt(calc.x) * _ME_GridSize.x, Mathf.RoundToInt(calc.y) * _ME_GridSize.y);
+
+                        _ME_SnapPos = new Vector3(calc2.x, _ME_MousePos.y, calc2.y);
+
+                        //Draw Grid
+                        Handles.color = new Color(0, 1, 0);
+                        float lineLength = 0;
+                        if (_ME_GridSize.x > _ME_GridSize.y)
+                            lineLength = _ME_GridSize.x + 1;
+                        else
+                            lineLength = _ME_GridSize.y + 1;
+
+                        for (int hor = 0; hor < 3; hor++)
+                        {
+                            Handles.DrawLine(new Vector3(calc2.x - lineLength, hitInfo.point.y, calc2.y - _ME_GridSize.y + _ME_GridSize.y * hor), new Vector3(calc2.x + lineLength, hitInfo.point.y, calc2.y - _ME_GridSize.y + _ME_GridSize.y * hor));
+                        }
+                        for (int ver = 0; ver < 3; ver++)
+                        {
+                            Handles.DrawLine(new Vector3(calc2.x - _ME_GridSize.x + _ME_GridSize.x * ver, hitInfo.point.y, calc2.y - lineLength), new Vector3(calc2.x - _ME_GridSize.x + _ME_GridSize.x * ver, hitInfo.point.y, calc2.y + lineLength));
+                        }
                     }
                 }
             }
@@ -2431,68 +2444,82 @@ public class Tool_QuickStart : EditorWindow
     //OnScene
     void OnScene(SceneView sceneView)
     {
-        //InScene Option Bar
-        Handles.BeginGUI();
-        if (_ME_ShowOptionsInScene)
+        if (_WindowID == 3)
         {
-            //Option Bar
-            GUI.Box(new Rect(0, 0, Screen.width, 22), GUIContent.none);
-            _ME_InScene_SelectedID = GUI.Toolbar(new Rect(22, 1, Screen.width / 2 - 30, 20), _ME_InScene_SelectedID, new string[] { "Settings", "Placement", "Transform", "Grid" });
-            switch (_ME_InScene_SelectedID)
+            //InScene Option Bar
+            Handles.BeginGUI();
+            if (_ME_ShowOptionsInScene)
             {
-                case 0: //Settings
-                    GUI.Label(new Rect(Screen.width / 2 - 5, 3, 50, 20), "Parent: ");
-                    _ME_ParentObj = (GameObject)EditorGUI.ObjectField(new Rect(Screen.width / 2 + 50, 1, 150, 20), _ME_ParentObj, typeof(GameObject), true);
-                    if (GUI.Button(new Rect(Screen.width - 110, 1, 90, 20), "Clean Parent"))
-                    {
-                        ME_CleanParent();
-                    }
-                    break;
-                case 1: //Placement
-                    _ME_PlacementStates = GUI.Toolbar(new Rect(Screen.width / 2 - 5, 1, 100, 20), _ME_PlacementStates, new string[] { "Click", "Paint" });
-                    _ME_PaintSpeed = EditorGUI.FloatField(new Rect(Screen.width / 2 + 185, 1, 50, 20), _ME_PaintSpeed);
-                    GUI.Label(new Rect(Screen.width / 2 + 100, 3, 500, 20), "Paint speed: ");
-                    break;
-                case 2: //Transform
-                    _ME_Size = EditorGUI.FloatField(new Rect(Screen.width / 2 + 125, 1, 100, 20), _ME_Size);
-                    break;
-                case 3: //Grid
-                    GUI.Label(new Rect(Screen.width / 2 + 80, 3, 100, 20), "Grid Size: ");
-                    _ME_GridSize.x = EditorGUI.FloatField(new Rect(Screen.width / 2 + 150, 1, 50, 20), _ME_GridSize.x);
-                    _ME_GridSize.y = EditorGUI.FloatField(new Rect(Screen.width / 2 + 200, 1, 50, 20), _ME_GridSize.y);
-                    GUI.Label(new Rect(Screen.width / 2, 3, 100, 20), "Enable: ");
-                    _ME_SnapPosActive = EditorGUI.Toggle(new Rect(Screen.width / 2 + 50, 3, 20, 20), _ME_SnapPosActive);
-                    break;
+                //Option Bar
+                GUI.Box(new Rect(0, 0, Screen.width, 22), GUIContent.none);
+                _ME_InScene_SelectedID = GUI.Toolbar(new Rect(22, 1, Screen.width / 2 - 30, 20), _ME_InScene_SelectedID, new string[] { "Settings", "Placement", "Transform", "Grid" });
+                switch (_ME_InScene_SelectedID)
+                {
+                    case 0: //Settings
+                        GUI.Label(new Rect(Screen.width / 2 - 5, 3, 50, 20), "Parent: ");
+                        _ME_ParentObj = (GameObject)EditorGUI.ObjectField(new Rect(Screen.width / 2 + 50, 1, 150, 20), _ME_ParentObj, typeof(GameObject), true);
+                        if (GUI.Button(new Rect(Screen.width - 110, 1, 90, 20), "Clean Parent"))
+                        {
+                            ME_CleanParent();
+                        }
+                        break;
+                    case 1: //Placement
+                        _ME_PlacementStates = GUI.Toolbar(new Rect(Screen.width / 2 - 5, 1, 100, 20), _ME_PlacementStates, new string[] { "Click", "Paint" });
+                        _ME_PaintSpeed = EditorGUI.FloatField(new Rect(Screen.width / 2 + 185, 1, 50, 20), _ME_PaintSpeed);
+                        GUI.Label(new Rect(Screen.width / 2 + 100, 3, 500, 20), "Paint speed: ");
+                        break;
+                    case 2: //Transform
+                        _ME_Size = EditorGUI.FloatField(new Rect(Screen.width / 2 + 125, 1, 100, 20), _ME_Size);
+                        break;
+                    case 3: //Grid
+                        GUI.Label(new Rect(Screen.width / 2 + 80, 3, 100, 20), "Grid Size: ");
+                        _ME_GridSize.x = EditorGUI.FloatField(new Rect(Screen.width / 2 + 150, 1, 50, 20), _ME_GridSize.x);
+                        _ME_GridSize.y = EditorGUI.FloatField(new Rect(Screen.width / 2 + 200, 1, 50, 20), _ME_GridSize.y);
+                        GUI.Label(new Rect(Screen.width / 2, 3, 100, 20), "Enable: ");
+                        _ME_SnapPosActive = EditorGUI.Toggle(new Rect(Screen.width / 2 + 50, 3, 20, 20), _ME_SnapPosActive);
+                        break;
+                }
             }
-        }
 
-        //Hotkeys Resize / Rotate
-        //Shift+MouseDown = Resize
-        if (_ME_ShiftDown && _ME_MouseDown)
-        {
-            _ME_Size = EditorGUI.Slider(new Rect(_ME_ClickPos.x - 15, _ME_ClickPos.y - 10, 50, 20), _ME_Size, 0.01f, 1000000);
-            GUI.Label(new Rect(_ME_ClickPos.x - 50, _ME_ClickPos.y - 10, 500, 20), "Size: ");
-        }
-        //Ctrl+MouseDown = Rotate
-        if (_ME_CtrlDown && _ME_MouseDown)
-        {
-            _ME_Rotation = EditorGUI.Slider(new Rect(_ME_ClickPos.x - 15, _ME_ClickPos.y - 10, 50, 20), _ME_Rotation, -1000000, 1000000);
-            GUI.Label(new Rect(_ME_ClickPos.x - 80, _ME_ClickPos.y - 10, 500, 20), "Rotation: ");
-        }
+            //Hotkeys Resize / Rotate
+            //Shift+MouseDown = Resize
+            Vector2 prevmove = _ME_PrevMousePos - Event.current.mousePosition;
+            if (_ME_ShiftDown && _ME_MouseDown)
+            {
+                _ME_Size = EditorGUI.Slider(new Rect(_ME_ClickPos.x - 15, _ME_ClickPos.y - 40, 50, 20), _ME_Size, 0.01f, 1000000);
+                _ME_Size -= (prevmove.x + prevmove.y) * 0.05f;
+                GUI.Label(new Rect(_ME_ClickPos.x - 50, _ME_ClickPos.y - 40, 500, 20), "Size: ");
+            }
+            //Ctrl+MouseDown = Rotate
+            if (_ME_CtrlDown && _ME_MouseDown)
+            {
+                _ME_Rotation = EditorGUI.Slider(new Rect(_ME_ClickPos.x - 15, _ME_ClickPos.y - 40, 50, 20), _ME_Rotation, -1000000, 1000000);
+                _ME_Rotation += prevmove.x + prevmove.y;
+                GUI.Label(new Rect(_ME_ClickPos.x - 80, _ME_ClickPos.y - 40, 500, 20), "Rotation: ");
+            }
+            _ME_PrevMousePos = Event.current.mousePosition;
 
-        //Inscene Show OptionButton
-        GUI.color = new Color(1f, 1f, 1f, 1f);
-        if (!_ME_ShowOptionsInScene)
-        {
-            if (GUI.Button(new Rect(1, 1, 20, 20), " +"))
-                _ME_ShowOptionsInScene = true;
+            //Inscene Show OptionButton
+            GUI.color = new Color(1f, 1f, 1f, 1f);
+            if (!_ME_ShowOptionsInScene)
+            {
+                if (GUI.Button(new Rect(1, 1, 20, 20), " +"))
+                    _ME_ShowOptionsInScene = true;
+            }
+            else
+            {
+                if (GUI.Button(new Rect(1, 1, 20, 20), " -"))
+                    _ME_ShowOptionsInScene = false;
+            }
+            Handles.EndGUI();
         }
-        else
-        {
-            if (GUI.Button(new Rect(1, 1, 20, 20), " -"))
-                _ME_ShowOptionsInScene = false;
-        }
-        Handles.EndGUI();
+    }
+
+    //TabChange
+    void ChangeTab()
+    {
+        if (_ME_ExampleObj != null)
+            DestroyImmediate(_ME_ExampleObj);
     }
 }
 

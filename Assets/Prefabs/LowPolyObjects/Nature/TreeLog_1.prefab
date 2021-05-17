@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5344365693708120760}
   - component: {fileID: 1280330585112505335}
   - component: {fileID: 5239545657338615567}
+  - component: {fileID: 6768775648512386186}
   m_Layer: 0
   m_Name: TreeLog_1
   m_TagString: Untagged
@@ -81,3 +82,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &6768775648512386186
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926532859019197951}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5222628774772635479, guid: aa526567458326f478bd05ab3e26b32c, type: 3}

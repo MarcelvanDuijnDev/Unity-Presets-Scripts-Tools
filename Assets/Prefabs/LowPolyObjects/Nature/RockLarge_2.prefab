@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 79626824504566143}
   - component: {fileID: 6540981737462060328}
   - component: {fileID: 181849513637847965}
+  - component: {fileID: 4706532042577267326}
   m_Layer: 0
   m_Name: RockLarge_2
   m_TagString: Untagged
@@ -81,3 +82,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4706532042577267326
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6540891358350150979}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2355342949331071812, guid: aa526567458326f478bd05ab3e26b32c, type: 3}

@@ -41,6 +41,7 @@ public class Tool_MapEditor : EditorWindow
     //Rotation/Size
     private float _Rotation, _Size = 1;
     private bool _RandomRot = false;
+    private Vector2 _PrevMousePos = new Vector3(0, 0, 0);
     #endregion
     #region Check
     //Check Buttons Event
@@ -421,17 +422,21 @@ public class Tool_MapEditor : EditorWindow
 
         //Hotkeys Resize / Rotate
         //Shift+MouseDown = Resize
+        Vector2 prevmove = _PrevMousePos - Event.current.mousePosition;
         if (_ShiftDown && _MouseDown)
         {
-            _Size = EditorGUI.Slider(new Rect(_ClickPos.x - 15, _ClickPos.y - 10, 50, 20), _Size, 0.01f, 1000000);
-            GUI.Label(new Rect(_ClickPos.x - 50, _ClickPos.y - 10, 500, 20), "Size: ");
+            _Size = EditorGUI.Slider(new Rect(_ClickPos.x - 15, _ClickPos.y - 40, 50, 20), _Size, 0.01f, 1000000);
+            _Size -= (prevmove.x + prevmove.y) * 0.05f;
+            GUI.Label(new Rect(_ClickPos.x - 50, _ClickPos.y - 40, 500, 20), "Size: ");
         }
         //Ctrl+MouseDown = Rotate
         if (_CtrlDown && _MouseDown)
         {
-            _Rotation = EditorGUI.Slider(new Rect(_ClickPos.x - 15, _ClickPos.y - 10, 50, 20), _Rotation, -1000000, 1000000);
-            GUI.Label(new Rect(_ClickPos.x - 80, _ClickPos.y - 10, 500, 20), "Rotation: ");
+            _Rotation = EditorGUI.Slider(new Rect(_ClickPos.x - 15, _ClickPos.y - 40, 50, 20), _Rotation, -1000000, 1000000);
+            _Rotation += prevmove.x + prevmove.y;
+            GUI.Label(new Rect(_ClickPos.x - 80, _ClickPos.y - 40, 500, 20), "Rotation: ");
         }
+        _PrevMousePos = Event.current.mousePosition;
 
         //Inscene Show OptionButton
         GUI.color = new Color(1f, 1f, 1f, 1f);

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2798586956572267246}
   - component: {fileID: 7111656467045390501}
   - component: {fileID: 6596726034773146872}
-  - component: {fileID: 7253119864384950445}
+  - component: {fileID: 4660425704019867606}
   m_Layer: 0
   m_Name: Shrine_Lamp_4
   m_TagString: Untagged
@@ -84,7 +84,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &7253119864384950445
+--- !u!65 &4660425704019867606
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -187,5 +187,6 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
