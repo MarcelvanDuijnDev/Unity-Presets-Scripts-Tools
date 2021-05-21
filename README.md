@@ -120,26 +120,36 @@ Social Info:
 [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs)
 
 Create a scene with scripts assigned with the press of a button.
+
 <a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
-<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_CreateMap.gif">
+<img align="center" width="50%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_CreateMap.gif">
 </a>
+
 
 A library of scripts that can be added with one click.
+
 <a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
-<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_SearchScripts.gif">
+<img align="center" width="50%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_SearchScripts.gif">
 </a>
+
 
 Multiple options
+
 <a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
-<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_Options.png">
+<img align="center" width="50%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_Options.png">
 </a>
+
 
 FileFinder
+
 <a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
-<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_FileFinder.png">
+<img align="center" width="50%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_FileFinder.png">
 </a>
 
+
 MapEditor
+
 <a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
-<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_MapEditor.png">
+<img align="center" width="50%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_MapEditor.png">
 </a>
+
