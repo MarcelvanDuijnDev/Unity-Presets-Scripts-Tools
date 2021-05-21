@@ -39,7 +39,7 @@ public class Tool_Commands : EditorWindow
     private string _NewCommandText = "";
     private int _Type;
 
-    [MenuItem("Tools/Commands %h")]
+    [MenuItem("Tools/Commands wip")]
     static void Init()
     {
         Tool_Commands window = EditorWindow.GetWindow(typeof(Tool_Commands), false, "Commands") as Tool_Commands;

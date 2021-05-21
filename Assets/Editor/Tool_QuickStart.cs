@@ -185,7 +185,7 @@ public class Tool_QuickStart : EditorWindow
             GUILayout.EndHorizontal();
 
             if (GUILayout.Button("Home", GUILayout.Height(50))) { _WindowID = 0; _SelectWindow = false; ChangeTab(); }
-            if (GUILayout.Button("FileFinder (wip)", GUILayout.Height(50))) { _WindowID = 1; _SelectWindow = false; ChangeTab(); }
+            if (GUILayout.Button("FileFinder", GUILayout.Height(50))) { _WindowID = 1; _SelectWindow = false; ChangeTab(); }
             if (GUILayout.Button("Script to String", GUILayout.Height(50))) { _WindowID = 2; _SelectWindow = false; ChangeTab(); }
             if (GUILayout.Button("MapEditor", GUILayout.Height(50))) { _WindowID = 3; _SelectWindow = false; ChangeTab(); }
         }
@@ -2240,25 +2240,28 @@ public class Tool_QuickStart : EditorWindow
     //Create Prefab/Clean Parent
     void ME_CreatePrefab(Vector3 createPos)
     {
-        GameObject createdObj = PrefabUtility.InstantiatePrefab(_ME_Prefabs[_ME_SelectedID]) as GameObject;
-        createdObj.transform.position = createPos;
-        createdObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
-
-        if (_ME_ParentObj == null)
+        if (ME_CheckPositionEmpty(true))
         {
-            _ME_ParentObj = new GameObject();
-            _ME_ParentObj.name = "MapEditor_Parent";
-        }
+            GameObject createdObj = PrefabUtility.InstantiatePrefab(_ME_Prefabs[_ME_SelectedID]) as GameObject;
+            createdObj.transform.position = createPos;
+            createdObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
 
-        createdObj.transform.parent = _ME_ParentObj.transform;
-        if (_ME_SnapPosActive)
-            createdObj.transform.position = _ME_SnapPos;
-        else
-            createdObj.transform.position = _ME_MousePos;
-        if (_ME_RandomRot)
-            createdObj.transform.rotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
-        else
-            createdObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+            if (_ME_ParentObj == null)
+            {
+                _ME_ParentObj = new GameObject();
+                _ME_ParentObj.name = "MapEditor_Parent";
+            }
+
+            createdObj.transform.parent = _ME_ParentObj.transform;
+            if (_ME_SnapPosActive)
+                createdObj.transform.position = _ME_SnapPos;
+            else
+                createdObj.transform.position = _ME_MousePos;
+            if (_ME_RandomRot)
+                createdObj.transform.rotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
+            else
+                createdObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+        }
     }
     void ME_CleanParent()
     {
@@ -2268,6 +2271,29 @@ public class Tool_QuickStart : EditorWindow
         {
             DestroyImmediate(_ME_ParentObj.transform.GetChild(childCalc).gameObject);
             childCalc -= 1;
+        }
+    }
+    bool ME_CheckPositionEmpty(bool checky)
+    {
+        if (_ME_ParentObj != null)
+        {
+            bool check = true;
+            for (int i = 0; i < _ME_ParentObj.transform.childCount; i++)
+            {
+                if (checky)
+                {
+                    if (_ME_ParentObj.transform.GetChild(i).position.x == _ME_SnapPos.x && _ME_ParentObj.transform.GetChild(i).position.z == _ME_SnapPos.z)
+                        check = false;
+                }
+                else
+                        if (_ME_ParentObj.transform.GetChild(i).position == _ME_SnapPos)
+                    check = false;
+            }
+            return check;
+        }
+        else
+        {
+            return true;
         }
     }
 

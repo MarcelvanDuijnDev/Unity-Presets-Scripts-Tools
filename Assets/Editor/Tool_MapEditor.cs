@@ -484,25 +484,28 @@ public class Tool_MapEditor : EditorWindow
     //Create Prefab/Clean Parent
     void CreatePrefab(Vector3 createPos)
     {
-        GameObject createdObj = PrefabUtility.InstantiatePrefab(_Prefabs[_SelectedID]) as GameObject;
-        createdObj.transform.position = createPos;
-        createdObj.transform.localScale = new Vector3(_Size, _Size, _Size);
-
-        if(_ParentObj == null)
+        if (CheckPositionEmpty(true))
         {
-            _ParentObj = new GameObject();
-            _ParentObj.name = "MapEditor_Parent";
-        }
+            GameObject createdObj = PrefabUtility.InstantiatePrefab(_Prefabs[_SelectedID]) as GameObject;
+            createdObj.transform.position = createPos;
+            createdObj.transform.localScale = new Vector3(_Size, _Size, _Size);
 
-        createdObj.transform.parent = _ParentObj.transform;
-        if (_SnapPosActive)
-            createdObj.transform.position = _SnapPos;
-        else
-            createdObj.transform.position = _MousePos;
-        if (_RandomRot)
-            createdObj.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
-        else
-            createdObj.transform.rotation = Quaternion.Euler(0, _Rotation, 0);
+            if (_ParentObj == null)
+            {
+                _ParentObj = new GameObject();
+                _ParentObj.name = "MapEditor_Parent";
+            }
+
+            createdObj.transform.parent = _ParentObj.transform;
+            if (_SnapPosActive)
+                createdObj.transform.position = _SnapPos;
+            else
+                createdObj.transform.position = _MousePos;
+            if (_RandomRot)
+                createdObj.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            else
+                createdObj.transform.rotation = Quaternion.Euler(0, _Rotation, 0);
+        }
     }
     void CleanParent()
     {
@@ -512,6 +515,29 @@ public class Tool_MapEditor : EditorWindow
         {
             DestroyImmediate(_ParentObj.transform.GetChild(childCalc).gameObject);
             childCalc -= 1;
+        }
+    }
+    bool CheckPositionEmpty(bool checky)
+    {
+        if (_ParentObj != null)
+        {
+            bool check = true;
+            for (int i = 0; i < _ParentObj.transform.childCount; i++)
+            {
+                if (checky)
+                {
+                    if (_ParentObj.transform.GetChild(i).position.x == _SnapPos.x && _ParentObj.transform.GetChild(i).position.z == _SnapPos.z)
+                        check = false;
+                }
+                else
+                        if (_ParentObj.transform.GetChild(i).position == _SnapPos)
+                    check = false;
+            }
+            return check;
+        }
+        else
+        {
+            return true;
         }
     }
 }
