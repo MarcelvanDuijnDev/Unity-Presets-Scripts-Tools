@@ -8,7 +8,8 @@ _This project contains scripts/art/prefabs that can be used for unity projects.
 The files are made by me and do not contain copyrighted material.
 Feel free to use/copy files from this project._
 
-[Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki)
+<!-- [Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki) -->
+### HighLight: [Tool_QuickStart.cs](#quickstart)
 
 ### Content:
 * [Movement](#movement)
@@ -111,3 +112,34 @@ Social Info:
 [ArtStation](https://www.artstation.com/marcelvanduijn)
 [Instagram](https://www.instagram.com/marcelvanduijn_/)
 [GitHub](https://github.com/MarcelvanDuijnDev)
+
+
+
+# highlight
+# quickstart
+[Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs)
+
+Create a scene with scripts assigned with the press of a button.
+<a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
+<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_CreateMap.gif">
+</a>
+
+A library of scripts that can be added with one click.
+<a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
+<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_SearchScripts.gif">
+</a>
+
+Multiple options
+<a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
+<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_Options.png">
+</a>
+
+FileFinder
+<a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
+<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_FileFinder.png">
+</a>
+
+MapEditor
+<a href="https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Editor/Tool_QuickStart.cs">
+<img align="center" width="30%" src="https://github.com/MarcelvanDuijnDev/MarcelvanDuijnDev/blob/main/Images/Tool_QuickStart_Preview_MapEditor.png">
+</a>
