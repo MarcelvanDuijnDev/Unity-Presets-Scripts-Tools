@@ -39,6 +39,23 @@ public class ObjectPool : MonoBehaviour
     }
 
     //GetObject
+    public GameObject GetObject(string objname)
+    {
+        int id = FindObjectPoolID(objname, false);
+        return GetObject(id, true);
+    }
+    public GameObject GetObject(GameObject obj)
+    {
+        int id = FindObjectPoolID(obj);
+        return GetObject(id, true);
+    }
+    public GameObject GetObjectPrefabName(string prefabname)
+    {
+        int id = FindObjectPoolID(prefabname, true);
+        return GetObject(id, true);
+    }
+
+    //GetObject/setactive
     public GameObject GetObject(string objname, bool setactive)
     {
         int id = FindObjectPoolID(objname, false);

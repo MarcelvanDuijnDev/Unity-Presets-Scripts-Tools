@@ -157,6 +157,8 @@ public class Tool_QuickStart : EditorWindow
 
     //Placement
     private GameObject _ME_ParentObj, _ME_ExampleObj;
+    private Transform _ME_HitObject;
+    private bool _ME_RotateWithObject = false;
 
     //Other
     private Vector2 _ME_ScrollPos1, _ME_ClickPos;
@@ -2253,14 +2255,26 @@ public class Tool_QuickStart : EditorWindow
             }
 
             createdObj.transform.parent = _ME_ParentObj.transform;
+
+            //SnapPos
             if (_ME_SnapPosActive)
                 createdObj.transform.position = _ME_SnapPos;
             else
                 createdObj.transform.position = _ME_MousePos;
+
+            //Rotation
+            /*
             if (_ME_RandomRot)
                 createdObj.transform.rotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
             else
                 createdObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+            */
+
+            if (_ME_RotateWithObject)
+                createdObj.transform.rotation = Quaternion.Euler(_ME_HitObject.eulerAngles.x, _ME_Rotation, _ME_HitObject.eulerAngles.z);
+            else
+                createdObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+            //Test
         }
     }
     void ME_CleanParent()
@@ -2324,6 +2338,9 @@ public class Tool_QuickStart : EditorWindow
                 //Check MousePosition
                 _ME_MousePos = hitInfo.point;
 
+                //Hit Object
+                _ME_HitObject = hitInfo.transform;
+
                 //Create Example Object
                 if (_ME_SelectedID <= _ME_Prefabs.Length)
                 {
@@ -2348,7 +2365,15 @@ public class Tool_QuickStart : EditorWindow
                 //Set Example Object Position + Rotation
                 if (_ME_ExampleObj != null)
                 {
-                    _ME_ExampleObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+                    //Rotate with hit object
+                    //Debug.Log("Transform: X" + _ME_HitObject.eulerAngles.x.ToString() + "  Y  " + _ME_HitObject.eulerAngles.z.ToString());
+
+                    //Rotation
+                    if (_ME_RotateWithObject)
+                        _ME_ExampleObj.transform.rotation = Quaternion.Euler(_ME_HitObject.eulerAngles.x, _ME_Rotation, _ME_HitObject.eulerAngles.z);
+                    else
+                        _ME_ExampleObj.transform.rotation = Quaternion.Euler(0, _ME_Rotation, 0);
+
                     _ME_ExampleObj.transform.localScale = new Vector3(_ME_Size, _ME_Size, _ME_Size);
                     if (!e.shift && !e.control)
                     {
