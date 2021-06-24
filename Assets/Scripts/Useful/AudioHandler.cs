@@ -7,15 +7,17 @@ using UnityEngine.Audio;
 public class AudioHandler : MonoBehaviour
 {
     [Header("Settings")]
+    [Tooltip("Only used for testing disable it for the final build to improve performance")]
     [SerializeField] private bool _RefreshSettingsOnUpdate = false;
-    [SerializeField] private AudioMixerGroup _AudioMixer = null;
 
-    [Header("Audio")]
+    [Header("AudioMixer/Audio")]
+    [SerializeField] private AudioMixerGroup _AudioMixer = null;
     [SerializeField] private List<AudioHandler_Sound> _Sound = new List<AudioHandler_Sound>();
 
-    public static AudioHandler AUDIO;
-
     private string _CurrentScene;
+
+    //You can call AudioHandler.AUDIO from every script as long as you have the script in the scene
+    public static AudioHandler AUDIO;
 
     void Start()
     {
@@ -29,6 +31,10 @@ public class AudioHandler : MonoBehaviour
             {
                 _Sound[i].Settings.AudioSource = this.gameObject.AddComponent<AudioSource>();
                 _Sound[i].Settings.AudioSource.outputAudioMixerGroup = _AudioMixer;
+
+                //AudioGroup
+                if (_Sound[i].Settings.AudioGroup != null)
+                    _Sound[i].Settings.AudioSource.outputAudioMixerGroup = _Sound[i].Settings.AudioGroup;
             }
 
             //AudioClip
@@ -146,12 +152,23 @@ public class AudioHandler : MonoBehaviour
         }
     }
 
+    /// <summary>Plays the audiotrack.</summary>
     public void PlayTrack(string trackname)
     {
         for (int i = 0; i < _Sound.Count; i++)
         {
             if (_Sound[i].AudioTrackName == trackname)
                 AudioHandler_PlayTrack(i);
+        }
+    }
+    /// <summary>Plays the audiotrack if it's not playing yet.</summary>
+    public void StartTrack(string trackname)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+                if (!_Sound[i].Settings.AudioSource.isPlaying)
+                    AudioHandler_PlayTrack(i);
         }
     }
     public void StopTrack(string trackname)
@@ -213,19 +230,20 @@ public class AudioHandler_Sound
 [System.Serializable]
 public class AudioHandler_Settings
 {
-    [Header("AudioClip")]
+    [Header("AudioClip/AudioMixerGroup")]
     public AudioClip AudioClip;
+    public AudioMixerGroup AudioGroup;
 
     [Header("AudioSource")]
     public AudioSource AudioSource;
-    public bool CreateAudioSource = true;
+    public bool CreateAudioSource;
 }
 
 [System.Serializable]
 public class AudioHandler_AudioSettings
 {
     [Header("AudioSettings")]
-    [Range(0, 1)] public float Volume = 1;
+    [Range(0, 1)] public float Volume;
     public bool Loop;
     public bool PlayOnStart;
 }
