@@ -13,13 +13,16 @@ using TMPro;
 
 public class Tool_QuickStart : EditorWindow
 {
-    //Navigation
-    int _WindowID = 0;      // Default/FileFinder/ScriptToString/MapEditor
+    //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI
     int _DimensionID = 0;   // 2D/3D
     int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
     bool _SelectWindow = false;
+
+    //Navigation Tool Windows
+    int _WindowID = 0;      // Default/FileFinder/ScriptToString/MapEditor
+    string[] _WindowNames = new string[] {"Home","FileFinder","ScriptToString","MapEditor" };
 
     //Scripts
     Tool_QuickStart_Script[] QuickStart_Scripts = new Tool_QuickStart_Script[] {
@@ -80,6 +83,7 @@ public class Tool_QuickStart : EditorWindow
     //Search
     string _Search_Script = "";
     string _Search_Tag = "";
+    string _Search_Window = ""; 
     string[] _Project_Scripts = new string[0];
     bool _Search_QuickStartScripts_Toggle = true;
     bool _Searcg_ProjectScripts_Toggle = false;
@@ -109,6 +113,7 @@ public class Tool_QuickStart : EditorWindow
     int _ToolStateCheck = 1;
 
     //FileFinder (FF) ----------------------------------------------
+    #region FileFinder
     string _FF_Type = "";
     string _FF_Search = "";
     string _FF_SearchCheck = "a";
@@ -123,14 +128,17 @@ public class Tool_QuickStart : EditorWindow
     //Results
     string[] _FF_SearchResults = new string[0];
     string[] _FF_SearchResultsChange = new string[0];
+    #endregion
 
 
     //Script To String (STS) ----------------------------------------------
+    #region Script To String
     string _STS_ScriptInput = "";
     string _STS_ScriptOutput = "";
     string _STS_CustomCommandCheck = "";
     private bool _STS_ToggleKeywords = false;
     List<string> _STS_CustomCommandCheckKeywords = new List<string>();
+    #endregion
 
 
     //Map Editor (ME) ----------------------------------------------
@@ -195,17 +203,21 @@ public class Tool_QuickStart : EditorWindow
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("=", GUILayout.Width(20)))
         {
+            _WindowID = 0;
             _SelectWindow = !_SelectWindow;
         }
         if (_SelectWindow)
         {
-            GUILayout.Label("Navigation");
+            GUILayout.Label("Tool Navigation");
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Home", GUILayout.Height(50))) { _WindowID = 0; _SelectWindow = false; ChangeTab(); }
-            if (GUILayout.Button("FileFinder", GUILayout.Height(50))) { _WindowID = 1; _SelectWindow = false; ChangeTab(); }
-            if (GUILayout.Button("Script to String", GUILayout.Height(50))) { _WindowID = 2; _SelectWindow = false; ChangeTab(); }
-            if (GUILayout.Button("MapEditor", GUILayout.Height(50))) { _WindowID = 3; _SelectWindow = false; ChangeTab(); }
+            _Search_Window = EditorGUILayout.TextField("Search: ", _Search_Window);
+
+            for (int i = 1; i < _WindowNames.Length; i++)
+            {
+                if (_Search_Window == "" || _WindowNames[i].ToLower().Contains(_Search_Window.ToLower()))
+                    if (GUILayout.Button(_WindowNames[i], GUILayout.Height(30))) { _WindowID = i; _SelectWindow = false; _Search_Window = ""; ChangeTab(); }
+            }
         }
         else
         {
