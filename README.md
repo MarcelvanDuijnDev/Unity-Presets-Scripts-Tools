@@ -86,6 +86,7 @@ Feel free to use/copy files from this project._
 # Practical
 - [DontDestory.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/DontDestroy.cs)
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/DoEvent.cs)
+- [PauzeMenu.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/PauseMenu.cs)
 - [OnCollision.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/OnCollision.cs)
 - [OnCollision2D.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/OnCollision2D.cs)
 - [PosToPos.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/Practical/PosToPos.cs)
