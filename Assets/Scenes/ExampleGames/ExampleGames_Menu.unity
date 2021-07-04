@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 292128881}
   - component: {fileID: 292128880}
   - component: {fileID: 292128879}
+  - component: {fileID: 292128882}
   m_Layer: 5
   m_Name: Button_Platformer2D
   m_TagString: Untagged
@@ -305,6 +306,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 292128877}
   m_CullTransparentMesh: 1
+--- !u!114 &292128882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292128877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0cd4509f1efb54e912d2809086cbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _UIEffect: 0
+  _MinDefaultMaxSize: {x: 0.9, y: 1, z: 1.1}
+  _IncreaseSpeed: 1
 --- !u!1 &469891037
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,6 +560,7 @@ GameObject:
   - component: {fileID: 537692439}
   - component: {fileID: 537692438}
   - component: {fileID: 537692437}
+  - component: {fileID: 537692440}
   m_Layer: 5
   m_Name: Button_3DTopDownShooter
   m_TagString: Untagged
@@ -665,6 +682,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 537692435}
   m_CullTransparentMesh: 1
+--- !u!114 &537692440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537692435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0cd4509f1efb54e912d2809086cbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _UIEffect: 0
+  _MinDefaultMaxSize: {x: 0.9, y: 1, z: 1.1}
+  _IncreaseSpeed: 1
 --- !u!1 &806851237
 GameObject:
   m_ObjectHideFlags: 0
@@ -826,6 +858,7 @@ GameObject:
   - component: {fileID: 1146614612}
   - component: {fileID: 1146614611}
   - component: {fileID: 1146614610}
+  - component: {fileID: 1146614613}
   m_Layer: 5
   m_Name: Button_SpaceSurvival
   m_TagString: Untagged
@@ -947,6 +980,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1146614608}
   m_CullTransparentMesh: 1
+--- !u!114 &1146614613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1146614608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0cd4509f1efb54e912d2809086cbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _UIEffect: 0
+  _MinDefaultMaxSize: {x: 0.9, y: 1, z: 1.1}
+  _IncreaseSpeed: 1
 --- !u!1 &1189743952
 GameObject:
   m_ObjectHideFlags: 0
