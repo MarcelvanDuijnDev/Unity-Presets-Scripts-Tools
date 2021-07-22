@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.0.1";
+    string _Version = "V1.0.2";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI
@@ -24,8 +24,8 @@ public class Tool_QuickStart : EditorWindow
     bool _SelectWindow = false;
 
     //Navigation Tool Windows
-    int _WindowID = 0;      // Default/FileFinder/ScriptToString/MapEditor
-    string[] _WindowNames = new string[] {"Home","FileFinder","ScriptToString","MapEditor" };
+    int _WindowID = 0;      // Default/UpdateLog/FileFinder/ScriptToString/MapEditor
+    string[] _WindowNames = new string[] {"Home","Update Log","FileFinder","ScriptToString","MapEditor" };
 
     //Scripts
     Tool_QuickStart_Script[] QuickStart_Scripts = new Tool_QuickStart_Script[] {
@@ -218,6 +218,14 @@ public class Tool_QuickStart : EditorWindow
             _WindowID = 0;
             _SelectWindow = !_SelectWindow;
         }
+        if (GUILayout.Button("?", GUILayout.Width(20)))
+        {
+            if (_WindowID == 1)
+                _WindowID = 0;
+            else
+                _WindowID = 1;
+            _SelectWindow = false;
+        }
         if (_SelectWindow)
         {
             GUILayout.Label("Tool Navigation");
@@ -225,7 +233,7 @@ public class Tool_QuickStart : EditorWindow
 
             _Search_Window = EditorGUILayout.TextField("Search: ", _Search_Window);
 
-            for (int i = 1; i < _WindowNames.Length; i++)
+            for (int i = 2; i < _WindowNames.Length; i++)
             {
                 if (_Search_Window == "" || _WindowNames[i].ToLower().Contains(_Search_Window.ToLower()))
                     if (GUILayout.Button(_WindowNames[i], GUILayout.Height(30))) { _WindowID = i; _SelectWindow = false; _Search_Window = ""; ChangeTab(); }
@@ -253,15 +261,19 @@ public class Tool_QuickStart : EditorWindow
                             break;
                     }
                     break;
-                case 1: //FileFinder
+                case 1: //UpdateLog
+                    GUILayout.EndHorizontal();
+                    UpdateLog();
+                    break;
+                case 2: //FileFinder
                     GUILayout.EndHorizontal();
                     FileFinder();
                     break;
-                case 2: //ScriptToString
+                case 3: //ScriptToString
                     GUILayout.EndHorizontal();
                     ScriptToString_Menu();
                     break;
-                case 3: //MapEditor
+                case 4: //MapEditor
                     GUILayout.EndHorizontal();
                     MapEditor_Menu();
                     break;
@@ -2543,6 +2555,35 @@ public class Tool_QuickStart : EditorWindow
     {
         if (_ME_ExampleObj != null)
             DestroyImmediate(_ME_ExampleObj);
+    }
+
+
+    //UpdateLog
+    void UpdateLog()
+    {
+        EditorGUILayout.BeginScrollView(_ScrollPos);
+        EditorGUILayout.BeginVertical("box");
+        GUILayout.Label("Update Log", EditorStyles.boldLabel);
+
+        GUILayout.Label(
+            "\n" +
+            "V1.0.2\n" +
+            "* Added Update log\n" +
+            "\n" +
+            "V1.0.1\n" +
+            "* Updated Cleanup Script To String (STS)\n" +
+            "* File Finder (FF) Now updates when changing type\n" +
+            "\n" +
+            "V1.0.0\n" +
+            "* Added Scripts\n" +
+            "* Fixed Scripts formating\n" +
+            "* Refactor Script To String (STS)\n" +
+            "\n" +
+            "\n" +
+            "");
+
+        EditorGUILayout.EndVertical();
+        EditorGUILayout.EndScrollView();
     }
 }
 
