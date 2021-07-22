@@ -12,6 +12,7 @@ public class Tool_FileFinder : EditorWindow
 
     //Project
     string _Project_Type = "";
+    string _Project_TypeCheck = "";
     string _Project_Search = "";
     string _Project_SearchCheck = "a";
     bool _Project_ExcludeMeta = true;
@@ -73,11 +74,12 @@ public class Tool_FileFinder : EditorWindow
         _Project_Results = 0;
         _Project_Total = 0;
 
-        if (_Project_Search != _Project_SearchCheck)
+        if (_Project_Search != _Project_SearchCheck || _Project_Type != _Project_TypeCheck)
         {
             _SearchResults = System.IO.Directory.GetFiles("Assets/", "*" + _Project_Type, System.IO.SearchOption.AllDirectories);
             _SearchResultsChange = _SearchResults;
             _Project_SearchCheck = _Project_Search;
+            _Project_TypeCheck = _Project_Type;
         }
     }
     void FileFinder_SearchProject()
