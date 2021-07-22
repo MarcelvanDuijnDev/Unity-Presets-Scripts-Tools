@@ -1,19 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 public class Tool_ScriptToString : EditorWindow
 {
-    string _ScriptInput = "";
+    MonoScript _InputScript;
     string _ScriptOutput = "";
 
-    List<string> _CustomCommandCheckKeywords = new List<string>();
-    string _CustomCommandCheck;
-
     private Vector2 _ScrollPos = new Vector2();
-    private bool _ToggleKeywords = false;
 
     [MenuItem("Tools/Convert Script to String")]
     public static void ShowWindow()
@@ -24,12 +21,12 @@ public class Tool_ScriptToString : EditorWindow
     void OnGUI()
     {
         if (GUILayout.Button("Convert", GUILayout.Height(30)))
+            if(_InputScript != null)
             _ScriptOutput = ConvertScriptToString();
 
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
         Display_InputOutput();
-        Show_Keywords();
-        Display_TextEditor();
+        Display_StringExample();
         EditorGUILayout.EndScrollView();
     }
 
@@ -38,7 +35,7 @@ public class Tool_ScriptToString : EditorWindow
         GUILayout.Space(20);
         //Input
         GUILayout.Label("Input: ", EditorStyles.boldLabel);
-        _ScriptInput = EditorGUILayout.TextField("", _ScriptInput);
+        _InputScript = EditorGUILayout.ObjectField(_InputScript, typeof(MonoScript), false) as MonoScript;
 
         //Output
         GUILayout.Label("Output: ", EditorStyles.boldLabel);
@@ -46,52 +43,7 @@ public class Tool_ScriptToString : EditorWindow
         GUILayout.Space(20);
     }
 
-    private void Show_Keywords()
-    {
-        //TextEditor Info
-        GUILayout.Label("Use Custom Keywords to fix lines that should not be included into the commend. \n" +
-            "Sometimes it leaves code after the command, you can addit it by adding a keyword below." +
-            "The x on the left shows the lines that contain a comment.");
-
-        GUILayout.Space(20);
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Custom Keywords: ", EditorStyles.boldLabel);
-        if (GUILayout.Button("Add common keywords", GUILayout.Width(200)))
-        {
-            AddCommonKeywords();
-        }
-        GUILayout.EndHorizontal();
-
-        _CustomCommandCheck = EditorGUILayout.TextField("", _CustomCommandCheck);
-        if (GUILayout.Button("AddKeyword"))
-        {
-            if (_CustomCommandCheck == "")
-                Debug.Log("Enter a keyword");
-            else
-            {
-                Add_Keyword(_CustomCommandCheck);
-                _CustomCommandCheck = "";
-                _ScriptOutput = ConvertScriptToString();
-            }
-        }
-
-        _ToggleKeywords = EditorGUILayout.Foldout(_ToggleKeywords, "Show Keywords");
-
-        if (_ToggleKeywords)
-            for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)
-            {
-                GUILayout.BeginHorizontal("box");
-                GUILayout.Label(_CustomCommandCheckKeywords[i]);
-                if (GUILayout.Button("Remove", GUILayout.Width(100)))
-                {
-                    _CustomCommandCheckKeywords.Remove(_CustomCommandCheckKeywords[i]);
-                    _CustomCommandCheck = "";
-                    _ScriptOutput = ConvertScriptToString();
-                }
-                GUILayout.EndHorizontal();
-            }
-    }
-    private void Display_TextEditor()
+    private void Display_StringExample()
     {
         //Preview
         List<string> output = new List<string>();
@@ -145,135 +97,38 @@ public class Tool_ScriptToString : EditorWindow
 
     private string ConvertScriptToString()
     {
-        _ScriptOutput = "";
-        string scriptasstring = "\"";
+        string newstring = "\"";
+        string path = GetPath();
+        string[] readText = File.ReadAllLines(path);
 
-        //Split / add to array
-        List<string> textedit = new List<string>();
-
-        for (int i = 0; i < _ScriptInput.Length; i++)
+        for (int i = 0; i < readText.Length; i++)
         {
-            textedit.Add(System.Convert.ToString(_ScriptInput[i]));
+            string newline = "";
+            for (int j = 0; j < readText[i].Length; j++)
+            {
+                if(System.Convert.ToString(readText[i][j]) == "\"")
+                    newline += "\\";
+                newline += System.Convert.ToString(readText[i][j]);
+            }
+            readText[i] = newline + "\\n";
+            newstring += readText[i];
         }
 
-        bool headercheck = false;
-        bool forcheck = false;
-        bool commentcheck = false;
+        newstring += "\"";
 
-        for (int i = 0; i < textedit.Count; i++)
-        {
-            //Header check
-            if (i + 7 < textedit.Count)
-            {
-                if (textedit[i] + textedit[i + 1] + textedit[i + 2] + textedit[i + 3] + textedit[i + 4] + textedit[i + 5] + textedit[i + 6] + textedit[i + 7] == "[Header(")
-                    headercheck = true;
-            }
-
-            //For check
-            if(i + 2 < textedit.Count)
-            {
-                if(textedit[i] + textedit[i+1] + textedit[i + 2] == "for")
-                {
-                    forcheck = true;
-                }
-            }
-
-            //Comment check
-            if (i + 1 < textedit.Count)
-            {
-                if (textedit[i] + textedit[i + 1] == "//" || textedit[i] + textedit[i + 1] == "/*")
-                    commentcheck = true;
-            }
-
-            //Comment /* + */
-            if (commentcheck)
-            {
-                if (textedit[i - 1] + textedit[i] == "*/")
-                {
-                    scriptasstring += "\\n";
-                    commentcheck = false;
-                }
-
-                for (int j = 0; j < _CustomCommandCheckKeywords.Count; j++)
-                {
-                    if(_CustomCommandCheckKeywords[j].Length < textedit.Count)
-                    {
-                        string check = "";
-
-                        for (int o = 0; o < _CustomCommandCheckKeywords[j].Length; o++)
-                        {
-                            check += textedit[i + o];
-                        }
-                        
-                        if(check == _CustomCommandCheckKeywords[j])
-                        {
-                            scriptasstring += "\\n";
-                            commentcheck = false;
-                        }
-                    }
-                }
-            }
-
-            scriptasstring += textedit[i];
-            //Endings check
-            if (i + 2 < textedit.Count)
-            {
-                if (textedit[i + 1] == "\"")
-                {
-                    scriptasstring += "\\";
-                }
-
-                if (textedit[i] == "}")
-                {
-                    scriptasstring += "\\n";
-                }
-                if (textedit[i] == ";" && !forcheck)
-                {
-                    scriptasstring += "\\n";
-                }
-                if(textedit[i] == "]" && headercheck)
-                {
-                    scriptasstring += "\\n";
-                    headercheck = false;
-                }
-                if (textedit[i] == ")" && forcheck)
-                {
-                    scriptasstring += "\\n";
-                    forcheck = false;
-                }
-            }
-        }
-        scriptasstring += "\"";
-
-        return scriptasstring;
+        return newstring;
     }
 
-    private void AddCommonKeywords()
+    private string GetPath()
     {
-        Add_Keyword("float");
-        Add_Keyword("double");
-        Add_Keyword("int");
-        Add_Keyword("void");
-        Add_Keyword("for");
-        Add_Keyword("switch");
-        Add_Keyword("private");
-        Add_Keyword("public");
-        Add_Keyword("[Header(");
-        Add_Keyword("case");
-        Add_Keyword("if");
-
-        _ScriptOutput = ConvertScriptToString();
-    }
-    private void Add_Keyword(string keyword)
-    {
-        bool exist = false;
-        for (int i = 0; i < _CustomCommandCheckKeywords.Count; i++)
+        string[] filepaths = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
+        for (int i = 0; i < filepaths.Length; i++)
         {
-            if (_CustomCommandCheckKeywords[i] == keyword)
-                exist = true;
+            if (filepaths[i].Contains(_InputScript.name + ".cs"))
+            {
+                return filepaths[i];
+            }
         }
-
-        if (!exist)
-            _CustomCommandCheckKeywords.Add(keyword);
+        return "";
     }
 }
