@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.0.0";
+    string _Version = "V1.0.1";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI
@@ -129,6 +129,7 @@ public class Tool_QuickStart : EditorWindow
     //FileFinder (FF) ----------------------------------------------
     #region FileFinder
     string _FF_Type = "";
+    string _FF_TypeCheck = "";
     string _FF_Search = "";
     string _FF_SearchCheck = "a";
     int _FF_Results = 0;
@@ -141,7 +142,6 @@ public class Tool_QuickStart : EditorWindow
 
     //Results
     string[] _FF_SearchResults = new string[0];
-    string[] _FF_SearchResultsChange = new string[0];
     #endregion
 
 
@@ -1846,11 +1846,11 @@ public class Tool_QuickStart : EditorWindow
         _FF_Results = 0;
         _FF_Total = 0;
 
-        if (_FF_Search != _FF_SearchCheck)
+        if (_FF_Search != _FF_SearchCheck || _FF_Type != _FF_TypeCheck)
         {
             _FF_SearchResults = System.IO.Directory.GetFiles("Assets/", "*" + _FF_Type, System.IO.SearchOption.AllDirectories);
-            _FF_SearchResultsChange = _FF_SearchResults;
             _FF_SearchCheck = _FF_Search;
+            _FF_TypeCheck = _FF_Type;
         }
     }
     void FileFinder_SearchAssets()
@@ -1984,8 +1984,7 @@ public class Tool_QuickStart : EditorWindow
     string STS_ConvertScriptToString()
     {
         string newstring = "\"";
-        string path = STS_GetPath();
-        string[] readText = File.ReadAllLines(path);
+        string[] readText = File.ReadAllLines(STS_GetPath());
 
         for (int i = 0; i < readText.Length; i++)
         {
@@ -1999,9 +1998,7 @@ public class Tool_QuickStart : EditorWindow
             readText[i] = newline + "\\n";
             newstring += readText[i];
         }
-
         newstring += "\"";
-
         return newstring;
     }
     string STS_GetPath()

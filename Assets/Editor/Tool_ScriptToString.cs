@@ -98,8 +98,7 @@ public class Tool_ScriptToString : EditorWindow
     private string ConvertScriptToString()
     {
         string newstring = "\"";
-        string path = GetPath();
-        string[] readText = File.ReadAllLines(path);
+        string[] readText = File.ReadAllLines(GetPath());
 
         for (int i = 0; i < readText.Length; i++)
         {
