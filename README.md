@@ -50,7 +50,7 @@ Feel free to use/copy files from this project._
 - [ShootingRayCast.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Weapons/ShootingRayCast.cs)
 
 # Editor
-- [Tool_Commands.cs]
+- [Tool_Commands.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/Tool_Commands.cs)
 - [Tool_CreateHexagonMesh.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/Tool_CreateHexagonMesh.cs)
 - [Tool_FileFinder.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/Tool_FileFinder.cs)
 - [Tool_MapEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/Tool_MapEditor.cs)
