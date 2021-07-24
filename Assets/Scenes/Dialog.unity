@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 6054929}
   - component: {fileID: 6054928}
   m_Layer: 5
-  m_Name: Image
+  m_Name: DialogBackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 495451687}
   - component: {fileID: 495451686}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: Button_Option3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -712,7 +712,7 @@ GameObject:
   - component: {fileID: 1359245445}
   - component: {fileID: 1359245444}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Button_Option1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -844,7 +844,7 @@ GameObject:
   - component: {fileID: 1389507325}
   - component: {fileID: 1389507324}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: '[DialogText]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -978,7 +978,7 @@ GameObject:
   - component: {fileID: 1447920991}
   - component: {fileID: 1447920990}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ButtonText_Option1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1129,74 +1129,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20225fa293e64a5419348f8e55140eae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Dialog:
-  - DialogTreeInfo: 
-    DialogTree:
-    - Dialog: test row 1 text 1
-      Options: []
-    - Dialog: test row 1 text 2
-      Options:
-      - OptionInfo: Goto Row2
-        Options:
-        - Option: 0
-          NextID: {x: 1, y: 0}
-        OptionToggle: 1
-      - OptionInfo: Goto Row3
-        Options:
-        - Option: 0
-          NextID: {x: 2, y: 0}
-        OptionToggle: 1
-      - OptionInfo: Ignore
-        Options: []
-        OptionToggle: 1
-  - DialogTreeInfo: 
-    DialogTree:
-    - Dialog: test row 2 text 1
-      Options: []
-    - Dialog: test row 2 text 2
-      Options: []
-    - Dialog: test row 2 text 3
-      Options:
-      - OptionInfo: back to row 1
-        Options:
-        - Option: 0
-          NextID: {x: 0, y: 0}
-        OptionToggle: 0
-      - OptionInfo: back this row
-        Options:
-        - Option: 0
-          NextID: {x: 1, y: 0}
-        OptionToggle: 0
-  - DialogTreeInfo: 
-    DialogTree:
-    - Dialog: test row 3 text 1
-      Options: []
-    - Dialog: test row 3 text 2
-      Options: []
-    - Dialog: test row 3 text 3
-      Options: []
-    - Dialog: test row 3 text 4
-      Options:
-      - OptionInfo: Back To Row 1
-        Options:
-        - Option: 0
-          NextID: {x: 0, y: 0}
-        OptionToggle: 1
-  CurrentID: {x: 0, y: 0}
-  DialogText: {fileID: 1389507324}
-  OptionsText:
+  _DialogText: {fileID: 1389507324}
+  _NextButton: {fileID: 743840182}
+  _OptionsText:
   - {fileID: 1447920990}
   - {fileID: 1793896375}
   - {fileID: 1951458586}
   - {fileID: 2027371546}
   - {fileID: 2087367274}
-  OptionsButtons:
+  _OptionsButtons:
   - {fileID: 1359245442}
   - {fileID: 2132782162}
   - {fileID: 495451684}
   - {fileID: 1571054835}
   - {fileID: 1574163128}
-  NextButton: {fileID: 743840182}
+  _Dialog: []
 --- !u!4 &1533710971
 Transform:
   m_ObjectHideFlags: 0
@@ -1224,7 +1171,7 @@ GameObject:
   - component: {fileID: 1571054838}
   - component: {fileID: 1571054837}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: Button_Option4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1357,7 +1304,7 @@ GameObject:
   - component: {fileID: 1574163131}
   - component: {fileID: 1574163130}
   m_Layer: 5
-  m_Name: Button (4)
+  m_Name: Button_Option5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1489,7 +1436,7 @@ GameObject:
   - component: {fileID: 1701601645}
   - component: {fileID: 1701601644}
   m_Layer: 5
-  m_Name: Image
+  m_Name: BackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1647,7 +1594,7 @@ GameObject:
   - component: {fileID: 1793896376}
   - component: {fileID: 1793896375}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ButtonText_Option2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1874,7 +1821,7 @@ GameObject:
   - component: {fileID: 1951458587}
   - component: {fileID: 1951458586}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ButtonText_Option3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2008,7 +1955,7 @@ GameObject:
   - component: {fileID: 2027371547}
   - component: {fileID: 2027371546}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ButtonText_Option4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2142,7 +2089,7 @@ GameObject:
   - component: {fileID: 2054788003}
   - component: {fileID: 2054788002}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ButtonNext_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2276,7 +2223,7 @@ GameObject:
   - component: {fileID: 2087367275}
   - component: {fileID: 2087367274}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ButtonText_Option5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2411,7 +2358,7 @@ GameObject:
   - component: {fileID: 2132782165}
   - component: {fileID: 2132782164}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: Button_Option2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

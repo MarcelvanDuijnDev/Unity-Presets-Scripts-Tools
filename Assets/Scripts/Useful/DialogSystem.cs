@@ -3,73 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Events;
 
 public class DialogSystem : MonoBehaviour
 {
-    public List<DialogSystem_DialogTree> Dialog = new List<DialogSystem_DialogTree>();
+    [Header("Ref")]
+    [SerializeField] private TextMeshProUGUI _DialogText;
+    [SerializeField] private Button _NextButton;
 
-    public Vector2Int CurrentID = new Vector2Int(0,0);
-    public TextMeshProUGUI DialogText;
+    [Header("Ref Options")]
+    [SerializeField] private List<TextMeshProUGUI> _OptionsText = new List<TextMeshProUGUI>();
+    [SerializeField] private List<GameObject> _OptionsButtons = new List<GameObject>();
 
-    public List<TextMeshProUGUI> OptionsText = new List<TextMeshProUGUI>();
-    public List<GameObject> OptionsButtons = new List<GameObject>();
+    [Header("Dialog")]
+    public List<DialogSystem_DialogTree> _Dialog = new List<DialogSystem_DialogTree>();
 
-    public Button NextButton;
-
-    void Start()
-    {
-        
-    }
+    //Private variables
+    private Vector2Int _CurrentID = new Vector2Int(0, 0);
 
     void Update()
     {
-        DialogText.text = Dialog[CurrentID.x].DialogTree[CurrentID.y].Dialog;
+        _DialogText.text = _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Dialog;
 
-
-
-        //OptionsActive
-        for (int i = 0; i < OptionsButtons.Count; i++)
+        // Option Buttons 
+        for (int i = 0; i < _OptionsButtons.Count; i++)
         {
-            if (Dialog[CurrentID.x].DialogTree[CurrentID.y].Options.Count != 0)
+            if (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options.Count != 0)
             {
-                if (i < Dialog[CurrentID.x].DialogTree[CurrentID.y].Options.Count)
+                if (i < _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options.Count)
                 {
-                    OptionsButtons[i].SetActive(true);
-                    OptionsText[i].text = Dialog[CurrentID.x].DialogTree[CurrentID.y].Options[i].OptionInfo;
+                    _OptionsButtons[i].SetActive(true);
+                    _OptionsText[i].text = _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[i].OptionInfo;
                 }
                 else
-                {
-                    OptionsButtons[i].SetActive(false);
-                }
+                    _OptionsButtons[i].SetActive(false);
             }
             else
-                OptionsButtons[i].SetActive(false);
+                _OptionsButtons[i].SetActive(false);
         }
 
-        //NextButton
-        if (Dialog[CurrentID.x].DialogTree[CurrentID.y].Options != null)
+        // NextButton
+        if (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options != null)
         {
-            if (Dialog[CurrentID.x].DialogTree[CurrentID.y].Options.Count == 0)
-                NextButton.enabled = true;
+            if (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options.Count == 0)
+                _NextButton.enabled = true;
             else
-                NextButton.enabled = false;
+                _NextButton.enabled = false;
         }
         else
-            NextButton.enabled = false;
+            _NextButton.enabled = false;
     }
 
     public void ButtonInput(int id)
     {
-        for (int i = 0; i < Dialog[CurrentID.x].DialogTree[CurrentID.y].Options[id].Options.Count; i++)
+        for (int i = 0; i < _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[id].Options.Count; i++)
         {
-            switch (Dialog[CurrentID.x].DialogTree[CurrentID.y].Options[id].Options[i].Option)
+            switch (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[id].Options[i].Option)
             {
                 case DialogSystem_DialogOption.Options.GOTO:
-                    CurrentID = Dialog[CurrentID.x].DialogTree[CurrentID.y].Options[id].Options[i].NextID;
+                    _CurrentID = _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[id].Options[i].NextID;
                     break;
                 case DialogSystem_DialogOption.Options.NEXT:
-                    CurrentID.y++;
+                    _CurrentID.y++;
                     break;
             }
             break;
@@ -78,7 +72,7 @@ public class DialogSystem : MonoBehaviour
 
     public void Next()
     {
-        CurrentID.y++;
+        _CurrentID.y++;
     }
 }
 
@@ -108,8 +102,10 @@ public class DialogSystem_DialogOptions
 [System.Serializable]
 public class DialogSystem_DialogOption
 {
+    //Options
     public enum Options {GOTO, NEXT};
     public Options Option;
 
+    //EventData
     public Vector2Int NextID = new Vector2Int();
 }

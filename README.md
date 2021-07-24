@@ -73,6 +73,7 @@ Feel free to use/copy files from this project._
 - [DebugCommandBase.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/DebugConsole/DebugCommandBase.cs)
 - [DebugConsole.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/DebugConsole/DebugConsole.cs)
 - [DialogSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/DialogSystem.cs)
+- [DialogSystemEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/DialogSystemEditor.cs)
 - [EnemySpawnHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/EnemySpawnHandler.cs)
 - [Health.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/Health.cs)
 - [Interactable.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/Interactable.cs)
