@@ -1,0 +1,178 @@
+{
+    "DialogNameID": "SavedDialogFileExample",
+    "DialogTree": [
+        {
+            "DialogTreeInfo": "",
+            "Dialog": [
+                {
+                    "Dialog": "Never gonna give you up",
+                    "Options": [
+                        {
+                            "OptionInfo": "Never gonna let you down",
+                            "Options": [
+                                {
+                                    "Option": 1,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        },
+                        {
+                            "OptionInfo": "Never gonna let you drown",
+                            "Options": [
+                                {
+                                    "Option": 0,
+                                    "NextID": {
+                                        "x": 2,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        },
+                        {
+                            "OptionInfo": "Please stop....",
+                            "Options": [
+                                {
+                                    "Option": 0,
+                                    "NextID": {
+                                        "x": 1,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        }
+                    ]
+                },
+                {
+                    "Dialog": "Never gonna run around and desert you",
+                    "Options": []
+                },
+                {
+                    "Dialog": "Never gonna make you cry",
+                    "Options": []
+                },
+                {
+                    "Dialog": "Never gonna finish this song.",
+                    "Options": [
+                        {
+                            "OptionInfo": "Oke1",
+                            "Options": [
+                                {
+                                    "Option": 2,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        },
+                        {
+                            "OptionInfo": "Oke2",
+                            "Options": [
+                                {
+                                    "Option": 2,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        },
+                        {
+                            "OptionInfo": "Oke3",
+                            "Options": [
+                                {
+                                    "Option": 2,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        },
+                        {
+                            "OptionInfo": "Back to start",
+                            "Options": [
+                                {
+                                    "Option": 0,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "DialogTreeInfo": "",
+            "Dialog": [
+                {
+                    "Dialog": "Oke :(",
+                    "Options": [
+                        {
+                            "OptionInfo": "Finish",
+                            "Options": [
+                                {
+                                    "Option": 2,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": false
+                        },
+                        {
+                            "OptionInfo": "Back to start",
+                            "Options": [
+                                {
+                                    "Option": 0,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "DialogTreeInfo": "",
+            "Dialog": [
+                {
+                    "Dialog": "Wrong",
+                    "Options": [
+                        {
+                            "OptionInfo": "Try again",
+                            "Options": [
+                                {
+                                    "Option": 0,
+                                    "NextID": {
+                                        "x": 0,
+                                        "y": 0
+                                    }
+                                }
+                            ],
+                            "OptionToggle": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

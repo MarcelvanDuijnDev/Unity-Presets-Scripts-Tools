@@ -15,24 +15,25 @@ public class DialogSystem : MonoBehaviour
     [SerializeField] private List<GameObject> _OptionsButtons = new List<GameObject>();
 
     [Header("Dialog")]
-    public List<DialogSystem_DialogTree> _Dialog = new List<DialogSystem_DialogTree>();
+    public DialogSystem_File _Dialog;
 
     //Private variables
     private Vector2Int _CurrentID = new Vector2Int(0, 0);
+    private bool _Finished;
 
     void Update()
     {
-        _DialogText.text = _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Dialog;
+        _DialogText.text = _Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Dialog;
 
         // Option Buttons 
         for (int i = 0; i < _OptionsButtons.Count; i++)
         {
-            if (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options.Count != 0)
+            if (_Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options.Count != 0)
             {
-                if (i < _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options.Count)
+                if (i < _Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options.Count)
                 {
                     _OptionsButtons[i].SetActive(true);
-                    _OptionsText[i].text = _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[i].OptionInfo;
+                    _OptionsText[i].text = _Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options[i].OptionInfo;
                 }
                 else
                     _OptionsButtons[i].SetActive(false);
@@ -42,28 +43,42 @@ public class DialogSystem : MonoBehaviour
         }
 
         // NextButton
-        if (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options != null)
+        if (_Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options != null)
         {
-            if (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options.Count == 0)
-                _NextButton.enabled = true;
+            if (_Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options.Count == 0)
+                _NextButton.gameObject.SetActive(true);
             else
-                _NextButton.enabled = false;
+                _NextButton.gameObject.SetActive(false);
         }
         else
-            _NextButton.enabled = false;
+            _NextButton.gameObject.SetActive(false);
+
+        //Done
+        if(_Finished)
+        {
+            _NextButton.gameObject.SetActive(false);
+            for (int i = 0; i < _OptionsButtons.Count; i++)
+            {
+                _OptionsButtons[i].SetActive(false);
+            }
+            _DialogText.text = "Finished";
+        }
     }
 
     public void ButtonInput(int id)
     {
-        for (int i = 0; i < _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[id].Options.Count; i++)
+        for (int i = 0; i < _Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options[id].Options.Count; i++)
         {
-            switch (_Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[id].Options[i].Option)
+            switch (_Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options[id].Options[i].Option)
             {
                 case DialogSystem_DialogOption.Options.GOTO:
-                    _CurrentID = _Dialog[_CurrentID.x].DialogTree[_CurrentID.y].Options[id].Options[i].NextID;
+                    _CurrentID = _Dialog.DialogTree[_CurrentID.x].Dialog[_CurrentID.y].Options[id].Options[i].NextID;
                     break;
                 case DialogSystem_DialogOption.Options.NEXT:
                     _CurrentID.y++;
+                    break;
+                case DialogSystem_DialogOption.Options.FINISHED:
+                    _Finished = true;
                     break;
             }
             break;
@@ -77,10 +92,17 @@ public class DialogSystem : MonoBehaviour
 }
 
 [System.Serializable]
+public class DialogSystem_File
+{
+    public string DialogNameID;
+    public List<DialogSystem_DialogTree> DialogTree = new List<DialogSystem_DialogTree>();
+}
+
+[System.Serializable]
 public class DialogSystem_DialogTree
 {
     public string DialogTreeInfo = "";
-    public List<DialogSystem_Dialog> DialogTree = new List<DialogSystem_Dialog>();
+    public List<DialogSystem_Dialog> Dialog = new List<DialogSystem_Dialog>();
 }
 
 [System.Serializable]
@@ -103,7 +125,7 @@ public class DialogSystem_DialogOptions
 public class DialogSystem_DialogOption
 {
     //Options
-    public enum Options {GOTO, NEXT};
+    public enum Options {GOTO, NEXT, FINISHED};
     public Options Option;
 
     //EventData
