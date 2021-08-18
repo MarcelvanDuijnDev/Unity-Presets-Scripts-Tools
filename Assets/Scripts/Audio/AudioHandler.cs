@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
@@ -16,10 +16,10 @@ public class AudioHandler : MonoBehaviour
 
     private string _CurrentScene;
 
-    //You can call AudioHandler.AUDIO from every script as long as you have the script in the scene
+    //You can call AudioHandler.AUDIO from every script as long as you have the script in the scene.
     public static AudioHandler AUDIO;
 
-    void Start()
+    void Awake()
     {
         AUDIO = this;
 
@@ -69,6 +69,12 @@ public class AudioHandler : MonoBehaviour
 
         for (int i = 0; i < _Sound.Count; i++)
         {
+            if(!_Sound[i].AudioEffects.FadingIn && !_Sound[i].AudioEffects.FadingOut)
+            {
+                _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
+                continue;
+            }
+
             //FadeIn
             if (_Sound[i].AudioEffects.FadingIn)
             {
@@ -151,6 +157,10 @@ public class AudioHandler : MonoBehaviour
             }
         }
     }
+    private void AudioHandler_PlayTrack(int trackid)
+    {
+        _Sound[trackid].Settings.AudioSource.Play();
+    }
 
     /// <summary>Plays the audiotrack.</summary>
     public void PlayTrack(string trackname)
@@ -161,6 +171,11 @@ public class AudioHandler : MonoBehaviour
                 AudioHandler_PlayTrack(i);
         }
     }
+    public void PlayTrack(int trackid)
+    {
+        AudioHandler_PlayTrack(trackid);
+    }
+
     /// <summary>Plays the audiotrack if it's not playing yet.</summary>
     public void StartTrack(string trackname)
     {
@@ -171,6 +186,13 @@ public class AudioHandler : MonoBehaviour
                     AudioHandler_PlayTrack(i);
         }
     }
+    public void StartTrack(int trackid)
+    {
+        if (!_Sound[trackid].Settings.AudioSource.isPlaying)
+            AudioHandler_PlayTrack(trackid);
+    }
+
+    /// <summary>Stops the audiotrack.</summary>
     public void StopTrack(string trackname)
     {
         for (int i = 0; i < _Sound.Count; i++)
@@ -179,6 +201,12 @@ public class AudioHandler : MonoBehaviour
                 _Sound[i].Settings.AudioSource.Stop();
         }
     }
+    public void StopTrack(int trackid)
+    {
+        _Sound[trackid].Settings.AudioSource.Stop();
+    }
+
+    /// <summary>Returns audio file name.</summary>
     public string Get_Track_AudioFileName(string trackname)
     {
         for (int i = 0; i < _Sound.Count; i++)
@@ -188,11 +216,65 @@ public class AudioHandler : MonoBehaviour
         }
         return "No AudioClip detected";
     }
-
-    private void AudioHandler_PlayTrack(int trackid)
+    public string Get_Track_AudioFileName(int trackid)
     {
-        _Sound[trackid].Settings.AudioSource.Play();
+        return _Sound[trackid].Settings.AudioClip.name;
     }
+
+    /// <summary>Set audiosource.</summary>
+    public void SetAudioSource(string trackname, AudioSource audiosource)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+                _Sound[i].Settings.AudioSource = audiosource;
+        }
+    }
+    public void SetAudioSource(int trackid, AudioSource audiosource)
+    {
+        _Sound[trackid].Settings.AudioSource = audiosource;
+    }
+
+    /// <summary>Set track volume.</summary>
+    public void SetTrackVolume(string trackname, float volume, bool checkmaxvolume)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+            {
+                if (!checkmaxvolume)
+                    _Sound[i].AudioSettings.Volume = volume;
+                else
+                    if (volume >= _Sound[i].AudioSettings.MaxVolume)
+                    _Sound[i].AudioSettings.Volume = _Sound[i].AudioSettings.MaxVolume;
+                else
+                    _Sound[i].AudioSettings.Volume = volume;
+                break;
+            }
+        }
+    }
+    public void SetTrackVolume(int trackid, float volume, bool checkmaxvolume)
+    {
+        if (!checkmaxvolume)
+            _Sound[trackid].AudioSettings.Volume = volume;
+        else if (volume >= _Sound[trackid].AudioSettings.MaxVolume)
+            _Sound[trackid].AudioSettings.Volume = _Sound[trackid].AudioSettings.MaxVolume;
+        else
+            _Sound[trackid].AudioSettings.Volume = volume;
+    }
+
+    /// <summary>Returns track id.</summary>
+    public int Get_Track_ID(string trackname)
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioTrackName == trackname)
+                return i;
+        }
+        return 0;
+    }
+
+    /// <summary>Refresh settings.</summary>
     public void RefreshSettings()
     {
         for (int i = 0; i < _Sound.Count; i++)
@@ -207,14 +289,7 @@ public class AudioHandler : MonoBehaviour
         }
     }
 
-    public void SetAudioSource(string trackname, AudioSource audiosource)
-    {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-                _Sound[i].Settings.AudioSource = audiosource;
-        }
-    }
+
 }
 
 [System.Serializable]
@@ -244,6 +319,7 @@ public class AudioHandler_AudioSettings
 {
     [Header("AudioSettings")]
     [Range(0, 1)] public float Volume;
+    [Range(0, 1)] public float MaxVolume;
     public bool Loop;
     public bool PlayOnStart;
 }

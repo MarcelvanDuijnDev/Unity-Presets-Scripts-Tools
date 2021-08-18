@@ -19,6 +19,7 @@ Feel free to use/copy files from this project._
 * [Editor](#editor)
 * [Saving / Loading Data](#saving--loading-data)
 * [Networking](#networking)
+* [Audio](#audio)
 * [Useful](#useful)
 * [Examples](#examples)
 * [Practical](#practical)
@@ -60,7 +61,6 @@ Feel free to use/copy files from this project._
 
 # Saving / Loading Data
 - [Read_ExcelFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/ReadWriteFiles/Read_ExcelFile.cs)
-- [ReadAudioFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/ReadAudioFile.cs)
 - [ReadWrite_TextFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/ReadWriteFiles/ReadWrite_TextFile.cs)
 - [SaveLoad_JSON.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/ReadWriteFiles/SaveLoad_JSON.cs)
 - [SaveLoad_XML.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/ReadWriteFiles/SaveLoad_XML.cs)
@@ -68,8 +68,13 @@ Feel free to use/copy files from this project._
 # Networking
 - [ReadTwitchChat.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Networking/ReadTwitchChat.cs)
 
+# Audio
+- [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs)
+- [AudioZoneBox.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZoneBox.cs)
+- [AudioZoneSphere.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZoneSphere.cs)
+- [ReadAudioFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/ReadAudioFile.cs)
+
 # Useful
-- [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/AudioHandler.cs)
 - [DebugCommandBase.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/DebugConsole/DebugCommandBase.cs)
 - [DebugConsole.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/DebugConsole/DebugConsole.cs)
 - [DialogSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/DialogSystem.cs)
