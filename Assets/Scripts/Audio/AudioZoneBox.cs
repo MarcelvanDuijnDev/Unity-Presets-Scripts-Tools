@@ -4,6 +4,10 @@ using UnityEditor.IMGUI.Controls;
 
 public class AudioZoneBox : MonoBehaviour
 {
+    private enum Options { SetVolume, VolumeOnDistance };
+    [Header("Type")]
+    [SerializeField] private Options _Option = Options.SetVolume;
+
     [Header("Target")]
     [SerializeField] private Transform _ZoneEffector = null;
 
@@ -11,9 +15,6 @@ public class AudioZoneBox : MonoBehaviour
     [SerializeField] private string _AudioTrack = "";
     [SerializeField] private float _Volume = 1;
 
-    [Header("Settings - Options")]
-    [SerializeField] private bool _SetVolumeOnEnter = true;
-    [SerializeField] private bool _VolumeOnDistance = false;
     [Tooltip("1 = volume from 0 to max based on how close the effector is to the center.")]
     [SerializeField] private float _IncreaseMultiplier = 1;
 
@@ -54,16 +55,16 @@ public class AudioZoneBox : MonoBehaviour
     {
         if (Bounds.Contains(_ZoneEffector.position))
         {
-            if (_SetVolumeOnEnter)
+            switch(_Option)
             {
-                AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, _Volume, true);
-            }
-
-            if (_VolumeOnDistance)
-            {
-                float distance = Vector3.Distance(_Bounds.center, _ZoneEffector.position);
-                float newvolume = (1 - (distance / _MaxDistance)) * _Volume * _IncreaseMultiplier;
-                AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, newvolume, true);
+                case Options.SetVolume:
+                    AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, _Volume, true);
+                    break;
+                case Options.VolumeOnDistance:
+                    float distance = Vector3.Distance(_Bounds.center, _ZoneEffector.position);
+                    float newvolume = (1 - (distance / _MaxDistance)) * _Volume * _IncreaseMultiplier;
+                    AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, newvolume, true);
+                    break;
             }
 
             // Check Effector OnExit
@@ -84,7 +85,7 @@ public class AudioZoneBox : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = new Vector4(0, 1f, 0, 0.1f);
-        Gizmos.DrawCube(Bounds.center, Bounds.size);
+        Gizmos.DrawCube(transform.position, Bounds.size);
     }
 }
 
