@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.0.7";
+    string _Version = "V1.0.8";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI
@@ -2564,11 +2564,14 @@ public class Tool_QuickStart : EditorWindow
     //UpdateLog
     void UpdateLog()
     {
-        EditorGUILayout.BeginScrollView(_ScrollPos);
+        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
         EditorGUILayout.BeginVertical("box");
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
         GUILayout.Label(
+            "\n" +
+            "V1.0.8 (22-aug-2021)\n" +
+            "* Fix update log not scrolling\n" +
             "\n" +
             "V1.0.7 (20-aug-2021)\n" +
             "* Updated AudioZoneBox.cs\n" +

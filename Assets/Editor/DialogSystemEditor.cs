@@ -29,6 +29,9 @@ class DialogSystemEditor : EditorWindow
 
         GUILayout.Label("Dialog Editor", EditorStyles.boldLabel);
         _Dialog = EditorGUILayout.ObjectField(_Dialog, typeof(DialogSystem), true) as DialogSystem;
+
+        if (_Dialog == null)
+            return;
         _Dialog._Dialog.DialogNameID = EditorGUILayout.TextField("DialogName",_Dialog._Dialog.DialogNameID);
 
         EditorGUILayout.BeginHorizontal("box");
