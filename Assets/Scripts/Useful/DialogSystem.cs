@@ -81,7 +81,6 @@ public class DialogSystem : MonoBehaviour
                     _Finished = true;
                     break;
             }
-            break;
         }
     }
 
