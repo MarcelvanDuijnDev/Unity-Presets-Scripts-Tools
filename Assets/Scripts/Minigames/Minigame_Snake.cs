@@ -48,7 +48,6 @@ public class Minigame_Snake : MonoBehaviour
         //CreateField
         StartCoroutine(CreateField());
     }
-
     void Update()
     {
         if (_GameRunning)
@@ -192,8 +191,6 @@ public class Minigame_Snake : MonoBehaviour
                 _SnakeObjects[x, y] = cube;
                 _SnakeObjects[x, y].SetActive(false);
             }
-
-
         _GameRunning = true;
         yield return new WaitForSeconds(1f);
         SetPickupLocation();

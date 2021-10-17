@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.0.10";
+    string _Version = "V1.0.11";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI
@@ -91,6 +91,9 @@ public class Tool_QuickStart : EditorWindow
         new Tool_QuickStart_Script("Turret",                    "Turret_Shooting",              "stable",     "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Turret : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private Vector2 _MinMaxRange = Vector2.zero;\n    [SerializeField] private float _SecondsBetweenShots = 2;\n    [SerializeField] private float _Damage = 25;\n    [SerializeField] private GameObject _ShootPart = null;\n    [SerializeField] private string _Tag = \"Enemy\";\n    \n    private float _Timer;\n    private GameObject _Target;\n\n    void Update()\n    {\n        if (_Target != null)\n        {\n            _ShootPart.transform.LookAt(_Target.transform.position);\n            _Timer += 1 * Time.deltaTime;\n            if (_Timer >= _SecondsBetweenShots)\n            {\n                _Target.GetComponent<Health>().DoDamage(_Damage);\n                _Timer = 0;\n            }\n        }\n        else\n        {\n            _ShootPart.transform.rotation = Quaternion.Euler(90, 0, 0);\n        }\n\n        _Target = FindEnemy();\n    }\n\n    public GameObject FindEnemy()\n    {\n        GameObject[] m_Targets = GameObject.FindGameObjectsWithTag(_Tag);\n        GameObject closest = null;\n        float distance = Mathf.Infinity;\n        Vector3 position = transform.position;\n\n        _MinMaxRange.x = _MinMaxRange.x * _MinMaxRange.x;\n        _MinMaxRange.y = _MinMaxRange.y * _MinMaxRange.y;\n        foreach (GameObject target in m_Targets)\n        {\n            Vector3 diff = target.transform.position - position;\n            float curDistance = diff.sqrMagnitude;\n            if (curDistance < distance && curDistance >= _MinMaxRange.x && curDistance <= _MinMaxRange.y)\n            {\n                closest = target;\n                distance = curDistance;\n            }\n        }\n        return closest;\n    }\n}\n"),
         new Tool_QuickStart_Script("UIEffects",                 "UI_Effect",                    "stable",     "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n    [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f,1f,1.1f);\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MinDefaultMaxSize.z)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.y, _OriginalSize.z, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinDefaultMaxSize.x)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.x)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n")
     };
+    bool[] _AddMultipleScripts = new bool[0];
+    bool _AddMultipleScriptsActive = false;
+    int _AddMultipleScripts_SelectAmount = 0;
 
     //Settings
     int _CreateSceneOptions = 0;
@@ -685,19 +688,43 @@ public class Tool_QuickStart : EditorWindow
         if (GUILayout.Button("Refresh"))
             SearchScripts();
 
+        //MultiSelect
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Add Multiple: ", GUILayout.Width(75));
+        _AddMultipleScriptsActive = EditorGUILayout.Toggle(_AddMultipleScriptsActive, GUILayout.Width(70));
+
+        //MultiSelect Buttons
+        if (_AddMultipleScriptsActive)
+        {
+            //Add Selected
+            if (GUILayout.Button("Add Selected", GUILayout.Width(100)))
+                for (int i = 0; i < _AddMultipleScripts.Length; i++)
+                    if (_AddMultipleScripts[i])
+                        AddScript(i);
+            //DeSelect
+            if (GUILayout.Button("DeSelect (" + _AddMultipleScripts_SelectAmount.ToString() + ")", GUILayout.Width(100)))
+                for (int i = 0; i < _AddMultipleScripts.Length; i++)
+                    _AddMultipleScripts[i] = false;
+        }
+        EditorGUILayout.EndHorizontal();
+
         //Search Options
         _Search_Script = EditorGUILayout.TextField("Search: ", _Search_Script);
         _Search_Tag = EditorGUILayout.TextField("SearchTag: ", _Search_Tag);
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
 
         //Quickstart Scripts
-        _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ") In Project: " + _Search_InProject_Results.ToString());
+        if (!_AddMultipleScriptsActive)
+            _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ")   ||   In Project: " + _Search_InProject_Results.ToString());
+        else
+            _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ")   ||   In Project: " + _Search_InProject_Results.ToString() + "   ||   Selected: " + _AddMultipleScripts_SelectAmount.ToString());
         if (_Search_QuickStartScripts_Toggle)
         {
             _Search_Results = 0;
             _Search_InProject_Results = 0;
             for (int i = 0; i < QuickStart_Scripts.Length; i++)
             {
+                //Scripts
                 if (_Search_Script == "" || QuickStart_Scripts[i].ScriptName.ToLower().Contains(_Search_Script.ToLower()))
                 {
                     if (QuickStart_Scripts[i].ScriptTag.ToLower().Contains(_Search_Tag.ToLower()) || QuickStart_Scripts[i].ScriptTag == "" || QuickStart_Scripts[i].ScriptTag == null)
@@ -718,9 +745,19 @@ public class Tool_QuickStart : EditorWindow
                         EditorGUILayout.BeginHorizontal("Box");
 
                         if (Screen.width <= 325)
-                            EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 130));
+                        {
+                            if (_AddMultipleScriptsActive)
+                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 150));
+                            else
+                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 135));
+                        }
                         else
-                            EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 180));
+                        {
+                            if (_AddMultipleScriptsActive)
+                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 205));
+                            else
+                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 190));
+                        }
 
                         if (Screen.width > 325)
                             EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptState, EditorStyles.miniLabel, GUILayout.Width(50));
@@ -744,8 +781,20 @@ public class Tool_QuickStart : EditorWindow
                         if (GUILayout.Button("Add", GUILayout.Width(50)))
                             AddScript(i);
                         EditorGUI.EndDisabledGroup();
+
+                        //Add Multiple
+                        if (_AddMultipleScriptsActive)
+                            _AddMultipleScripts[i] = EditorGUILayout.Toggle(_AddMultipleScripts[i]);
                         EditorGUILayout.EndHorizontal();
                     }
+                }
+
+                //SelectAmount
+                _AddMultipleScripts_SelectAmount = 0;
+                for (int j = 0; j < _AddMultipleScripts.Length; j++)
+                {
+                    if (_AddMultipleScripts[j])
+                        _AddMultipleScripts_SelectAmount++;
                 }
             }
         }
@@ -841,6 +890,10 @@ public class Tool_QuickStart : EditorWindow
         {
             QuickStart_Scripts[i].Exist = checkexist[i];
         }
+
+        //Set 
+        if (_AddMultipleScripts.Length == 0)
+            _AddMultipleScripts = new bool[QuickStart_Scripts.Length];
 
         //Scripts Project
         _Project_Scripts = System.IO.Directory.GetFiles("Assets/", "*.cs", System.IO.SearchOption.AllDirectories);
@@ -2401,7 +2454,7 @@ public class Tool_QuickStart : EditorWindow
     void OnSceneGUI(SceneView sceneView)
     {
         //MapEditor
-        if (_WindowID == 3)
+        if (_WindowID == 4)
         {
             Event e = Event.current;
             Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
@@ -2584,7 +2637,7 @@ public class Tool_QuickStart : EditorWindow
     //OnScene
     void OnScene(SceneView sceneView)
     {
-        if (_WindowID == 3)
+        if (_WindowID == 4)
         {
             //InScene Option Bar
             Handles.BeginGUI();
@@ -2668,9 +2721,19 @@ public class Tool_QuickStart : EditorWindow
     {
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
         EditorGUILayout.BeginVertical("box");
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Github"))
+            Application.OpenURL("https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools");
+        EditorGUILayout.EndHorizontal();
+
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
         GUILayout.Label(
+            "\n" +
+            "V1.0.11 (17-oct-2021)\n" +
+            "* Added Multi Select option\n" +
+            "* Fix MapEditor not working \n" +
             "\n" +
             "V1.0.10 (15-oct-2021)\n" +
             "* Updated AudioHandler code\n" +
@@ -2712,10 +2775,7 @@ public class Tool_QuickStart : EditorWindow
             "* Start QuickStart update log \n" +
             "* Added Scripts\n" +
             "* Fixed Scripts formating\n" +
-            "* Refactor Script To String (STS)\n" +
-            "\n" +
-            "\n" +
-            "");
+            "* Refactor Script To String (STS)");
 
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndScrollView();
