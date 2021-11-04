@@ -68,7 +68,7 @@ public class InteractionHandler : MonoBehaviour
             }
         }
 
-        if(_ActiveObject != null)
+        if(_ActiveObject != null && _Interactable != null)
         {
             if (_Interactable._Type != Interactable.InteractableType.Item)
             {

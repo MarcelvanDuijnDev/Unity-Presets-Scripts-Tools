@@ -42,13 +42,13 @@ public class Interactable : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private Rigidbody _RB;
     private Vector3 _DefaultLocalPosition;
-    private Vector3 _DefaultPosition;
+    private Vector3 _DefaultRotation;
     private bool _MovingBack;
 
     private void Start()
     {
         _DefaultLocalPosition = transform.localPosition;
-        _DefaultPosition = transform.position;
+        _DefaultRotation = transform.eulerAngles;
         _RB = GetComponent<Rigidbody>();
         if (_Type == InteractableType.SetLight || _Type == InteractableType.SetLightNegative)
         {
@@ -68,6 +68,7 @@ public class Interactable : MonoBehaviour
 
         if (_MovingBack)
         {
+            transform.eulerAngles = _DefaultRotation;
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, _DefaultLocalPosition, 10 * Time.deltaTime);
             if (transform.localPosition == _DefaultLocalPosition)
                 _MovingBack = false;
