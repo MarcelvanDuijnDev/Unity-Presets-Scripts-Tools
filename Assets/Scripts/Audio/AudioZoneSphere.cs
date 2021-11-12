@@ -17,28 +17,36 @@ public class AudioZoneSphere : MonoBehaviour
     [Tooltip("1 = volume from 0 to max based on how close the effector is to the center.")]
     [SerializeField] private float _IncreaseMultiplier = 1;
 
+    [Header("3D Audio")]
+    [SerializeField] private bool _Use3DAudio = true;
+    [SerializeField] private bool _UseThisPos = true;
+    [SerializeField] private bool _CreateNewAudioSource = true;
+
     // Check effector leaving bounds
     private bool _EffectorInBounds;
 
     //Bounds
-    public float BoundsRadius;
+    public float BoundsRadius = 5;
     public BoundingSphere Bounds { get { return _Bounds; } set { _Bounds = value; } }
     [SerializeField] private BoundingSphere _Bounds = new BoundingSphere(Vector3.zero, 5);
 
     // Optimization (This way the AudioHandler doesn't have too loop trough the available audiotracks)
     private int _AudioTrackID;
 
-    // AudioHandler Ref
-    private AudioHandler AudioHandler;
-
     // Max distance
     private float _MaxDistance;
 
     void Start()
     {
-        _Bounds = new BoundingSphere(transform.position, BoundsRadius);
+        //3D Audio
+        if (_Use3DAudio)
+        {
+            if(_CreateNewAudioSource)
+                _AudioTrack = AudioHandler.AUDIO.DuplicateAudioTrack(_AudioTrack);
 
-        AudioHandler = AudioHandler.AUDIO;
+            if (_UseThisPos)
+                AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrack, transform.position);
+        }
 
         if (_ZoneEffector == null)
         {
@@ -88,6 +96,7 @@ public class AudioZoneSphere : MonoBehaviour
     {
         Gizmos.color = new Vector4(0, 1f, 0, 0.1f);
         Gizmos.DrawSphere(transform.position, Bounds.radius);
+        _Bounds.radius = BoundsRadius;
     }
 }
 

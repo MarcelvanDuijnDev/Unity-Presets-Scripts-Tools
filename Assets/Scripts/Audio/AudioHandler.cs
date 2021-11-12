@@ -29,12 +29,38 @@ public class AudioHandler : MonoBehaviour
             //AudioSource
             if (_Sound[i].Settings.CreateAudioSource)
             {
-                _Sound[i].Settings.AudioSource = this.gameObject.AddComponent<AudioSource>();
+                //3D Space
+                if (_Sound[i].Audio3D.Enable3DAudio)
+                {
+                    //Create new object
+                    GameObject audiopos = new GameObject("Audio_" + _Sound[i].AudioTrackName);
+
+                    //Set audiopos position
+                    if (_Sound[i].Audio3D.SpatialTransform != null)
+                        audiopos.transform.position = _Sound[i].Audio3D.SpatialTransform.position;
+                    else
+                        audiopos.transform.position = _Sound[i].Audio3D.SpatialPosition;
+                    audiopos.transform.parent = this.gameObject.transform;
+
+                    //Add AudioSource to audioposition
+                    _Sound[i].Settings.AudioSource = audiopos.AddComponent<AudioSource>();
+                }
+
+                //SetVolume
+                _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
+
+                //AudioMixer
                 _Sound[i].Settings.AudioSource.outputAudioMixerGroup = _AudioMixer;
 
                 //AudioGroup
                 if (_Sound[i].Settings.AudioGroup != null)
                     _Sound[i].Settings.AudioSource.outputAudioMixerGroup = _Sound[i].Settings.AudioGroup;
+            }
+
+            //3D Space Settings
+            if (_Sound[i].Audio3D.Enable3DAudio)
+            {
+                _Sound[i].Settings.AudioSource.spatialBlend = 1;
             }
 
             //AudioClip
@@ -69,12 +95,6 @@ public class AudioHandler : MonoBehaviour
 
         for (int i = 0; i < _Sound.Count; i++)
         {
-            if(!_Sound[i].AudioEffects.FadingIn && !_Sound[i].AudioEffects.FadingOut)
-            {
-                _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
-                continue;
-            }
-
             //FadeIn
             if (_Sound[i].AudioEffects.FadingIn)
             {
@@ -289,7 +309,92 @@ public class AudioHandler : MonoBehaviour
         }
     }
 
+    /// <summary>Duplicate AudioTrack.</summary>
+    public string DuplicateAudioTrack(string trackname)
+    {
+        int audioid = Get_Track_ID(trackname);
 
+        AudioHandler_Sound newsound = new AudioHandler_Sound();
+        GameObject newaudiopos = new GameObject();
+
+        newsound.AudioTrackName = "Audio_" + _Sound[audioid].AudioTrackName;
+
+        //Settings
+        newsound.Settings = new AudioHandler_Settings();
+        newsound.Settings.AudioClip = _Sound[audioid].Settings.AudioClip;
+        newsound.Settings.AudioGroup = _Sound[audioid].Settings.AudioGroup;
+        newsound.Settings.AudioSource = newaudiopos.AddComponent<AudioSource>();
+        newsound.Settings.CreateAudioSource = _Sound[audioid].Settings.CreateAudioSource;
+
+        //Control
+        newsound.AudioControl = new AudioHandler_Control();
+        newsound.AudioControl.SceneEnabled = _Sound[audioid].AudioControl.SceneEnabled;
+        newsound.AudioControl.StartAudioOnScene = _Sound[audioid].AudioControl.StartAudioOnScene;
+        newsound.AudioControl.StopAudioOnScene = _Sound[audioid].AudioControl.StopAudioOnScene;
+        newsound.AudioControl.StopOnNextScene = _Sound[audioid].AudioControl.StopOnNextScene;
+
+        //Audio3D
+        newsound.Audio3D = new AudioHandler_3DAudio();
+        newsound.Audio3D.Enable3DAudio = _Sound[audioid].Audio3D.Enable3DAudio;
+        newsound.Audio3D.SpatialPosition = _Sound[audioid].Audio3D.SpatialPosition;
+        newsound.Audio3D.SpatialTransform = _Sound[audioid].Audio3D.SpatialTransform;
+
+        //AudioSettings
+        newsound.AudioSettings = new AudioHandler_AudioSettings();
+        newsound.AudioSettings.Loop = _Sound[audioid].AudioSettings.Loop;
+        newsound.AudioSettings.MaxVolume = _Sound[audioid].AudioSettings.MaxVolume;
+        newsound.AudioSettings.PlayOnStart = _Sound[audioid].AudioSettings.PlayOnStart;
+        newsound.AudioSettings.Volume = _Sound[audioid].AudioSettings.Volume;
+
+        //AudioEffect
+        newsound.AudioEffects = new AudioHandler_Effects();
+        newsound.AudioEffects.FadeIn = _Sound[audioid].AudioEffects.FadeIn;
+        newsound.AudioEffects.FadeInDone = _Sound[audioid].AudioEffects.FadeInDone;
+        newsound.AudioEffects.FadeInDuration = _Sound[audioid].AudioEffects.FadeInDuration;
+        newsound.AudioEffects.FadeInSpeed = _Sound[audioid].AudioEffects.FadeInSpeed;
+        newsound.AudioEffects.FadeOut = _Sound[audioid].AudioEffects.FadeOut;
+        newsound.AudioEffects.FadeOutAfterTime = _Sound[audioid].AudioEffects.FadeOutAfterTime;
+        newsound.AudioEffects.FadeOutDone = _Sound[audioid].AudioEffects.FadeOutDone;
+        newsound.AudioEffects.FadeOutDuration = _Sound[audioid].AudioEffects.FadeOutDuration;
+        newsound.AudioEffects.FadeOutSpeed = _Sound[audioid].AudioEffects.FadeOutSpeed;
+        newsound.AudioEffects.FadingIn = _Sound[audioid].AudioEffects.FadingIn;
+        newsound.AudioEffects.FadingOut = _Sound[audioid].AudioEffects.FadingOut;
+
+        newsound.AudioTrackName += "_" + _Sound.Count.ToString();
+
+        //Activate Settings
+        newsound.Settings.AudioSource.loop = newsound.AudioSettings.Loop;
+        newsound.Settings.AudioSource.volume = newsound.AudioSettings.Volume;
+        if (newsound.Audio3D.Enable3DAudio)
+            newsound.Settings.AudioSource.spatialBlend = 1;
+        if (newsound.AudioSettings.PlayOnStart)
+            newsound.Settings.AudioSource.Play();
+
+        //Create new object
+        newaudiopos.transform.name = newsound.AudioTrackName;
+
+        //Audio Source Settings
+        newsound.Settings.AudioSource.clip = newsound.Settings.AudioClip;
+        newsound.Settings.AudioSource.outputAudioMixerGroup = newsound.Settings.AudioGroup;
+
+        //Position
+        if (newsound.Audio3D.SpatialTransform != null)
+            ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialTransform.position);
+        else
+            ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialPosition);
+
+        //Apply
+        newaudiopos.transform.parent = this.transform;
+        _Sound.Add(newsound);
+        return newsound.AudioTrackName;
+    }
+
+    /// <summary>Change AudioSource Position.</summary>
+    public void ChangeAudioPosition(string trackname, Vector3 newpos)
+    {
+        int audioid = Get_Track_ID(trackname);
+        _Sound[audioid].Settings.AudioSource.transform.position = newpos;
+    }
 }
 
 [System.Serializable]
@@ -298,6 +403,7 @@ public class AudioHandler_Sound
     public string AudioTrackName;
     public AudioHandler_Settings Settings;
     public AudioHandler_AudioSettings AudioSettings;
+    public AudioHandler_3DAudio Audio3D;
     public AudioHandler_Control AudioControl;
     public AudioHandler_Effects AudioEffects;
 }
@@ -318,8 +424,8 @@ public class AudioHandler_Settings
 public class AudioHandler_AudioSettings
 {
     [Header("AudioSettings")]
-    [Range(0, 1)] public float Volume;
-    [Range(0, 1)] public float MaxVolume;
+    [Range(0, 1)] public float Volume = 1;
+    [Range(0, 1)] public float MaxVolume = 1;
     public bool Loop;
     public bool PlayOnStart;
 }
@@ -350,4 +456,13 @@ public class AudioHandler_Effects
     [HideInInspector] public float FadeOutSpeed;
     [HideInInspector] public bool FadeOutDone;
     [HideInInspector] public bool FadingOut;
+}
+
+[System.Serializable]
+public class AudioHandler_3DAudio
+{
+    [Header("3D Space / (0,0,0)+null = this object position")]
+    public bool Enable3DAudio;
+    public Vector3 SpatialPosition;
+    public Transform SpatialTransform;
 }
