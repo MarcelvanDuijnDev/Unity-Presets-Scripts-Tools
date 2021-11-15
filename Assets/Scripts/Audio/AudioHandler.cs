@@ -67,19 +67,22 @@ public class AudioHandler : MonoBehaviour
             _Sound[i].Settings.AudioSource.clip = _Sound[i].Settings.AudioClip;
 
             //Settings
-            if (_Sound[i].AudioSettings.PlayOnStart)
+            if (!_Sound[i].AudioSettings.PlayOnStart_DiplicateOnly)
             {
-                _Sound[i].Settings.AudioSource.playOnAwake = _Sound[i].AudioSettings.PlayOnStart;
-                _Sound[i].Settings.AudioSource.Play();
-            }
-            if (_Sound[i].AudioEffects.FadeIn)
-            {
-                _Sound[i].Settings.AudioSource.volume = 1;
-                _Sound[i].AudioEffects.FadeInSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeInDuration;
-            }
-            if (_Sound[i].AudioEffects.FadeOut)
-            {
-                _Sound[i].AudioEffects.FadeOutSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeOutDuration;
+                if (_Sound[i].AudioSettings.PlayOnStart)
+                {
+                    _Sound[i].Settings.AudioSource.playOnAwake = _Sound[i].AudioSettings.PlayOnStart;
+                    _Sound[i].Settings.AudioSource.Play();
+                }
+                if (_Sound[i].AudioEffects.FadeIn)
+                {
+                    _Sound[i].Settings.AudioSource.volume = 1;
+                    _Sound[i].AudioEffects.FadeInSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeInDuration;
+                }
+                if (_Sound[i].AudioEffects.FadeOut)
+                {
+                    _Sound[i].AudioEffects.FadeOutSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeOutDuration;
+                }
             }
         }
 
@@ -383,6 +386,10 @@ public class AudioHandler : MonoBehaviour
         else
             ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialPosition);
 
+        //PlayOnStart
+        if (newsound.AudioSettings.PlayOnStart)
+            newsound.Settings.AudioSource.Play();
+
         //Apply
         newaudiopos.transform.parent = this.transform;
         _Sound.Add(newsound);
@@ -428,6 +435,7 @@ public class AudioHandler_AudioSettings
     [Range(0, 1)] public float MaxVolume = 1;
     public bool Loop;
     public bool PlayOnStart;
+    public bool PlayOnStart_DiplicateOnly;
 }
 
 [System.Serializable]
