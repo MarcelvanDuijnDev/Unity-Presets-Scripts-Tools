@@ -45,6 +45,8 @@ public class AudioHandler : MonoBehaviour
                     //Add AudioSource to audioposition
                     _Sound[i].Settings.AudioSource = audiopos.AddComponent<AudioSource>();
                 }
+                else
+                    _Sound[i].Settings.AudioSource = this.gameObject.AddComponent<AudioSource>();
 
                 //SetVolume
                 _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;

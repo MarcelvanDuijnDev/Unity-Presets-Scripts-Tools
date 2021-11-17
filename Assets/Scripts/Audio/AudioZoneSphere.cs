@@ -92,6 +92,15 @@ public class AudioZoneSphere : MonoBehaviour
         }
     }
 
+    public void PlayTrack()
+    {
+        AudioHandler.AUDIO.PlayTrack(_AudioTrack);
+    }
+    public void StartTrack()
+    {
+        AudioHandler.AUDIO.StartTrack(_AudioTrack);
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = new Vector4(0, 1f, 0, 0.1f);
