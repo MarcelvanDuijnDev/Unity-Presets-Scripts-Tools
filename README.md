@@ -70,7 +70,6 @@ Feel free to use/copy files from this project._
 
 # Audio
 - [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs)
-- [AudioZoneBox.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZoneBox.cs)
 - [AudioZoneSphere.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZoneSphere.cs)
 - [ReadAudioFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/ReadAudioFile.cs)
 
