@@ -125,7 +125,9 @@ public class Tool_ScriptToString : EditorWindow
         {
             if (filepaths[i].Contains(_InputScript.name + ".cs"))
             {
-                return filepaths[i];
+                string[] filepathsplit = filepaths[i].Split(char.Parse("\\"));
+                if (filepathsplit[filepathsplit.Length-1] == _InputScript.name + ".cs")
+                    return filepaths[i];
             }
         }
         return "";
