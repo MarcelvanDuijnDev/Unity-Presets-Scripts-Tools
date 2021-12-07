@@ -296,7 +296,7 @@ public class AudioHandler : MonoBehaviour
             if (_Sound[i].AudioTrackName == trackname)
                 return i;
         }
-        return 0;
+        return -1;
     }
 
     /// <summary>Refresh settings.</summary>
@@ -318,6 +318,8 @@ public class AudioHandler : MonoBehaviour
     public string DuplicateAudioTrack(string trackname)
     {
         int audioid = Get_Track_ID(trackname);
+        if (audioid == -1)
+            return null;
 
         AudioHandler_Sound newsound = new AudioHandler_Sound();
         GameObject newaudiopos = new GameObject();
@@ -402,7 +404,8 @@ public class AudioHandler : MonoBehaviour
     public void ChangeAudioPosition(string trackname, Vector3 newpos)
     {
         int audioid = Get_Track_ID(trackname);
-        _Sound[audioid].Settings.AudioSource.transform.position = newpos;
+        if (audioid != -1)
+            _Sound[audioid].Settings.AudioSource.transform.position = newpos;
     }
 }
 
