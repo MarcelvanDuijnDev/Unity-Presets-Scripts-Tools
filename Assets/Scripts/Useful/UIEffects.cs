@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private enum UIEffectOptions { Grow, Shrink }
     [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;
+    [SerializeField] private bool _RelativeToOriginalSize = true;
     [SerializeField] private Vector3 _MinDefaultMaxSize = new Vector3(0.9f,1f,1.1f);
     [SerializeField] private float _IncreaseSpeed = 1;
 
@@ -16,6 +15,13 @@ public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     void Start()
     {
         _OriginalSize = transform.localScale;
+
+        if (_RelativeToOriginalSize)
+        {
+            _MinDefaultMaxSize = new Vector3(_OriginalSize.x * _MinDefaultMaxSize.x, _OriginalSize.y, _OriginalSize.z * _MinDefaultMaxSize.z);
+        }
+
+        _IncreaseSpeed = _IncreaseSpeed * ((_OriginalSize.x + _OriginalSize.y + _OriginalSize.z) / 3);
     }
 
     void Update()
