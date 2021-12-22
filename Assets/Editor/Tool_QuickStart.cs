@@ -14,10 +14,10 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.0.17";
+    string _Version = "V1.1.0";
 
     //Navigation Tool
-    int _MenuID = 0;        // QuickStart/Scripts/QuickUI
+    int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
     int _DimensionID = 0;   // 2D/3D
     int _Type2DID = 0;      // Platformer/TopDown/VisualNovel
     int _Type3DID = 0;      // FPS/ThirdPerson/TopDown/Platformer
@@ -132,6 +132,15 @@ public class Tool_QuickStart : EditorWindow
     //Tool Mode
     int _ToolState = 0;
     int _ToolStateCheck = 1;
+
+    //Scene Window
+    bool[] _SceneStructure = new bool[0];
+    string[] _SceneStructureOptions = new string[] {
+    "Essentials",
+    "Canvas",
+    "Map",
+    "Lighting",
+    "Other"};
 
     //FileFinder (FF) ----------------------------------------------
     #region FileFinder
@@ -252,7 +261,7 @@ public class Tool_QuickStart : EditorWindow
             {
                 case 0: //Default
                         //Menu Type
-                    _MenuID = GUILayout.Toolbar(_MenuID, new string[] { "QuickStart", "Scripts", "QuickUI (wip)" });
+                    _MenuID = GUILayout.Toolbar(_MenuID, new string[] { "QuickStart", "Scripts", "QuickUI (wip)", "Scene (wip)" });
                     GUILayout.EndHorizontal();
 
                     switch (_MenuID)
@@ -265,6 +274,9 @@ public class Tool_QuickStart : EditorWindow
                             break;
                         case 2: //QuickUI
                             Menu_QuickUI();
+                            break;
+                        case 3: //Scene
+                            Menu_Scene();
                             break;
                     }
                     break;
@@ -1942,6 +1954,54 @@ public class Tool_QuickStart : EditorWindow
     }
 
 
+    //Home > Scene : Menu
+    void Menu_Scene()
+    {
+        for (int i = 0; i < _SceneStructure.Length; i++)
+        {
+            _SceneStructure[i] = EditorGUILayout.Toggle(_SceneStructureOptions[i], _SceneStructure[i]);
+        }
+
+        if (GUILayout.Button("Add Scene Structure"))
+        {
+            if (_SceneStructure[0])
+                if (GameObject.Find("----- Essentials -----") == null)
+                {
+                    GameObject newobject_essentials = new GameObject();
+                    newobject_essentials.name = "----- Essentials -----";
+                }
+
+            if (_SceneStructure[1])
+                if (GameObject.Find("----- Canvas -----") == null)
+                {
+                    GameObject newobject_canvas = new GameObject();
+                    newobject_canvas.name = "----- Canvas -----";
+                }
+
+            if (_SceneStructure[2])
+                if (GameObject.Find("----- Map -----") == null)
+                {
+                    GameObject newobject_map = new GameObject();
+                    newobject_map.name = "----- Map -----";
+                }
+
+            if (_SceneStructure[3])
+                if (GameObject.Find("----- Lighting -----") == null)
+                {
+                    GameObject newobject_lighting = new GameObject();
+                    newobject_lighting.name = "----- Lighting -----";
+                }
+
+            if (_SceneStructure[4])
+                if (GameObject.Find("----- Other -----") == null)
+                {
+                    GameObject newobject_other = new GameObject();
+                    newobject_other.name = "----- Other -----";
+                }
+        }
+    }
+
+
     //FileFinder
     void FileFinder()
     {
@@ -2403,6 +2463,12 @@ public class Tool_QuickStart : EditorWindow
     {
         SceneView.duringSceneGui += this.OnSceneGUI;
         SceneView.duringSceneGui += this.OnScene;
+
+        _SceneStructure = new bool[_SceneStructureOptions.Length];
+        for (int i = 0; i < _SceneStructure.Length; i++)
+        {
+            _SceneStructure[i] = true;
+        }
     }
     void OnDisable()
     {
@@ -2691,6 +2757,9 @@ public class Tool_QuickStart : EditorWindow
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
         GUILayout.Label(
+            "\n" +
+            "V1.1.0 (22-dec-2021)\n" +
+            "* Added Add Scene Structure option\n" +
             "\n" +
             "V1.0.17 (20-dec-2021)\n" +
             "* Update UIEffects.cs\n" +
