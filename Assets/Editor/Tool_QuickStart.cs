@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.1.0";
+    string _Version = "V1.1.1";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -698,7 +698,17 @@ public class Tool_QuickStart : EditorWindow
                             _Search_InProject_Results++;
                         }
                         else
-                            GUI.backgroundColor = new Color(1, 0, 0);
+                        {
+                            if (_AddMultipleScriptsActive)
+                            {
+                                if (_AddMultipleScripts[i])
+                                    GUI.backgroundColor = new Color(0.5f,0.7f,0);
+                                else
+                                    GUI.backgroundColor = new Color(1, 0, 0);
+                            }
+                            else
+                                GUI.backgroundColor = new Color(1, 0, 0);
+                        }
 
                         //Script
                         EditorGUILayout.BeginHorizontal("Box");
@@ -742,8 +752,11 @@ public class Tool_QuickStart : EditorWindow
                         EditorGUI.EndDisabledGroup();
 
                         //Add Multiple
-                        if (_AddMultipleScriptsActive)
-                            _AddMultipleScripts[i] = EditorGUILayout.Toggle(_AddMultipleScripts[i]);
+                        if (_AddMultipleScriptsActive) { 
+                                EditorGUI.BeginDisabledGroup(QuickStart_Scripts[i].Exist);
+                                _AddMultipleScripts[i] = EditorGUILayout.Toggle(_AddMultipleScripts[i]);
+                                EditorGUI.EndDisabledGroup();
+                            }
                         EditorGUILayout.EndHorizontal();
                     }
                 }
@@ -802,11 +815,15 @@ public class Tool_QuickStart : EditorWindow
         if (scriptid != 999)
         {
             if (QuickStart_Scripts[scriptid].Exist)
-            { GUI.backgroundColor = new Color(0, 1, 0); }
+            { 
+                GUI.backgroundColor = new Color(0, 1, 0); 
+                
+            }
             else
                 GUI.backgroundColor = new Color(1, 0, 0);
 
             EditorGUILayout.BeginHorizontal("Box");
+
             GUILayout.Label(name + ".cs");
             EditorGUI.BeginDisabledGroup(QuickStart_Scripts[scriptid].Exist);
             if (GUILayout.Button("Add", GUILayout.Width(50)))
@@ -2758,6 +2775,9 @@ public class Tool_QuickStart : EditorWindow
 
         GUILayout.Label(
             "\n" +
+            "V1.1.1 (28-dec-2021)\n" +
+            "* Multi Select improvements \n" +
+            "\n" +
             "V1.1.0 (22-dec-2021)\n" +
             "* Added Add Scene Structure option\n" +
             "\n" +
@@ -2773,7 +2793,7 @@ public class Tool_QuickStart : EditorWindow
             "* Fix Script > Tool_ScriptToString.cs\n" +
             "* Fix Script > DialogSystemEditor.cs\n" +
             "* Cleanup Generate examples\n" +
-            "* Increased script seach precision\n" +
+            "* Increased script search precision\n" +
             "\n" +
             "V1.0.15 (23-nov-2021)\n" +
             "* Wrong bullet script fix\n" +
