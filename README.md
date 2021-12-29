@@ -8,6 +8,8 @@ _This project contains scripts/art/prefabs that can be used for unity projects.
 The files are made by me and do not contain copyrighted material.
 Feel free to use/copy files from this project._
 
+_Donate (Crypto): **0x7FaA4ACF568F7fBdB907A5862962C755ddc381A1**_
+
 <!-- [Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki) -->
 ### HighLight: [Tool_QuickStart.cs](#quickstart)
 
@@ -174,3 +176,6 @@ MapEditor
 
 
 First commit: Oct 8, 2020
+
+
+_Donate (Crypto): **0x7FaA4ACF568F7fBdB907A5862962C755ddc381A1**_
