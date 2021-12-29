@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections;
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;
@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.1.1";
+    string _Version = "V1.1.2";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -317,7 +317,7 @@ public class Tool_QuickStart : EditorWindow
         switch (_DimensionID)
         {
             case 0:
-                _Type2DID = GUILayout.Toolbar(_Type2DID, new string[] { "Platformer", "TopDown", "VisualNovel" });
+                _Type2DID = GUILayout.Toolbar(_Type2DID, new string[] { "Platformer", "TopDown", "VisualNovel (wip)" });
                 break;
             case 1:
                 _Type3DID = GUILayout.Toolbar(_Type3DID, new string[] { "FPS", "ThirdPerson", "TopDown", "Platformer" });
@@ -360,7 +360,8 @@ public class Tool_QuickStart : EditorWindow
                 break;
             case 2: //VisualNovel
                 GUILayout.Label("Essential", EditorStyles.boldLabel);
-                ScriptStatus("VisualNovelHandler");
+                ScriptStatus("DialogSystem");
+                ScriptStatus("DialogSystemEditor");
                 GUILayout.Label("Extra", EditorStyles.boldLabel);
                 break;
         }
@@ -472,6 +473,9 @@ public class Tool_QuickStart : EditorWindow
                     break;
                 case 1: //TopDown
                     CreateObjects_2D_TopDown(player, groundCube, cameraObj);
+                    break;
+                case 2: //VisualNovel
+                    CreateObjects_2D_VisualNovel(player, groundCube);
                     break;
             }
         }
@@ -632,6 +636,36 @@ public class Tool_QuickStart : EditorWindow
             cameraobj.GetComponent(UnityType).SendMessage("Set_OffSet", new Vector3(0, 3, -10));
         }
     }
+    void CreateObjects_2D_VisualNovel(GameObject playerobj, GameObject groundobj)
+    {
+        DestroyImmediate(playerobj);
+        DestroyImmediate(groundobj);
+
+        //Create DialogSystem
+        GameObject dialogsystemobj = new GameObject();
+        dialogsystemobj.name = "DialogSystem";
+
+        if (ScriptExist("DialogSystem"))
+        {
+            string UniType = "DialogSystem";
+            Type UnityType = Type.GetType(UniType + ", Assembly-CSharp");
+            dialogsystemobj.AddComponent(UnityType);
+        }
+
+
+        //Create Canvas
+        GameObject visualnovel_canvas = HUD_Create_Canvas();
+        visualnovel_canvas.name = "Canvas_VisualNovel";
+
+        //Dialogtext
+        GameObject visualnovel_text = HUD_Create_Text();
+
+
+        //Add to canvas
+        visualnovel_text.transform.parent = visualnovel_canvas.transform;
+
+
+    }
 
 
     //Home > Scripts
@@ -711,8 +745,22 @@ public class Tool_QuickStart : EditorWindow
                         }
 
                         //Script
-                        EditorGUILayout.BeginHorizontal("Box");
+                        Rect testrect = EditorGUILayout.BeginHorizontal();
 
+                        //Update Faster
+                        Repaint();
+
+                        if (Event.current.mousePosition.y >= testrect.y && Event.current.mousePosition.y <= testrect.y + testrect.height)
+                        {
+                            GUI.backgroundColor = new Color(0.2f, 0.8f, 0);
+                            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+                            {
+                                if (_AddMultipleScriptsActive)
+                                    _AddMultipleScripts[i] = !_AddMultipleScripts[i];
+                            }
+                        }
+
+                        EditorGUILayout.BeginHorizontal("Box");
                         if (Screen.width <= 325)
                         {
                             if (_AddMultipleScriptsActive)
@@ -757,6 +805,7 @@ public class Tool_QuickStart : EditorWindow
                                 _AddMultipleScripts[i] = EditorGUILayout.Toggle(_AddMultipleScripts[i]);
                                 EditorGUI.EndDisabledGroup();
                             }
+                        EditorGUILayout.EndHorizontal();
                         EditorGUILayout.EndHorizontal();
                     }
                 }
@@ -2774,6 +2823,10 @@ public class Tool_QuickStart : EditorWindow
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
         GUILayout.Label(
+            "\n" +
+            "V1.1.2 (29-dec-2021)\n" +
+            "* Realtime feedback > Script select \n" +
+            "* Added QuickStart>2D>VisualNovel(wip) \n" +
             "\n" +
             "V1.1.1 (28-dec-2021)\n" +
             "* Multi Select improvements \n" +
