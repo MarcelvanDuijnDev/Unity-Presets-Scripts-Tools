@@ -9,9 +9,9 @@ The files are made by me and do not contain copyrighted material.
 Feel free to use/copy files from this project._
 
 <!-- [Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki) -->
-### HighLight: [Tool_QuickStart.cs](#quickstart)
+### HighLight: [Tool_QuickStart.cs](#quickstart) < _Multi purpose Unity tool_
 
-### Content:
+### Content (Scripts):
 * [Movement](#movement)
 * [Vehicles](#vehicles)
 * [AI](#ai)
@@ -25,6 +25,7 @@ Feel free to use/copy files from this project._
 * [Practical](#practical)
 * [MathAndAlgorithms](#mathandalgorithms)
 * [Other](#other)
+### Other:
 * [License & Copyright](#license--copyright)
 * [Social Info / Donate](#social-info--donate)
   
@@ -179,9 +180,6 @@ MapEditor
 </a>
 
 
-
-
 First commit: Oct 8, 2020
-
 
 _Donate (Crypto): **0x7FaA4ACF568F7fBdB907A5862962C755ddc381A1**_
