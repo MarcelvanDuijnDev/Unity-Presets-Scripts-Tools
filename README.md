@@ -119,6 +119,9 @@ Feel free to use/copy files from this project._
 
 # License & Copyright
 Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/LICENSE)
+tl;dr:
+Without restrictions / feel free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software
 
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
