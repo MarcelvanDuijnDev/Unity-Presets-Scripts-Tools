@@ -26,6 +26,7 @@ Feel free to use/copy files from this project._
 * [MathAndAlgorithms](#mathandalgorithms)
 * [Other](#other)
 * [License & Copyright](#license--copyright)
+* [Social Info / Donate](#social-info--donate)
   
 # Movement 
 - [Movement_2D_Platformer.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_2D_Platformer.cs)
@@ -119,9 +120,12 @@ Feel free to use/copy files from this project._
 
 # License & Copyright
 Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/LICENSE)
+
 tl;dr:
 Without restrictions / feel free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software
+
+# Social Info / Donate
 
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
@@ -133,10 +137,11 @@ Social Info:
 [Instagram](https://www.instagram.com/marcelvanduijn_/)
 [GitHub](https://github.com/MarcelvanDuijnDev)
 
+_Donate (Crypto): **0x7FaA4ACF568F7fBdB907A5862962C755ddc381A1**_
 
 
 # highlight
-# quickstart
+### quickstart
 [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/Tool_QuickStart.cs)
 
 Create a scene with scripts assigned with the press of a button.
