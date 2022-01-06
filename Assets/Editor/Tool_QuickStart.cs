@@ -101,6 +101,7 @@ public class Tool_QuickStart : EditorWindow
     int _CreateSceneOptions = 0;
     Vector2 _ScrollPos = new Vector2();
     bool _StartUpSearch = false;
+    bool[] _UpdateLogFoldout = new bool[2];
 
     //Search
     string _Search_Script = "";
@@ -2557,6 +2558,7 @@ public class Tool_QuickStart : EditorWindow
         {
             _SceneStructure[i] = true;
         }
+        _UpdateLogFoldout[1] = true;
     }
     void OnDisable()
     {
@@ -2844,104 +2846,117 @@ public class Tool_QuickStart : EditorWindow
 
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
-        GUILayout.Label(
-            "\n" +
-            "V1.1.3 (3-jan-2022)\n" +
-            "* Added Script Descriptions \n" +
-            "\n" +
-            "V1.1.2 (29-dec-2021)\n" +
-            "* Realtime feedback > Script select \n" +
-            "* Added QuickStart>2D>VisualNovel(wip) \n" +
-            "\n" +
-            "V1.1.1 (28-dec-2021)\n" +
-            "* Multi Select improvements \n" +
-            "\n" +
-            "V1.1.0 (22-dec-2021)\n" +
-            "* Added Add Scene Structure option\n" +
-            "\n" +
-            "V1.0.17 (20-dec-2021)\n" +
-            "* Update UIEffects.cs\n" +
-            "\n" +
-            "V1.0.16 (9-dec-2021)\n" +
-            "* Update ScriptToString\n" +
-            "* Update AudioHandler.cs\n" +
-            "* Update AudioZone.cs\n" +
-            "* Added AudioZoneEditor.cs to scripts\n" +
-            "* Added Select all option \n" +
-            "* Fix Script > Tool_ScriptToString.cs\n" +
-            "* Fix Script > DialogSystemEditor.cs\n" +
-            "* Cleanup Generate examples\n" +
-            "* Increased script search precision\n" +
-            "\n" +
-            "V1.0.15 (23-nov-2021)\n" +
-            "* Wrong bullet script fix\n" +
-            "\n" +
-            "V1.0.14 (19-nov-2021)\n" +
-            "* Update AudioHandler.cs\n" +
-            "* Update AudioZoneSphere.cs\n" +
-            "* Removed AudioZoneBox.cs\n" +
-            "* Disabled Empty scripts\n" +
-            "\n" +
-            "V1.0.13 (4-nov-2021)\n" +
-            "* Update Interactable.cs\n" +
-            "* Update InteractionHandler.cs\n" +
-            "\n" +
-            "V1.0.12 (24-oct-2021)\n" +
-            "* Added FadeInOut.cs\n" +
-            "\n" +
-            "V1.0.11 (17-oct-2021)\n" +
-            "* Added Multi Select option\n" +
-            "* Fix MapEditor not working\n" +
-            "\n" +
-            "V1.0.10 (15-oct-2021)\n" +
-            "* Updated AudioHandler code\n" +
-            "\n" +
-            "V1.0.9 (5-sep-2021)\n" +
-            "* Fix QuickUI formating\n" +
-            "* Added QuickUI profiles\n" +
-            "* Updated QuickUI editor layout\n" +
-            "\n" +
-            "V1.0.8 (22-aug-2021)\n" +
-            "* Fix update log not scrolling\n" +
-            "\n" +
-            "V1.0.7 (20-aug-2021)\n" +
-            "* Updated AudioZoneBox.cs\n" +
-            "* Updated AudioZoneSphere.cs\n" +
-            "\n" +
-            "V1.0.6 (18-aug-2021)\n" +
-            "* Added AudioZoneBox.cs\n" +
-            "* Added AudioZoneSphere.cs\n" +
-            "\n" +
-            "V1.0.5 (13-aug-2021)\n" +
-            "* Added dates to updatelog\n" +
-            "* Fixed Loading wrong script (SaveLoad_JSON) \n" +
-            "\n" +
-            "V1.0.4 (23-jul-2021)\n" +
-            "* Added DialogSystem.cs + DialogSystemEditor.cs\n" +
-            "\n" +
-            "V1.0.3 (22-jul-2021)\n" +
-            "* Fixed Typo > Scripts\n" +
-            "\n" +
-            "V1.0.2 (22-jul-2021)\n" +
-            "* Added Update log\n" +
-            "\n" +
-            "V1.0.1 (22-jul-2021)\n" +
-            "* Updated Cleanup Script To String (STS)\n" +
-            "* File Finder (FF) Now updates when changing type\n" +
-            "\n" +
-            "V1.0.0 (22-jul-2021)\n" +
-            "* Start QuickStart update log \n" +
-            "* Added Scripts\n" +
-            "* Fixed Scripts formating\n" +
-            "* Refactor Script To String (STS)\n" +
-            "\n \n" +
-            "(22-jul-2021) \n" +
-            "Start Update Log\n" +
-            "               △\n               △\n" +
-            "Multiple changes \n" +
-            "               △\n               △\n" +
-            "(26-oct-2020)\n" +
-            "* Created Tool_QuickStart.cs");
+        _UpdateLogFoldout[1] = EditorGUILayout.Foldout(_UpdateLogFoldout[1], "2022");
+        if (_UpdateLogFoldout[1])
+        {
+            GUILayout.Label(
+                "\n" +
+                "V1.1.4 (4-jan-2022)\n" +
+                "* Update log separated into years\n" +
+                "\n" +
+                "V1.1.3 (3-jan-2022)\n" +
+                "* Added Script Descriptions\n" +
+                "");
+        }
+
+        _UpdateLogFoldout[0] = EditorGUILayout.Foldout(_UpdateLogFoldout[0], "2021");
+        if (_UpdateLogFoldout[0])
+        {
+            GUILayout.Label(
+                "\nV1.1.2 (29-dec-2021)\n" +
+                "* Realtime feedback > Script select \n" +
+                "* Added QuickStart>2D>VisualNovel(wip) \n" +
+                "\n" +
+                "V1.1.1 (28-dec-2021)\n" +
+                "* Multi Select improvements \n" +
+                "\n" +
+                "V1.1.0 (22-dec-2021)\n" +
+                "* Added Add Scene Structure option\n" +
+                "\n" +
+                "V1.0.17 (20-dec-2021)\n" +
+                "* Update UIEffects.cs\n" +
+                "\n" +
+                "V1.0.16 (9-dec-2021)\n" +
+                "* Update ScriptToString\n" +
+                "* Update AudioHandler.cs\n" +
+                "* Update AudioZone.cs\n" +
+                "* Added AudioZoneEditor.cs to scripts\n" +
+                "* Added Select all option \n" +
+                "* Fix Script > Tool_ScriptToString.cs\n" +
+                "* Fix Script > DialogSystemEditor.cs\n" +
+                "* Cleanup Generate examples\n" +
+                "* Increased script search precision\n" +
+                "\n" +
+                "V1.0.15 (23-nov-2021)\n" +
+                "* Wrong bullet script fix\n" +
+                "\n" +
+                "V1.0.14 (19-nov-2021)\n" +
+                "* Update AudioHandler.cs\n" +
+                "* Update AudioZoneSphere.cs\n" +
+                "* Removed AudioZoneBox.cs\n" +
+                "* Disabled Empty scripts\n" +
+                "\n" +
+                "V1.0.13 (4-nov-2021)\n" +
+                "* Update Interactable.cs\n" +
+                "* Update InteractionHandler.cs\n" +
+                "\n" +
+                "V1.0.12 (24-oct-2021)\n" +
+                "* Added FadeInOut.cs\n" +
+                "\n" +
+                "V1.0.11 (17-oct-2021)\n" +
+                "* Added Multi Select option\n" +
+                "* Fix MapEditor not working\n" +
+                "\n" +
+                "V1.0.10 (15-oct-2021)\n" +
+                "* Updated AudioHandler code\n" +
+                "\n" +
+                "V1.0.9 (5-sep-2021)\n" +
+                "* Fix QuickUI formating\n" +
+                "* Added QuickUI profiles\n" +
+                "* Updated QuickUI editor layout\n" +
+                "\n" +
+                "V1.0.8 (22-aug-2021)\n" +
+                "* Fix update log not scrolling\n" +
+                "\n" +
+                "V1.0.7 (20-aug-2021)\n" +
+                "* Updated AudioZoneBox.cs\n" +
+                "* Updated AudioZoneSphere.cs\n" +
+                "\n" +
+                "V1.0.6 (18-aug-2021)\n" +
+                "* Added AudioZoneBox.cs\n" +
+                "* Added AudioZoneSphere.cs\n" +
+                "\n" +
+                "V1.0.5 (13-aug-2021)\n" +
+                "* Added dates to updatelog\n" +
+                "* Fixed Loading wrong script (SaveLoad_JSON) \n" +
+                "\n" +
+                "V1.0.4 (23-jul-2021)\n" +
+                "* Added DialogSystem.cs + DialogSystemEditor.cs\n" +
+                "\n" +
+                "V1.0.3 (22-jul-2021)\n" +
+                "* Fixed Typo > Scripts\n" +
+                "\n" +
+                "V1.0.2 (22-jul-2021)\n" +
+                "* Added Update log\n" +
+                "\n" +
+                "V1.0.1 (22-jul-2021)\n" +
+                "* Updated Cleanup Script To String (STS)\n" +
+                "* File Finder (FF) Now updates when changing type\n" +
+                "\n" +
+                "V1.0.0 (22-jul-2021)\n" +
+                "* Start QuickStart update log \n" +
+                "* Added Scripts\n" +
+                "* Fixed Scripts formating\n" +
+                "* Refactor Script To String (STS)\n" +
+                "\n \n" +
+                "(22-jul-2021) \n" +
+                "Start Update Log\n" +
+                "               △\n               △\n" +
+                "Multiple changes \n" +
+                "               △\n               △\n" +
+                "(26-oct-2020)\n" +
+                "* Created Tool_QuickStart.cs");
+        }
 
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndScrollView();
