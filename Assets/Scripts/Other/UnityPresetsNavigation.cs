@@ -5,17 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class UnityPresetsNavigation : MonoBehaviour
 {
-    void Start()
-    {
-        
-    }
-
-
-    void Update()
-    {
-        
-    }
-
     public void LoadScene(string scenename)
     {
         SceneManager.LoadScene(scenename);

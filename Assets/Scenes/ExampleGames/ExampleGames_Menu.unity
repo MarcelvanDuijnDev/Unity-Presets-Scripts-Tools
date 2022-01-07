@@ -251,7 +251,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 292128880}
   m_OnClick:
     m_PersistentCalls:
@@ -319,8 +319,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _UIEffect: 0
-  _MinDefaultMaxSize: {x: 0.9, y: 1, z: 1.1}
+  _RelativeToOriginalSize: 1
   _IncreaseSpeed: 1
+  _MinimalSize: 0.9
+  _MaximalSize: 1.1
 --- !u!1 &469891037
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,8 +697,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _UIEffect: 0
-  _MinDefaultMaxSize: {x: 0.9, y: 1, z: 1.1}
+  _RelativeToOriginalSize: 1
   _IncreaseSpeed: 1
+  _MinimalSize: 0.9
+  _MaximalSize: 1.1
 --- !u!1 &806851237
 GameObject:
   m_ObjectHideFlags: 0
@@ -925,7 +929,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1146614611}
   m_OnClick:
     m_PersistentCalls:
@@ -993,8 +997,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _UIEffect: 0
-  _MinDefaultMaxSize: {x: 0.9, y: 1, z: 1.1}
+  _RelativeToOriginalSize: 1
   _IncreaseSpeed: 1
+  _MinimalSize: 0.9
+  _MaximalSize: 1.1
 --- !u!1 &1189743952
 GameObject:
   m_ObjectHideFlags: 0
