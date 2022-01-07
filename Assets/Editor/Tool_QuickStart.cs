@@ -1,20 +1,20 @@
 using System.Collections.Generic;
 using System.Collections;
-using UnityEditor.SceneManagement;
-using UnityEditorInternal;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEditor;
 using System.IO;
 using System;
-using UnityEngine.UI;
+using UnityEditor.SceneManagement;
+using UnityEditorInternal;
+using UnityEditor;
+using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine;
 using TMPro;
 
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.1.3";
+    string _Version = "V1.2.0";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -143,6 +143,17 @@ public class Tool_QuickStart : EditorWindow
     "Map",
     "Lighting",
     "Other"};
+    List<Tool_QuickStart_SceneOrganizer> _SceneObjects = new List<Tool_QuickStart_SceneOrganizer>();
+    List<Tool_QuickStart_SceneOrganizer> _SceneObjects_Snapshot = new List<Tool_QuickStart_SceneOrganizer>();
+    List<Tool_QuickStart_SceneOrganizer_GameObjectProfile_All> _AllSceneObjects = new List<Tool_QuickStart_SceneOrganizer_GameObjectProfile_All>();
+    bool _SceneObjects_ShowSnapshot = true;
+    bool _SceneObjects_Show_SceneStructure = false;
+    bool _SceneObjects_Show_SceneAllObject = false;
+    bool _SceneObjects_Show_Scripts = false;
+    string _SceneObjects_Search = "";
+    string _SceneObjects_SearchScript = "";
+    bool _SceneObjects_Filter_HasScript = false;
+    Vector2 _Scene_Scroll;
 
     //FileFinder (FF) ----------------------------------------------
     #region FileFinder
@@ -2046,47 +2057,281 @@ public class Tool_QuickStart : EditorWindow
     //Home > Scene : Menu
     void Menu_Scene()
     {
-        for (int i = 0; i < _SceneStructure.Length; i++)
+        //Scene Structure
+        _SceneObjects_Show_SceneStructure = EditorGUILayout.Foldout(_SceneObjects_Show_SceneStructure, "Scene Structure (wip):");
+        if (_SceneObjects_Show_SceneStructure)
         {
-            _SceneStructure[i] = EditorGUILayout.Toggle(_SceneStructureOptions[i], _SceneStructure[i]);
+            for (int i = 0; i < _SceneStructure.Length; i++)
+            {
+                _SceneStructure[i] = EditorGUILayout.Toggle(_SceneStructureOptions[i], _SceneStructure[i]);
+            }
+
+            if (GUILayout.Button("Add Scene Structure"))
+            {
+                if (_SceneStructure[0])
+                    if (GameObject.Find("----- Essentials -----") == null)
+                    {
+                        GameObject newobject_essentials = new GameObject();
+                        newobject_essentials.name = "----- Essentials -----";
+                    }
+
+                if (_SceneStructure[1])
+                    if (GameObject.Find("----- Canvas -----") == null)
+                    {
+                        GameObject newobject_canvas = new GameObject();
+                        newobject_canvas.name = "----- Canvas -----";
+                    }
+
+                if (_SceneStructure[2])
+                    if (GameObject.Find("----- Map -----") == null)
+                    {
+                        GameObject newobject_map = new GameObject();
+                        newobject_map.name = "----- Map -----";
+                    }
+
+                if (_SceneStructure[3])
+                    if (GameObject.Find("----- Lighting -----") == null)
+                    {
+                        GameObject newobject_lighting = new GameObject();
+                        newobject_lighting.name = "----- Lighting -----";
+                    }
+
+                if (_SceneStructure[4])
+                    if (GameObject.Find("----- Other -----") == null)
+                    {
+                        GameObject newobject_other = new GameObject();
+                        newobject_other.name = "----- Other -----";
+                    }
+            }
+
+            //Organize
+            Menu_Scene_Organizer();
         }
 
-        if (GUILayout.Button("Add Scene Structure"))
+        //All Objects
+        _SceneObjects_Show_SceneAllObject = EditorGUILayout.Foldout(_SceneObjects_Show_SceneAllObject, "Scene All Objects (wip):");
+        if (_SceneObjects_Show_SceneAllObject)
+            Menu_Scene_ObjectFiltered();
+    }
+    void Menu_Scene_Organizer()
+    {
+        GUILayout.Label("Organize");
+        if (GUILayout.Button("Create SnapShot (wip)"))
         {
-            if (_SceneStructure[0])
-                if (GameObject.Find("----- Essentials -----") == null)
+            _SceneObjects_Snapshot.Clear();
+
+            //Get Root Objects
+            List<GameObject> rootobjects = new List<GameObject>();
+            Scene scene = SceneManager.GetActiveScene();
+            scene.GetRootGameObjects(rootobjects);
+
+            //Add Root Objects To SnapShot Profile
+            for (int i = 0; i < rootobjects.Count; ++i)
+            {
+                GameObject gameObject = rootobjects[i];
+                Tool_QuickStart_SceneOrganizer parentobject = new Tool_QuickStart_SceneOrganizer();
+                parentobject.ParentObject = rootobjects[i];
+                _SceneObjects_Snapshot.Add(parentobject);
+            }
+
+            //Get Child Object
+            for (int i = 0; i < _SceneObjects_Snapshot.Count; i++)
+            {
+                for (int j = 0; j < _SceneObjects_Snapshot[i].ParentObject.transform.childCount; j++)
                 {
-                    GameObject newobject_essentials = new GameObject();
-                    newobject_essentials.name = "----- Essentials -----";
+                    Tool_QuickStart_SceneOrganizer_GameObjectProfile newchildobj = new Tool_QuickStart_SceneOrganizer_GameObjectProfile();
+                    newchildobj.ScriptAmount = _SceneObjects_Snapshot[i].ParentObject.transform.GetChild(j).GetComponents<MonoBehaviour>().Length;
+                    newchildobj.ChildObject = _SceneObjects_Snapshot[i].ParentObject.transform.GetChild(j).gameObject;
+
+                    _SceneObjects_Snapshot[i].ChildObjects.Add(newchildobj);
+                }
+            }
+        }
+
+        //SnapShot
+        _SceneObjects_ShowSnapshot = EditorGUILayout.Foldout(_SceneObjects_ShowSnapshot, "SnapShot");
+        if (_SceneObjects_ShowSnapshot)
+        {
+            for (int i = 0; i < _SceneObjects_Snapshot.Count; i++)
+            {
+                GUILayout.Label(_SceneObjects_Snapshot[i].ParentObject.name);
+
+                for (int j = 0; j < _SceneObjects_Snapshot[i].ChildObjects.Count; j++)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    //Object
+                    GUILayout.Label(_SceneObjects_Snapshot[i].ChildObjects[j].ChildObject.name);
+
+                    //HasScripts
+                    GUILayout.Label("Scripts: " + _SceneObjects_Snapshot[i].ChildObjects[j].ScriptAmount.ToString());
+
+                    //Up Down List
+                    bool check1 = false;
+                    bool check2 = false;
+                    if (j == 0)
+                        check1 = true;
+                    if (j == _SceneObjects_Snapshot[i].ChildObjects.Count - 1)
+                        check2 = true;
+                    EditorGUI.BeginDisabledGroup(check1);
+                    if (GUILayout.Button("/\\", GUILayout.Width(20)))
+                    {
+                        GameObject oldobj = _SceneObjects_Snapshot[i].ChildObjects[j - 1].ChildObject;
+                        GameObject newobj = _SceneObjects_Snapshot[i].ChildObjects[j].ChildObject;
+                        _SceneObjects_Snapshot[i].ChildObjects[j - 1].ChildObject = newobj;
+                        _SceneObjects_Snapshot[i].ChildObjects[j].ChildObject = oldobj;
+                    }
+                    EditorGUI.EndDisabledGroup();
+
+                    EditorGUI.BeginDisabledGroup(check2);
+                    if (GUILayout.Button("\\/", GUILayout.Width(20)))
+                    {
+                        GameObject oldobj = _SceneObjects_Snapshot[i].ChildObjects[j + 1].ChildObject;
+                        GameObject newobj = _SceneObjects_Snapshot[i].ChildObjects[j].ChildObject;
+                        _SceneObjects_Snapshot[i].ChildObjects[j + 1].ChildObject = newobj;
+                        _SceneObjects_Snapshot[i].ChildObjects[j].ChildObject = oldobj;
+                    }
+                    EditorGUI.EndDisabledGroup();
+
+                    EditorGUILayout.EndHorizontal();
+                }
+            }
+        }
+
+        //Apply
+        if (GUILayout.Button("Apply"))
+        {
+            for (int i = 0; i < _SceneObjects_Snapshot.Count; i++)
+            {
+                for (int j = 0; j < _SceneObjects_Snapshot[i].ChildObjects.Count; j++)
+                {
+                    _SceneObjects_Snapshot[i].ChildObjects[j].ChildObject.transform.parent = null;
+                    _SceneObjects_Snapshot[i].ChildObjects[j].ChildObject.transform.parent = _SceneObjects_Snapshot[i].ParentObject.transform;
+                }
+            }
+        }
+    }
+    void Menu_Scene_ObjectFiltered()
+    {
+        //Scan Scene
+        if(GUILayout.Button("Scan Scene"))
+        {
+            _AllSceneObjects.Clear();
+            GameObject[] allobjects = GameObject.FindObjectsOfType<GameObject>(true);
+            for (int i = 0; i < allobjects.Length; i++)
+            {
+                Tool_QuickStart_SceneOrganizer_GameObjectProfile_All newobj = new Tool_QuickStart_SceneOrganizer_GameObjectProfile_All();
+                newobj.Scripts = new List<string>();
+                newobj.ChildObject = allobjects[i];
+
+                //Get Script Names
+                MonoBehaviour[] scripts = allobjects[i].GetComponents<MonoBehaviour>();
+                List<String> scriptnames = new List<string>();
+                foreach(MonoBehaviour mb in scripts)
+                {
+                    scriptnames.Add(mb.GetType().Name);
                 }
 
-            if (_SceneStructure[1])
-                if (GameObject.Find("----- Canvas -----") == null)
+                //Add Script Names To Object Profiles
+                for (int j = 0; j < scriptnames.Count; j++)
                 {
-                    GameObject newobject_canvas = new GameObject();
-                    newobject_canvas.name = "----- Canvas -----";
+                    newobj.Scripts.Add(scriptnames[j]);
                 }
 
-            if (_SceneStructure[2])
-                if (GameObject.Find("----- Map -----") == null)
-                {
-                    GameObject newobject_map = new GameObject();
-                    newobject_map.name = "----- Map -----";
-                }
+                _AllSceneObjects.Add(newobj);
+            }
+        }
 
-            if (_SceneStructure[3])
-                if (GameObject.Find("----- Lighting -----") == null)
-                {
-                    GameObject newobject_lighting = new GameObject();
-                    newobject_lighting.name = "----- Lighting -----";
-                }
+        //Search
+        EditorGUILayout.BeginHorizontal("box");
+        _SceneObjects_Search = EditorGUILayout.TextField("Search: ", _SceneObjects_Search);
+        EditorGUILayout.EndHorizontal();
 
-            if (_SceneStructure[4])
-                if (GameObject.Find("----- Other -----") == null)
+        //Search Script
+        EditorGUILayout.BeginHorizontal("box");
+        _SceneObjects_SearchScript = EditorGUILayout.TextField("Search Script: ", _SceneObjects_SearchScript);
+        _SceneObjects_Filter_HasScript = EditorGUILayout.Toggle("Has Scripts", _SceneObjects_Filter_HasScript);
+        _SceneObjects_Show_Scripts = EditorGUILayout.Toggle("Show Scripts", _SceneObjects_Show_Scripts);
+        EditorGUILayout.EndHorizontal();
+
+        //Loop Trough Objects/Scripts
+        _Scene_Scroll = EditorGUILayout.BeginScrollView(_Scene_Scroll);
+        for (int i = 0; i < _AllSceneObjects.Count; i++)
+        {
+            if (_AllSceneObjects[i].ChildObject.name.ToLower().Contains(_SceneObjects_Search.ToLower()))
+            {
+                if (_SceneObjects_Filter_HasScript || _SceneObjects_SearchScript != "")
+                    Scene_ObjectFilter_SearchScript(i);
+                else
+                    Scene_ObjectFilter_Search(i);
+            }
+        }
+        EditorGUILayout.EndScrollView();
+    }
+    void Scene_ObjectFilter_Search(int i)
+    {
+        if (_SceneObjects_Show_Scripts)
+        {
+            if (_AllSceneObjects[i].Scripts.Count > 0)
+            {
+                EditorGUILayout.BeginVertical("box");
+                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count.ToString());
+                for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
                 {
-                    GameObject newobject_other = new GameObject();
-                    newobject_other.name = "----- Other -----";
+                    GUILayout.Label("> " + _AllSceneObjects[i].Scripts[j] + ".cs");
                 }
+                EditorGUILayout.EndVertical();
+            }
+            else
+                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: 0");
+        }
+        else
+        {
+            if (_AllSceneObjects[i].Scripts.Count > 0)
+                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count.ToString());
+            else
+                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: 0");
+        }
+
+    }
+    void Scene_ObjectFilter_SearchScript(int i)
+    {
+        if (_AllSceneObjects[i].Scripts.Count > 0)
+        {
+            if (_SceneObjects_SearchScript != "")
+            {
+                bool check = false;
+                for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
+                {
+                    if (_AllSceneObjects[i].Scripts[j].ToLower().Contains(_SceneObjects_SearchScript.ToLower()))
+                        check = true;
+                }
+                if (check)
+                {
+                    EditorGUILayout.BeginVertical("box");
+                    GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count);
+                    for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
+                    {
+                        GUILayout.Label("> " + _AllSceneObjects[i].Scripts[j] + ".cs");
+                    }
+                    EditorGUILayout.EndHorizontal();
+                }
+            }
+            else
+            {
+                if (_SceneObjects_Show_Scripts)
+                {
+                    EditorGUILayout.BeginVertical("box");
+                    GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count);
+                    for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
+                    {
+                        GUILayout.Label("> " + _AllSceneObjects[i].Scripts[j] + ".cs");
+                    }
+                    EditorGUILayout.EndHorizontal();
+                }
+                else
+                    GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count);
+
+            }
         }
     }
 
@@ -2851,7 +3096,15 @@ public class Tool_QuickStart : EditorWindow
         {
             GUILayout.Label(
                 "\n" +
-                "V1.1.4 (4-jan-2022)\n" +
+                "V1.2.0 (7-jan-2022)\n" +
+                "Scene Window Updates\n" +
+                "* Added Scene GameObject Profiles\n" +
+                "* Added Scene GameObject Explorer\n" +
+                "* Added Scene Structure Options\n" +
+                "* Added Multiple Filter Options\n" +
+                "* Scene Structure checks if objects exist before creating\n" +
+                "\n" +
+                "V1.1.4 (6-jan-2022)\n" +
                 "* Update log separated into years\n" +
                 "\n" +
                 "V1.1.3 (3-jan-2022)\n" +
@@ -3020,4 +3273,20 @@ public class Tool_QuickStart_Script
         _Script_Description = description;
         _Script_Code = code;
     }
+}
+public class Tool_QuickStart_SceneOrganizer
+{
+    public GameObject ParentObject;
+    public List<Tool_QuickStart_SceneOrganizer_GameObjectProfile> ChildObjects = new List<Tool_QuickStart_SceneOrganizer_GameObjectProfile>();
+}
+public class Tool_QuickStart_SceneOrganizer_GameObjectProfile
+{
+    public GameObject ChildObject;
+    public bool Changed = false;
+    public int ScriptAmount;
+}
+public class Tool_QuickStart_SceneOrganizer_GameObjectProfile_All
+{
+    public GameObject ChildObject;
+    public List<string> Scripts = new List<string>();
 }
