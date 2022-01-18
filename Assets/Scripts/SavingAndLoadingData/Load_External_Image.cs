@@ -14,10 +14,10 @@ public class Load_External_Image : MonoBehaviour
     void Start()
     {
         _Files_JPG = System.IO.Directory.GetFiles(_Path, "*.jpg");
-        StartCoroutine(LoadImages_BackGround());
+        StartCoroutine(LoadImages());
     }
 
-    private IEnumerator LoadImages_BackGround()
+    private IEnumerator LoadImages()
     {
         //Load JPG
         foreach (string tstring in _Files_JPG)
@@ -29,9 +29,6 @@ public class Load_External_Image : MonoBehaviour
             www.LoadImageIntoTexture(texTmp);
 
             _Images.Add(texTmp);
-
-            GameObject newobj = null;
-            newobj.transform.eulerAngles = new Vector3(0,0,0);
         }
     }
 }
