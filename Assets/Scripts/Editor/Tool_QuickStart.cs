@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.2.0";
+    string _Version = "V1.2.1";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -763,7 +763,7 @@ public class Tool_QuickStart : EditorWindow
                         //Update Faster
                         Repaint();
 
-                        if (Event.current.mousePosition.y >= testrect.y && Event.current.mousePosition.y <= testrect.y + testrect.height)
+                        if (Event.current.mousePosition.y >= testrect.y && Event.current.mousePosition.y <= testrect.y + testrect.height && Event.current.mousePosition.x < testrect.width - 120)
                         {
                             GUI.backgroundColor = new Color(0.2f, 0.8f, 0);
                             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
@@ -3095,6 +3095,9 @@ public class Tool_QuickStart : EditorWindow
         if (_UpdateLogFoldout[1])
         {
             GUILayout.Label(
+                "\n" +
+                "V1.2.1 (23-jan-2022)\n" +
+                "* Scripts description no longer showing up when the cursor is on the buttons (Select,Add)\n" +
                 "\n" +
                 "V1.2.0 (7-jan-2022)\n" +
                 "Scene Window Updates\n" +
