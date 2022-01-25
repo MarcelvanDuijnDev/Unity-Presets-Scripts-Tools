@@ -5,20 +5,22 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class Movement_CC_FirstPerson : MonoBehaviour
 {
-    //Movement
-    [SerializeField] private float _NormalSpeed = 5, _SprintSpeed = 8;
+    [Header("Settings")]
+    [SerializeField] private float _NormalSpeed = 5;
+    [SerializeField] private float _SprintSpeed = 8;
     [SerializeField] private float _JumpSpeed = 5;
     [SerializeField] private float _Gravity = 20;
-    private Vector3 _MoveDirection = Vector3.zero;
-    //Look around
-    public float _CameraSensitivity = 1;
-    [SerializeField] private Transform _Head = null;
-    private float _RotationX = 90.0f;
-    private float _RotationY = 0.0f;
-    private float _Speed;
+    [SerializeField] private float _CameraSensitivity = 1;
 
+    [Header("Head")]
+    [SerializeField] private Transform _Head = null;
+    
+    //Private Variables
+    private Vector3 _MoveDirection;
+    private Vector2 _LookRotation;
     private CharacterController _CC;
     private bool _LockRotation;
+    private float _Speed;
 
     void Start()
     {
@@ -34,12 +36,12 @@ public class Movement_CC_FirstPerson : MonoBehaviour
         //Look around
         if (!_LockRotation)
         {
-            _RotationX += Input.GetAxis("Mouse X") * _CameraSensitivity;
-            _RotationY += Input.GetAxis("Mouse Y") * _CameraSensitivity;
-            _RotationY = Mathf.Clamp(_RotationY, -90, 90);
+            _LookRotation.x += Input.GetAxis("Mouse X") * _CameraSensitivity;
+            _LookRotation.y += Input.GetAxis("Mouse Y") * _CameraSensitivity;
+            _LookRotation.y = Mathf.Clamp(_LookRotation.y, -90, 90);
 
-            transform.localRotation = Quaternion.AngleAxis(_RotationX, Vector3.up);
-            _Head.transform.localRotation = Quaternion.AngleAxis(_RotationY, Vector3.left);
+            transform.localRotation = Quaternion.AngleAxis(_LookRotation.x, Vector3.up);
+            _Head.transform.localRotation = Quaternion.AngleAxis(_LookRotation.y, Vector3.left);
         }
 
         //Movement
