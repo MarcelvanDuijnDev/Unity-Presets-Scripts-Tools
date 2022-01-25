@@ -108,6 +108,10 @@ public class AudioZone : MonoBehaviour
     {
         AudioHandler.AUDIO.StartTrack(_AudioTrackName);
     }
+    public void StopTrack()
+    {
+        AudioHandler.AUDIO.StopTrack(_AudioTrackName);
+    }
 
     private void OnDrawGizmos()
     {
