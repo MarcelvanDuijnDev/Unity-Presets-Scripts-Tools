@@ -22,13 +22,13 @@ public class OnCollision2D : MonoBehaviour
     private void Action(Collider2D other)
     {
         if (_HasTag)
-            if (other.CompareTag(_Tag) && other.gameObject.layer == _LayerMask)
+            if (other.CompareTag(_Tag) && _LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
                 _Event.Invoke();
     }
     private void Action(Collision2D other)
     {
         if (_HasTag)
-            if (other.gameObject.CompareTag(_Tag) && other.gameObject.layer == _LayerMask)
+            if (other.gameObject.CompareTag(_Tag) && _LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
                 _Event.Invoke();
     }
 

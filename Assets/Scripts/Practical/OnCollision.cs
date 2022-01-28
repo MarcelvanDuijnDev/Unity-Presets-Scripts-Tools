@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class OnCollision : MonoBehaviour
 {
-    private enum Options {OnTriggerEnter, OnTriggerExit, OnTriggerStay, OnCollisionEnter, OnCollisionExit, OnCollisionStay, OnAll};
+    private enum Options { OnTriggerEnter, OnTriggerExit, OnTriggerStay, OnCollisionEnter, OnCollisionExit, OnCollisionStay, OnAll };
     [SerializeField] private LayerMask _LayerMask = ~0;
     [SerializeField] private Options _Option = Options.OnAll;
     [SerializeField] private string _Tag = "";
@@ -22,13 +22,13 @@ public class OnCollision : MonoBehaviour
     private void Action(Collider other)
     {
         if (_HasTag)
-            if (other.CompareTag(_Tag) && other.gameObject.layer == _LayerMask)
+            if (other.CompareTag(_Tag) && _LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
                 _Event.Invoke();
     }
     private void Action(Collision other)
     {
         if (_HasTag)
-            if (other.gameObject.CompareTag(_Tag) && other.gameObject.layer == _LayerMask)
+            if (other.gameObject.CompareTag(_Tag) && _LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
                 _Event.Invoke();
     }
 
