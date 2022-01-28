@@ -150,6 +150,21 @@ public class AudioHandler : MonoBehaviour
             _CurrentScene = SceneManager.GetActiveScene().name;
             for (int i = 0; i < _Sound.Count; i++)
             {
+                //Stop NextScene
+                if (_Sound[i].AudioControl.StopOnNextScene)
+                {
+                    //FadeOut
+                    if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadingOut)
+                    {
+                        _Sound[i].AudioEffects.FadingIn = false;
+                        _Sound[i].AudioEffects.FadeOutDone = false;
+                        _Sound[i].AudioEffects.FadingOut = true;
+                    }
+                    else
+                        _Sound[i].Settings.AudioSource.Stop();
+                }
+
+                //Start AudioOnScene
                 for (int o = 0; o < _Sound[i].AudioControl.StartAudioOnScene.Count; o++)
                 {
                     if (_Sound[i].AudioControl.StartAudioOnScene[o] == _CurrentScene)
@@ -164,6 +179,8 @@ public class AudioHandler : MonoBehaviour
                         _Sound[i].Settings.AudioSource.Play();
                     }
                 }
+
+                //Stop AudioOnScene
                 for (int o = 0; o < _Sound[i].AudioControl.StopAudioOnScene.Count; o++)
                 {
                     if (_Sound[i].AudioControl.StopAudioOnScene[o] == _CurrentScene)
