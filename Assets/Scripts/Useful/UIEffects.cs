@@ -20,6 +20,11 @@ public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private Vector3 _OriginalSize;
     private bool _MouseOver;
 
+    void OnEnable()
+    {
+        _MouseOver = false;
+    }
+
     void Start()
     {
         _OriginalSize = transform.localScale;
