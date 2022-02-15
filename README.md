@@ -112,6 +112,7 @@ Feel free to use/copy files from this project._
 - [OnCollision.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/OnCollision.cs)
 - [OnCollision2D.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/OnCollision2D.cs)
 - [PauseMenu.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/PauseMenu.cs)
+- [Pendulum.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Pendulum.cs)
 - [PosToPos.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/PosToPos.cs)
 - [Rotation.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Rotation.cs)
 - [SolarSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/SolarSystem.cs)
