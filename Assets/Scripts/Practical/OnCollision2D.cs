@@ -15,21 +15,31 @@ public class OnCollision2D : MonoBehaviour
 
     private void Start()
     {
-        if (_Tag != "" || _Tag != null)
+        if (_Tag != "" && _Tag != null)
             _HasTag = true;
     }
 
     private void Action(Collider2D other)
     {
         if (_HasTag)
+        {
             if (other.CompareTag(_Tag) && _LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
+                _Event.Invoke();
+        }
+        else
+            if(_LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
                 _Event.Invoke();
     }
     private void Action(Collision2D other)
     {
         if (_HasTag)
+        { 
             if (other.gameObject.CompareTag(_Tag) && _LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
                 _Event.Invoke();
+        }
+        else
+            if (_LayerMask == (_LayerMask | (1 << other.gameObject.layer)))
+            _Event.Invoke();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
