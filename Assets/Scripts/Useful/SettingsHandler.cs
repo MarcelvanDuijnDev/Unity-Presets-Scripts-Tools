@@ -8,37 +8,80 @@ using System;
 
 public class SettingsHandler : MonoBehaviour
 {
+    [Header("Audio")]
     [SerializeField] private AudioMixer _AudioMixer = null;
     [SerializeField] private float _Current_Volume = 1;
+    [SerializeField] private Slider _Slider_Volume = null;
 
-
+    [Header("Screen")]
     [SerializeField] private TMP_Dropdown _Dropdown_Resolution = null;
+    [SerializeField] private TMP_Dropdown _DropDown_ScreenOptions = null;
+
+    [Header("Quality")]
     [SerializeField] private TMP_Dropdown _Dropdown_Quality = null;
     [SerializeField] private TMP_Dropdown _Dropdown_Texture = null;
     [SerializeField] private TMP_Dropdown _Dropdown_AA = null;
-    [SerializeField] private Slider _Slider_Volume = null;
 
     [SerializeField] private Resolution[] _Resolutions = null;
+
+    [Header("Extra")]
+    [SerializeField] private Toggle _Toggle_Vsync = null;
+    [SerializeField] private TextMeshProUGUI _Text_FPS;
 
     private void Start()
     {
         _Resolutions = Screen.resolutions;
-        _Dropdown_Resolution.ClearOptions();
-        List<string> options = new List<string>();
 
-        int currentresid = 0;
-        for (int i = 0; i < _Resolutions.Length; i++)
+        //Resolutions
+        if (_Dropdown_Resolution != null)
         {
-            string option = _Resolutions[i].width + " x " + _Resolutions[i].height;
-            options.Add(option);
+            _Dropdown_Resolution.ClearOptions();
+            List<string> options = new List<string>();
+            int currentresid = 0;
+            for (int i = 0; i < _Resolutions.Length; i++)
+            {
+                string option = _Resolutions[i].width + " x " + _Resolutions[i].height;
+                options.Add(option);
 
-            if (_Resolutions[i].width == Screen.currentResolution.width && _Resolutions[i].height == Screen.currentResolution.height)
-                currentresid = i;
+                if (_Resolutions[i].width == Screen.currentResolution.width && _Resolutions[i].height == Screen.currentResolution.height)
+                    currentresid = i;
+            }
+
+            _Dropdown_Resolution.AddOptions(options);
+            _Dropdown_Resolution.value = currentresid;
+            _Dropdown_Resolution.RefreshShownValue();
         }
 
-        _Dropdown_Resolution.AddOptions(options);
-        _Dropdown_Resolution.value = currentresid;
-        _Dropdown_Resolution.RefreshShownValue();
+        //Screen
+        if (_DropDown_ScreenOptions != null)
+        {
+            _DropDown_ScreenOptions.ClearOptions();
+            List<string> options = new List<string>();
+            options.Add("Fullscreen");
+            options.Add("Windowed");
+            options.Add("Borderless Window");
+            _DropDown_ScreenOptions.AddOptions(options);
+        }
+
+        //Quallity
+        if (_Dropdown_Quality != null)
+        {
+            _Dropdown_Quality.ClearOptions();
+            List<string> options = new List<string>();
+            options.Add("Very Low");
+            options.Add("Low");
+            options.Add("Medium");
+            options.Add("High");
+            options.Add("Very High");
+            options.Add("Ultra");
+            _Dropdown_Quality.AddOptions(options);
+        }
+    }
+
+    private void Update()
+    {
+        if (_Text_FPS != null)
+            _Text_FPS.text = "Current FPS: " + Mathf.RoundToInt((1 / Time.unscaledDeltaTime)).ToString("0");
     }
 
     // [Display]
@@ -58,8 +101,8 @@ public class SettingsHandler : MonoBehaviour
     //Quiality
     public void Set_Quality(int qualityid)
     {
-        if (qualityid != 6) // if the user is not using 
-                               //any of the presets
+        if (qualityid != 6) // Default
+
             QualitySettings.SetQualityLevel(qualityid);
         switch (qualityid)
         {
@@ -134,18 +177,35 @@ public class SettingsHandler : MonoBehaviour
     }
     public void SaveSettings()
     {
-        PlayerPrefs.SetInt("QualitySettingPreference",
-                   _Dropdown_Quality.value);
-        PlayerPrefs.SetInt("ResolutionPreference",
-                   _Dropdown_Resolution.value);
-        PlayerPrefs.SetInt("TextureQualityPreference",
-                   _Dropdown_Texture.value);
-        PlayerPrefs.SetInt("AntiAliasingPreference",
-                   _Dropdown_AA.value);
-        PlayerPrefs.SetInt("FullscreenPreference",
-                   Convert.ToInt32(Screen.fullScreen));
-        PlayerPrefs.SetFloat("VolumePreference",
-                   _Current_Volume);
+        if (_Dropdown_Quality != null)
+            PlayerPrefs.SetInt("QualitySettingPreference", _Dropdown_Quality.value);
+
+        if (_Dropdown_Resolution != null)
+            PlayerPrefs.SetInt("ResolutionPreference", _Dropdown_Resolution.value);
+
+        if (_Dropdown_Texture != null)
+            PlayerPrefs.SetInt("TextureQualityPreference", _Dropdown_Texture.value);
+
+        if (_Dropdown_AA != null)
+            PlayerPrefs.SetInt("AntiAliasingPreference", _Dropdown_AA.value);
+
+        if (_DropDown_ScreenOptions != null)
+        {
+            if (_DropDown_ScreenOptions.value == 0)
+                PlayerPrefs.SetInt("FullscreenPreference", Convert.ToInt32(Screen.fullScreen));
+            if (_DropDown_ScreenOptions.value == 1)
+                PlayerPrefs.SetInt("FullscreenPreference", Convert.ToInt32(Screen.fullScreenMode = FullScreenMode.Windowed));
+            if (_DropDown_ScreenOptions.value == 2)
+                PlayerPrefs.SetInt("FullscreenPreference", Convert.ToInt32(Screen.fullScreenMode = FullScreenMode.FullScreenWindow));
+        }
+
+        if (_Toggle_Vsync != null)
+            if (_Toggle_Vsync.isOn)
+                Application.targetFrameRate = 60;
+            else
+                Application.targetFrameRate = 999;
+
+        PlayerPrefs.SetFloat("VolumePreference", _Current_Volume);
     }
     public void LoadSettings(int currentResolutionIndex)
     {
