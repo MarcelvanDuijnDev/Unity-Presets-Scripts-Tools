@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.2.8";
+    string _Version = "V1.3.0";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -113,7 +113,11 @@ public class Tool_QuickStart : EditorWindow
     string _Search_Window = ""; 
     string[] _Project_Scripts = new string[0];
     bool _Search_QuickStartScripts_Toggle = true;
-    bool _Searcg_ProjectScripts_Toggle = false;
+    bool _Search_ProjectScripts_Toggle = false;
+    bool _Search_UpToDate_Toggle = false;
+    bool _Search_UpToDate_HasChecked = false;
+    int _Search_UpToDate_Amount = 0;
+    int _Search_UpToDate_Total = 0;
     int _Search_ProjectScripts_Results = 0;
     int _Search_ProjectScripts_Total = 0;
     int _Search_Results = 0;
@@ -692,6 +696,15 @@ public class Tool_QuickStart : EditorWindow
         if (GUILayout.Button("Refresh"))
             SearchScripts();
 
+        //Check UpToDate
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Check UpToDate: ", GUILayout.Width(100));
+        _Search_UpToDate_Toggle = EditorGUILayout.Toggle(_Search_UpToDate_Toggle, GUILayout.Width(30));
+        if(_Search_UpToDate_Toggle)
+            if (GUILayout.Button("Check All", GUILayout.Width(100)))
+                ScriptUpToDateAll();
+        EditorGUILayout.EndHorizontal();
+
         //MultiSelect
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Add Multiple: ", GUILayout.Width(75));
@@ -724,10 +737,13 @@ public class Tool_QuickStart : EditorWindow
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
 
         //Quickstart Scripts
-        if (!_AddMultipleScriptsActive)
-            _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ")   ||   In Project: " + _Search_InProject_Results.ToString());
-        else
-            _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ")   ||   In Project: " + _Search_InProject_Results.ToString() + "   ||   Selected: " + _AddMultipleScripts_SelectAmount.ToString());
+        string togglestring = "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ")   ||   In Project: " + _Search_InProject_Results.ToString();
+        if(_Search_UpToDate_Toggle)
+            togglestring += "   ||   UpToDate: (" + _Search_UpToDate_Amount.ToString() + "/" + _Search_UpToDate_Total.ToString() + ")";
+        if (_AddMultipleScriptsActive)
+            togglestring += "   ||   Selected: " + _AddMultipleScripts_SelectAmount.ToString();
+
+        _Search_QuickStartScripts_Toggle = EditorGUILayout.Foldout(_Search_QuickStartScripts_Toggle, togglestring);
         if (_Search_QuickStartScripts_Toggle)
         {
             _Search_Results = 0;
@@ -794,14 +810,36 @@ public class Tool_QuickStart : EditorWindow
                         }
                         else
                         {
+                            float offset = 0;
+
                             if (_AddMultipleScriptsActive)
-                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 205));
+                                offset = -205;
                             else
-                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width - 190));
+                                offset = -190;
+
+                            if (_Search_UpToDate_Toggle && !QuickStart_Scripts[i].UpToDate && _Search_UpToDate_HasChecked)
+                                offset -= 65;
+
+                            if (_AddMultipleScriptsActive)
+                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width + offset));
+                            else
+                                EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width + offset));
                         }
 
                         if (Screen.width > 325)
                             EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptState, EditorStyles.miniLabel, GUILayout.Width(50));
+
+                        //Check if Uptodate
+                        if(QuickStart_Scripts[i].Exist && _Search_UpToDate_HasChecked && _Search_UpToDate_Toggle)
+                        {
+                            if(!QuickStart_Scripts[i].UpToDate)
+                            { 
+                                EditorGUI.BeginDisabledGroup(false);
+                                if (GUILayout.Button("Update", GUILayout.Width(60)))
+                                    ScriptUpToDate_Update(i);
+                                EditorGUI.EndDisabledGroup();
+                            }
+                        }
 
                         //Select Script
                         if (!QuickStart_Scripts[i].Exist)
@@ -834,7 +872,6 @@ public class Tool_QuickStart : EditorWindow
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.EndHorizontal();
 
-                        
                         //Description
                         if (!_AddMultipleScriptsActive && _ShowScriptDescription == i)
                         { 
@@ -844,7 +881,6 @@ public class Tool_QuickStart : EditorWindow
                             else
                                 GUILayout.Label("No Info", EditorStyles.helpBox);
                         }
-                        
                     }
                 }
 
@@ -861,8 +897,8 @@ public class Tool_QuickStart : EditorWindow
         GUI.backgroundColor = Color.white;
 
         //ProjectScripts
-        _Searcg_ProjectScripts_Toggle = EditorGUILayout.Foldout(_Searcg_ProjectScripts_Toggle, "Project" + "     ||     Results(" + _Search_ProjectScripts_Results.ToString() + "/" + _Search_ProjectScripts_Total.ToString() + ")");
-        if (_Searcg_ProjectScripts_Toggle)
+        _Search_ProjectScripts_Toggle = EditorGUILayout.Foldout(_Search_ProjectScripts_Toggle, "Project" + "     ||     Results(" + _Search_ProjectScripts_Results.ToString() + "/" + _Search_ProjectScripts_Total.ToString() + ")");
+        if (_Search_ProjectScripts_Toggle)
         {
             _Search_ProjectScripts_Results = 0;
 
@@ -977,6 +1013,48 @@ public class Tool_QuickStart : EditorWindow
             }
         }
         return QuickStart_Scripts[scriptid].Exist;
+    }
+
+    void ScriptUpToDateAll()
+    {
+        _Search_UpToDate_Amount = 0;
+        _Search_UpToDate_Total = 0;
+        for (int i = 0; i < QuickStart_Scripts.Length; i++)
+        {
+            ScriptUpToDate(i);
+        }
+        _Search_UpToDate_HasChecked = true;
+    }
+    bool ScriptUpToDate(int id)
+    {
+        if (QuickStart_Scripts[id].Exist)
+        {
+            _Search_UpToDate_Total++;
+            bool check = false;
+
+            //Editor / Script
+            string[] scriptcode_editor = QuickStart_Scripts[id].ScriptCode.Split('\n');
+            string[] scriptcode = File.ReadAllLines(QuickStart_Scripts[id].ScriptPath);
+
+            if ((scriptcode_editor.Length - 1) == scriptcode.Length)
+            {
+                QuickStart_Scripts[id].UpToDate = true;
+                _Search_UpToDate_Amount++;
+            }
+            return check;
+        }
+        return false;
+    }
+    void ScriptUpToDate_Update(int id)
+    {
+        using (StreamWriter sw = new StreamWriter(string.Format(QuickStart_Scripts[id].ScriptPath,
+                                           new object[] { QuickStart_Scripts[id].ScriptName.Replace(" ", "") })))
+        {
+            sw.Write(QuickStart_Scripts[id].ScriptCode);
+        }
+        AssetDatabase.Refresh();
+        SearchScripts();
+        ScriptUpToDateAll();
     }
 
     //Home > Scripts : Add
@@ -3100,6 +3178,9 @@ public class Tool_QuickStart : EditorWindow
         {
             GUILayout.Label(
                 "\n" +
+                "V1.3.0 (10-mar-2022)\n" +
+                "* Added Update Script Function)\n" +
+                "\n" +
                 "V1.2.8 (7-mar-2022)\n" +
                 "* Updated ObjectPool.cs)\n" +
                 "\n" +
@@ -3293,6 +3374,7 @@ public class Tool_QuickStart_Script
     private string _Script_Path;
 
     public bool Exist;
+    public bool UpToDate;
 
     public string ScriptName { get { return _Script_Name; } }
     public string ScriptTag { get { return _Script_Tag; } }
