@@ -15,17 +15,11 @@ public class AnimatorOverrider : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
             Set(0);
-        }
         if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
             Set(1);
-        }
         if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
             Set(2);
-        }
     }
 
     public void SetAnimations(AnimatorOverrideController overridecontroller)
