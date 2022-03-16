@@ -14,6 +14,7 @@ public class AnimatorOverrider : MonoBehaviour
 
     private void Update()
     {
+        //Example
         if (Input.GetKeyDown(KeyCode.Alpha1))
             Set(0);
         if (Input.GetKeyDown(KeyCode.Alpha2))
