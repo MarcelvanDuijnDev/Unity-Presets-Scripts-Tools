@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.3.1";
+    string _Version = "V1.3.2";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -159,12 +159,21 @@ public class Tool_QuickStart : EditorWindow
     List<Tool_QuickStart_SceneOrganizer_GameObjectProfile_All> _AllSceneObjects = new List<Tool_QuickStart_SceneOrganizer_GameObjectProfile_All>();
     bool _SceneObjects_ShowSnapshot = true;
     bool _SceneObjects_Show_SceneStructure = false;
-    bool _SceneObjects_Show_SceneAllObject = false;
-    bool _SceneObjects_Show_Scripts = false;
+    bool _SceneObjects_Show_SceneAllObject = true;
+    bool _SceneObjects_Filter_ShowScripts = false;
     string _SceneObjects_Search = "";
     string _SceneObjects_SearchScript = "";
+    string _SceneObjects_SearchComponent = "";
     bool _SceneObjects_Filter_HasScript = false;
+    bool _SceneObjects_Filter_ShowComponents = false;
     Vector2 _Scene_Scroll;
+    enum _Scene_FilterOptions { 
+        None,
+        RigidBody,
+        BoxCollider,
+        SphereCollider
+    }
+    _Scene_FilterOptions _SceneFilter;
 
     //FileFinder (FF) ----------------------------------------------
     #region FileFinder
@@ -2342,21 +2351,34 @@ public class Tool_QuickStart : EditorWindow
                     newobj.Scripts.Add(scriptnames[j]);
                 }
 
+                Component[] components = allobjects[i].GetComponents(typeof(Component));
+                foreach (Component component in components)
+                {
+                    //Debug.Log(component.ToString());
+
+                    string[] componentsplit = component.ToString().Split(".");
+                    string componentfinal = componentsplit[componentsplit.Length - 1];
+                    componentfinal = componentfinal.Substring(0, componentfinal.Length - 1);
+
+                    newobj.Components.Add(componentfinal);
+                }
+
                 _AllSceneObjects.Add(newobj);
             }
         }
 
-        //Search
-        EditorGUILayout.BeginHorizontal("box");
-        _SceneObjects_Search = EditorGUILayout.TextField("Search: ", _SceneObjects_Search);
-        EditorGUILayout.EndHorizontal();
-
-        //Search Script
-        EditorGUILayout.BeginHorizontal("box");
+        //Search Obj_Name/Script/Component
+        EditorGUILayout.BeginVertical("box");
+        _SceneObjects_Search = EditorGUILayout.TextField("Search Obj Name: ", _SceneObjects_Search);
         _SceneObjects_SearchScript = EditorGUILayout.TextField("Search Script: ", _SceneObjects_SearchScript);
+        _SceneObjects_SearchComponent = EditorGUILayout.TextField("Search Component: ", _SceneObjects_SearchComponent);
         _SceneObjects_Filter_HasScript = EditorGUILayout.Toggle("Has Scripts", _SceneObjects_Filter_HasScript);
-        _SceneObjects_Show_Scripts = EditorGUILayout.Toggle("Show Scripts", _SceneObjects_Show_Scripts);
-        EditorGUILayout.EndHorizontal();
+        _SceneObjects_Filter_ShowScripts = EditorGUILayout.Toggle("Show Scripts", _SceneObjects_Filter_ShowScripts);
+        _SceneObjects_Filter_ShowComponents = EditorGUILayout.Toggle("Show Components", _SceneObjects_Filter_ShowComponents);
+        EditorGUILayout.EndVertical();
+
+        //Type wip
+        //_SceneFilter = (_Scene_FilterOptions)EditorGUILayout.EnumPopup("Filter", _SceneFilter);
 
         //Loop Trough Objects/Scripts
         _Scene_Scroll = EditorGUILayout.BeginScrollView(_Scene_Scroll);
@@ -2364,82 +2386,72 @@ public class Tool_QuickStart : EditorWindow
         {
             if (_AllSceneObjects[i].ChildObject.name.ToLower().Contains(_SceneObjects_Search.ToLower()))
             {
-                if (_SceneObjects_Filter_HasScript || _SceneObjects_SearchScript != "")
-                    Scene_ObjectFilter_SearchScript(i);
-                else
-                    Scene_ObjectFilter_Search(i);
+                Scene_ObjectFilter_ApplyFilter(i);
             }
         }
         EditorGUILayout.EndScrollView();
     }
-    void Scene_ObjectFilter_Search(int i)
-    {
-        if (_SceneObjects_Show_Scripts)
-        {
-            if (_AllSceneObjects[i].Scripts.Count > 0)
-            {
-                EditorGUILayout.BeginVertical("box");
-                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count.ToString());
-                for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
-                {
-                    GUILayout.Label("> " + _AllSceneObjects[i].Scripts[j] + ".cs");
-                }
-                EditorGUILayout.EndVertical();
-            }
-            else
-                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: 0");
-        }
-        else
-        {
-            if (_AllSceneObjects[i].Scripts.Count > 0)
-                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count.ToString());
-            else
-                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: 0");
-        }
 
-    }
-    void Scene_ObjectFilter_SearchScript(int i)
+    void Scene_ObjectFilter_ApplyFilter(int i)
     {
+        //Has Scripts
         if (_AllSceneObjects[i].Scripts.Count > 0)
         {
-            if (_SceneObjects_SearchScript != "")
+            //Check if script exist
+            bool check1 = false;
+            for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
             {
-                bool check = false;
-                for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
-                {
-                    if (_AllSceneObjects[i].Scripts[j].ToLower().Contains(_SceneObjects_SearchScript.ToLower()))
-                        check = true;
-                }
-                if (check)
-                {
-                    EditorGUILayout.BeginVertical("box");
-                    GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count);
-                    for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
-                    {
-                        GUILayout.Label("> " + _AllSceneObjects[i].Scripts[j] + ".cs");
-                    }
-                    EditorGUILayout.EndHorizontal();
-                }
+                if (_SceneObjects_SearchScript == "" || _AllSceneObjects[i].Scripts[j].ToLower().Contains(_SceneObjects_SearchScript.ToLower()))
+                    check1 = true;
             }
-            else
+            //Check if component exist
+            bool check2 = false;
+            for (int j = 0; j < _AllSceneObjects[i].Components.Count; j++)
             {
-                if (_SceneObjects_Show_Scripts)
+                if (_SceneObjects_SearchComponent == "" || _AllSceneObjects[i].Components[j].ToLower().Contains(_SceneObjects_SearchComponent.ToLower()))
+                    check2 = true;
+            }
+
+            if (check1 && check2)
+            {
+                //ShowScripts / ShowComponents
+                EditorGUILayout.BeginVertical("box");
+                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count + "  -   Components: " + _AllSceneObjects[i].Components.Count);
+                if (_SceneObjects_Filter_ShowScripts)
                 {
-                    EditorGUILayout.BeginVertical("box");
-                    GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count);
                     for (int j = 0; j < _AllSceneObjects[i].Scripts.Count; j++)
                     {
-                        GUILayout.Label("> " + _AllSceneObjects[i].Scripts[j] + ".cs");
+                        GUILayout.Label(">> " + _AllSceneObjects[i].Scripts[j] + ".cs");
                     }
-                    EditorGUILayout.EndHorizontal();
                 }
-                else
-                    GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: " + _AllSceneObjects[i].Scripts.Count);
-
+                if (_SceneObjects_Filter_ShowComponents)
+                {
+                    for (int j = 0; j < _AllSceneObjects[i].Components.Count; j++)
+                    {
+                        GUILayout.Label("> " + _AllSceneObjects[i].Components[j]);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+        else //0 Scripts
+        {
+            //HasScripts
+            if (!_SceneObjects_Filter_HasScript)
+            {
+                EditorGUILayout.BeginVertical("box");
+                GUILayout.Label(i.ToString() + "  -  " + _AllSceneObjects[i].ChildObject.name + "  -  " + "Scripts: 0" + "  -   Components: " + _AllSceneObjects[i].Components.Count);
+                if (_SceneObjects_Filter_ShowComponents)
+                {
+                    for (int j = 0; j < _AllSceneObjects[i].Components.Count; j++)
+                    {
+                        GUILayout.Label("> " + _AllSceneObjects[i].Components[j]);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
             }
         }
     }
-
 
     //FileFinder
     void FileFinder()
@@ -3201,6 +3213,9 @@ public class Tool_QuickStart : EditorWindow
         {
             GUILayout.Label(
                 "\n" +
+                "V1.3.2 (20-mar-2022)\n" +
+                "* Updated Scene(wip) > SceneExplorer\n" +
+                "\n" +
                 "V1.3.1 (16-mar-2022)\n" +
                 "* Added AnimatorOverrider.cs\n" +
                 "* Improved Search Scripts Window / Options\n" +
@@ -3436,4 +3451,5 @@ public class Tool_QuickStart_SceneOrganizer_GameObjectProfile_All
 {
     public GameObject ChildObject;
     public List<string> Scripts = new List<string>();
+    public List<string> Components = new List<string>();
 }
