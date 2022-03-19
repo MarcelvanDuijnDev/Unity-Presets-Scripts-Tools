@@ -81,6 +81,7 @@ Feel free to use/copy files from this project._
 - [ReadAudioFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/ReadAudioFile.cs)
 
 # Useful
+- [AnimatorOverrider.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/AnimatorOverrider.cs)
 - [DialogSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/DialogSystem.cs)
 - [DialogSystemEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/DialogSystemEditor.cs)
 - [DebugCommandBase.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/DebugConsole/DebugCommandBase.cs)
