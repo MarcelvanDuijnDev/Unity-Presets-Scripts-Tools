@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.3.2";
+    string _Version = "V1.3.3";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -119,6 +119,7 @@ public class Tool_QuickStart : EditorWindow
     bool _Search_ProjectScripts_Toggle = false;
     bool _Search_UpToDate_Toggle = false;
     bool _Search_UpToDate_HasChecked = false;
+    bool _Search_Compare_Toggle = false;
     int _Search_UpToDate_Amount = 0;
     int _Search_UpToDate_Total = 0;
     int _Search_ProjectScripts_Results = 0;
@@ -715,11 +716,27 @@ public class Tool_QuickStart : EditorWindow
 
             //Check UpToDate
             EditorGUILayout.BeginHorizontal("box");
+
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Check UpToDate: ", GUILayout.Width(150));
             _Search_UpToDate_Toggle = EditorGUILayout.Toggle(_Search_UpToDate_Toggle);
+            
             if (_Search_UpToDate_Toggle)
+            {
+                
                 if (GUILayout.Button("Check All", GUILayout.Width(100)))
                     ScriptUpToDateAll();
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            if (_Search_UpToDate_Toggle)
+            {
+                EditorGUILayout.LabelField("Compare: ", GUILayout.Width(150));
+                _Search_Compare_Toggle = EditorGUILayout.Toggle(_Search_Compare_Toggle);
+            }
+            EditorGUILayout.EndHorizontal();
+            GUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
 
             //MultiSelect
@@ -850,7 +867,12 @@ public class Tool_QuickStart : EditorWindow
                                 offset = -190;
 
                             if (_Search_UpToDate_Toggle && !QuickStart_Scripts[i].UpToDate && _Search_UpToDate_HasChecked && QuickStart_Scripts[i].Exist)
-                                offset -= 65;
+                            {
+                                if (_Search_Compare_Toggle)
+                                    offset -= 130;
+                                else
+                                    offset -= 65;
+                            }
 
                             if (_AddMultipleScriptsActive)
                                 EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptName + ".cs", EditorStyles.boldLabel, GUILayout.Width(Screen.width + offset));
@@ -865,7 +887,13 @@ public class Tool_QuickStart : EditorWindow
                         if(QuickStart_Scripts[i].Exist && _Search_UpToDate_HasChecked && _Search_UpToDate_Toggle)
                         {
                             if(!QuickStart_Scripts[i].UpToDate)
-                            { 
+                            {
+                                if (_Search_Compare_Toggle)
+                                {
+                                    if (GUILayout.Button("Compare", GUILayout.Width(60)))
+                                        ScriptUpToDate_Compare(i);
+                                }
+
                                 EditorGUI.BeginDisabledGroup(false);
                                 if (GUILayout.Button("Update", GUILayout.Width(60)))
                                     ScriptUpToDate_Update(i);
@@ -1087,6 +1115,17 @@ public class Tool_QuickStart : EditorWindow
         AssetDatabase.Refresh();
         SearchScripts();
         ScriptUpToDateAll();
+    }
+    void ScriptUpToDate_Compare(int id)
+    {
+        if (QuickStart_Scripts[id].Exist)
+        {
+            //Editor / Script
+            string[] scriptcode_editor = QuickStart_Scripts[id].ScriptCode.Split('\n');
+            string[] scriptcode = File.ReadAllLines(QuickStart_Scripts[id].ScriptPath);
+
+            Debug.Log("[InUnity] Script Length:(" + scriptcode.Length + ")" + "  Tool_QuickStart/" + QuickStart_Scripts[id].ScriptName + " Length:(" + (scriptcode_editor.Length-1).ToString() + ")");
+        }
     }
 
     //Home > Scripts : Add
@@ -3212,6 +3251,9 @@ public class Tool_QuickStart : EditorWindow
         if (_UpdateLogFoldout[1])
         {
             GUILayout.Label(
+                "\n" +
+                "V1.3.3 (26-mar-2022)\n" +
+                "* Added Search Scripts Compare Option \n" +
                 "\n" +
                 "V1.3.2 (20-mar-2022)\n" +
                 "* Updated Scene(wip) > SceneExplorer\n" +
