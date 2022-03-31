@@ -14,7 +14,7 @@ using TMPro;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.3.3";
+    string _Version = "V1.3.4";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -126,6 +126,7 @@ public class Tool_QuickStart : EditorWindow
     int _Search_ProjectScripts_Total = 0;
     int _Search_Results = 0;
     int _Search_InProject_Results = 0;
+    public int _Search_CompareID = 0;
 
     //HUD Settings
     bool _HUD_EnableLiveEdit = true;
@@ -250,6 +251,8 @@ public class Tool_QuickStart : EditorWindow
     Texture2D[] _ME_PrefabIcon = new Texture2D[0];
     bool _ME_FirstLoad = true;
     #endregion
+
+    public static Tool_QuickStart TOOL;
 
 
     [MenuItem("Tools/Tool_QuickStart %q")]
@@ -713,7 +716,6 @@ public class Tool_QuickStart : EditorWindow
         _ScriptOptionsFoldout = EditorGUILayout.Foldout(_ScriptOptionsFoldout, "Extra Options");
         if (_ScriptOptionsFoldout)
         {
-
             //Check UpToDate
             EditorGUILayout.BeginHorizontal("box");
 
@@ -891,7 +893,10 @@ public class Tool_QuickStart : EditorWindow
                                 if (_Search_Compare_Toggle)
                                 {
                                     if (GUILayout.Button("Compare", GUILayout.Width(60)))
-                                        ScriptUpToDate_Compare(i);
+                                    {
+                                        _Search_CompareID = i;
+                                        EditorWindow.GetWindow(typeof(Tool_QuickStart_CompareScripts));
+                                    }
                                 }
 
                                 EditorGUI.BeginDisabledGroup(false);
@@ -1116,16 +1121,26 @@ public class Tool_QuickStart : EditorWindow
         SearchScripts();
         ScriptUpToDateAll();
     }
-    void ScriptUpToDate_Compare(int id)
+    public string[] ScriptUpToDate_Compare_Script()
     {
-        if (QuickStart_Scripts[id].Exist)
+        string[] scriptcode = new string[0];
+        if (QuickStart_Scripts[_Search_CompareID].Exist)
         {
-            //Editor / Script
-            string[] scriptcode_editor = QuickStart_Scripts[id].ScriptCode.Split('\n');
-            string[] scriptcode = File.ReadAllLines(QuickStart_Scripts[id].ScriptPath);
-
-            Debug.Log("[InUnity] Script Length:(" + scriptcode.Length + ")" + "  Tool_QuickStart/" + QuickStart_Scripts[id].ScriptName + " Length:(" + (scriptcode_editor.Length-1).ToString() + ")");
+            //Script
+            scriptcode = File.ReadAllLines(QuickStart_Scripts[_Search_CompareID].ScriptPath);
         }
+        return scriptcode;
+    }
+    public string[] ScriptUpToDate_Compare_Editor()
+    {
+        string[] scriptcode_editor = new string[0];
+
+        if (QuickStart_Scripts[_Search_CompareID].Exist)
+        {
+            //Editor
+            scriptcode_editor = QuickStart_Scripts[_Search_CompareID].ScriptCode.Split('\n');
+        }
+        return scriptcode_editor;
     }
 
     //Home > Scripts : Add
@@ -2951,6 +2966,8 @@ public class Tool_QuickStart : EditorWindow
     //Enable/Disable
     void OnEnable()
     {
+        TOOL = this;
+
         SceneView.duringSceneGui += this.OnSceneGUI;
         SceneView.duringSceneGui += this.OnScene;
 
@@ -3252,6 +3269,9 @@ public class Tool_QuickStart : EditorWindow
         {
             GUILayout.Label(
                 "\n" +
+                "V1.3.4 (31-mar-2022)\n" +
+                "* Improved Script Compare Option (wip) \n" +
+                "\n" +
                 "V1.3.3 (26-mar-2022)\n" +
                 "* Added Search Scripts Compare Option \n" +
                 "\n" +
@@ -3494,4 +3514,125 @@ public class Tool_QuickStart_SceneOrganizer_GameObjectProfile_All
     public GameObject ChildObject;
     public List<string> Scripts = new List<string>();
     public List<string> Components = new List<string>();
+}
+
+public class Tool_QuickStart_CompareScripts : EditorWindow
+{
+    Tool_QuickStart _Tool_QuickStart = Tool_QuickStart.TOOL;
+
+    int _CompareID = -1;
+    string[] _Scripts_Unity;
+    string[] _Scripts_Editor;
+    bool[] _Script_UnityDifference;
+    bool[] _Script_EditorDifference;
+
+    Vector2 _ScrollView = new Vector2();
+
+    Vector2 _Scroll_Script = new Vector2();
+    Vector2 _Scroll_Editor = new Vector2();
+
+    void OnGUI()
+    {
+        _ScrollView = EditorGUILayout.BeginScrollView(_ScrollView);
+
+        if(_CompareID != _Tool_QuickStart._Search_CompareID)
+        {
+            _CompareID = _Tool_QuickStart._Search_CompareID;
+            UpdateScripts();
+        }
+
+        GUILayout.Label("Compare (wip)", EditorStyles.boldLabel);
+        GUILayout.BeginHorizontal();
+
+
+        GUILayout.BeginVertical("box");
+        GUILayout.Label("Script Unity");
+        _Scroll_Script = EditorGUILayout.BeginScrollView(_Scroll_Script);
+        for (int i = 0; i < _Scripts_Unity.Length; i++)
+        {
+            if (_Script_UnityDifference[i])
+            {
+                GUI.backgroundColor = new Color(1, 0, 0);
+                GUILayout.BeginHorizontal("box");
+            }
+            else
+                GUILayout.BeginHorizontal();
+
+            GUILayout.Label((i + 1).ToString(), GUILayout.Width(25));
+            GUILayout.Label(_Scripts_Unity[i]);
+            GUILayout.EndHorizontal();
+
+            GUI.backgroundColor = Color.white;
+        }
+        EditorGUILayout.EndScrollView();
+        GUILayout.EndVertical();
+
+
+        GUILayout.BeginVertical("box");
+        GUILayout.Label("Script Editor");
+        _Scroll_Editor = EditorGUILayout.BeginScrollView(_Scroll_Editor);
+        for (int i = 0; i < _Scripts_Editor.Length; i++)
+        {
+            if (_Script_EditorDifference[i])
+            {
+                GUI.backgroundColor = new Color(1, 0, 0);
+                GUILayout.BeginHorizontal("box");
+            }
+            else
+                GUILayout.BeginHorizontal();
+
+            GUILayout.Label((i + 1).ToString(), GUILayout.Width(25));
+            GUILayout.Label(_Scripts_Editor[i]);
+            GUILayout.EndHorizontal();
+            GUI.backgroundColor = Color.white;
+        }
+        EditorGUILayout.EndScrollView();
+        GUILayout.EndVertical();
+
+
+        GUILayout.EndHorizontal();
+
+        EditorGUILayout.EndScrollView();
+    }
+
+    void UpdateScripts()
+    {
+        //Get Scripts
+        _Scripts_Unity = _Tool_QuickStart.ScriptUpToDate_Compare_Script();
+        _Script_UnityDifference = new bool[_Scripts_Unity.Length];
+        _Scripts_Editor = _Tool_QuickStart.ScriptUpToDate_Compare_Editor();
+        _Script_EditorDifference = new bool[_Scripts_Editor.Length];
+
+        //Compare Scripts Unity
+        for (int i = 0; i < _Script_UnityDifference.Length; i++)
+        {
+            if(_Scripts_Editor.Length > i)
+            {
+                if(_Scripts_Editor[i] != _Scripts_Unity[i])
+                {
+                    _Script_UnityDifference[i] = true;
+                }
+            }
+            else
+            {
+                _Script_UnityDifference[i] = true;
+            }
+        }
+
+        //Compare Scripts Editor
+        for (int i = 0; i < _Script_EditorDifference.Length; i++)
+        {
+            if (_Scripts_Unity.Length > i)
+            {
+                if (_Scripts_Editor[i] != _Scripts_Unity[i])
+                {
+                    _Script_EditorDifference[i] = true;
+                }
+            }
+            else
+            {
+                _Script_EditorDifference[i] = true;
+            }
+        }
+    }
 }
