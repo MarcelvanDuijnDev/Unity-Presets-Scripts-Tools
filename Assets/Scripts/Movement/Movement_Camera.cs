@@ -92,7 +92,7 @@ public class Movement_Camera : MonoBehaviour
                 }
             }
         }
-        else
+        else //CutScene
         {
             //Position
             _TargetPosition = _CutScenePosition;
@@ -110,9 +110,7 @@ public class Movement_Camera : MonoBehaviour
                 transform.eulerAngles = new Vector3(lookrotation.eulerAngles.x + _CutSceneRotation.x, lookrotation.eulerAngles.y + _CutSceneRotation.y, lookrotation.eulerAngles.z + _CutSceneRotation.z);
             }
             else
-            {
                 transform.eulerAngles = _CutSceneRotation;
-            }
         }
     }
 
