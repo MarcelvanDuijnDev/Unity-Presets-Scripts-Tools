@@ -15,6 +15,7 @@ public class AudioHandler : MonoBehaviour
     [SerializeField] private List<AudioHandler_Sound> _Sound = new List<AudioHandler_Sound>();
 
     private string _CurrentScene;
+    private bool _HasFade;
 
     //You can call AudioHandler.AUDIO from every script as long as you have the script in the scene.
     public static AudioHandler AUDIO;
@@ -91,51 +92,69 @@ public class AudioHandler : MonoBehaviour
         RefreshSettings();
     }
 
+    private void Start()
+    {
+        for (int i = 0; i < _Sound.Count; i++)
+        {
+            if (_Sound[i].AudioEffects.FadeIn || _Sound[i].AudioEffects.FadeOut)
+            {
+                _HasFade = true;
+                break;
+            }
+        }
+    }
+
     void Update()
     {
+        //Check if scene has changed
         CheckNewScene();
 
+        //Mostly for debug reasons (impacts performance)
         if (_RefreshSettingsOnUpdate)
             RefreshSettings();
 
-        for (int i = 0; i < _Sound.Count; i++)
+        //If fadein or fadeout is used
+        if (_HasFade)
         {
-            //FadeIn
-            if (_Sound[i].AudioEffects.FadingIn)
+            for (int i = 0; i < _Sound.Count; i++)
             {
-                if (_Sound[i].AudioEffects.FadeIn && !_Sound[i].AudioEffects.FadeInDone)
+                //FadeIn
+                if (_Sound[i].AudioEffects.FadingIn)
                 {
-                    if (_Sound[i].Settings.AudioSource.volume < _Sound[i].AudioSettings.Volume)
+                    if (_Sound[i].AudioEffects.FadeIn && !_Sound[i].AudioEffects.FadeInDone)
                     {
-                        _Sound[i].Settings.AudioSource.volume += _Sound[i].AudioEffects.FadeInSpeed * Time.deltaTime;
-                    }
-                    else
-                    {
-                        _Sound[i].AudioEffects.FadeInDone = true;
-                        _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
-                    }
-                }
-            }
-            //FadeOut
-            if (_Sound[i].AudioEffects.FadingOut)
-            {
-                if (_Sound[i].AudioEffects.FadeOutAfterTime > -0.1f)
-                {
-                    _Sound[i].AudioEffects.FadeOutAfterTime -= 1 * Time.deltaTime;
-                }
-                else
-                {
-                    if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadeOutDone)
-                    {
-                        if (_Sound[i].Settings.AudioSource.volume > 0)
+                        if (_Sound[i].Settings.AudioSource.volume < _Sound[i].AudioSettings.Volume)
                         {
-                            _Sound[i].Settings.AudioSource.volume -= _Sound[i].AudioEffects.FadeOutSpeed * Time.deltaTime;
+                            _Sound[i].Settings.AudioSource.volume += _Sound[i].AudioEffects.FadeInSpeed * Time.deltaTime;
                         }
                         else
                         {
-                            _Sound[i].AudioEffects.FadeOutDone = true;
-                            _Sound[i].Settings.AudioSource.volume = 0;
-                            _Sound[i].Settings.AudioSource.Stop();
+                            _Sound[i].AudioEffects.FadeInDone = true;
+                            _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
+                        }
+                    }
+                }
+                //FadeOut
+                if (_Sound[i].AudioEffects.FadingOut)
+                {
+                    if (_Sound[i].AudioEffects.FadeOutAfterTime > -0.1f)
+                    {
+                        _Sound[i].AudioEffects.FadeOutAfterTime -= 1 * Time.deltaTime;
+                    }
+                    else
+                    {
+                        if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadeOutDone)
+                        {
+                            if (_Sound[i].Settings.AudioSource.volume > 0)
+                            {
+                                _Sound[i].Settings.AudioSource.volume -= _Sound[i].AudioEffects.FadeOutSpeed * Time.deltaTime;
+                            }
+                            else
+                            {
+                                _Sound[i].AudioEffects.FadeOutDone = true;
+                                _Sound[i].Settings.AudioSource.volume = 0;
+                                _Sound[i].Settings.AudioSource.Stop();
+                            }
                         }
                     }
                 }
@@ -210,7 +229,10 @@ public class AudioHandler : MonoBehaviour
         for (int i = 0; i < _Sound.Count; i++)
         {
             if (_Sound[i].AudioTrackName == trackname)
+            {
                 AudioHandler_PlayTrack(i);
+                break;
+            }
         }
     }
     public void PlayTrack(int trackid)
@@ -224,8 +246,11 @@ public class AudioHandler : MonoBehaviour
         for (int i = 0; i < _Sound.Count; i++)
         {
             if (_Sound[i].AudioTrackName == trackname)
+            {
                 if (!_Sound[i].Settings.AudioSource.isPlaying)
                     AudioHandler_PlayTrack(i);
+                break;
+            }
         }
     }
     public void StartTrack(int trackid)
@@ -240,7 +265,10 @@ public class AudioHandler : MonoBehaviour
         for (int i = 0; i < _Sound.Count; i++)
         {
             if (_Sound[i].AudioTrackName == trackname)
+            {
                 _Sound[i].Settings.AudioSource.Stop();
+                break;
+            }
         }
     }
     public void StopTrack(int trackid)
@@ -269,7 +297,10 @@ public class AudioHandler : MonoBehaviour
         for (int i = 0; i < _Sound.Count; i++)
         {
             if (_Sound[i].AudioTrackName == trackname)
+            {
                 _Sound[i].Settings.AudioSource = audiosource;
+                break;
+            }
         }
     }
     public void SetAudioSource(int trackid, AudioSource audiosource)
