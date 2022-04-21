@@ -63,7 +63,7 @@ public class AudioZone : MonoBehaviour
         else
         {
             _AudioTrackID = -1;
-            Debug.Log("AudioZone: AudioHandler does not exist in scene");
+            Debug.Log("AudioZone: AudioHandler does not exist in this scene");
         }
     }
 
@@ -113,7 +113,7 @@ public class AudioZone : MonoBehaviour
         AudioHandler.AUDIO.StopTrack(_AudioTrackName);
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Vector4(0, 1f, 0, 0.1f);
         Gizmos.DrawSphere(transform.position, Range);
