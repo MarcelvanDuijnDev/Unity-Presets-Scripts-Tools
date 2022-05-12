@@ -79,8 +79,9 @@ public class AudioHandler : MonoBehaviour
                 }
                 if (_Sound[i].AudioEffects.FadeIn)
                 {
-                    _Sound[i].Settings.AudioSource.volume = 1;
+                    _Sound[i].Settings.AudioSource.volume = 0;
                     _Sound[i].AudioEffects.FadeInSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeInDuration;
+                    _Sound[i].AudioEffects.FadingIn = true;
                 }
                 if (_Sound[i].AudioEffects.FadeOut)
                 {
