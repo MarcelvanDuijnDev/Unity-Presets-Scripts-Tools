@@ -40,4 +40,18 @@ public class FadeInOut : MonoBehaviour
 
         _Image.color = _Color;
     }
+
+    public void SetFade(bool isfadein)
+    {
+        if (isfadein)
+        {
+            _FadeOption = Fade.In;
+            _Color = new Color(_Image.color.r, _Image.color.g, _Image.color.b, 0);
+        }
+        else
+        {
+            _FadeOption = Fade.Out;
+            _Color = new Color(_Image.color.r, _Image.color.g, _Image.color.b, 1);
+        }
+    }
 }

@@ -93,6 +93,7 @@ Feel free to use/copy files from this project._
 - [InteractionHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/InteractionHandler.cs)
 - [LightEffects.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/LightEffects.cs)
 - [LoadScenes.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/LoadScenes.cs)
+- [LoadScenesWithLoadingBar.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/LoadScenesWithLoadingBar.cs)
 - [MenuHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/MenuHandler.cs)
 - [ObjectPool.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/ObjectPool/ObjectPool.cs)
 - [ObjectPoolSimple.cs](https://github.com/MarcelvanDuijnDev/UnityPresets/blob/main/Assets/Scripts/ObjectPool/ObjectPoolSimple.cs)

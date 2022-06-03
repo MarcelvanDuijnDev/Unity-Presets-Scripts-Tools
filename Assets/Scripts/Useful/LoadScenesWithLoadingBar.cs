@@ -1,54 +1,21 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Events;
-using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine;
+using TMPro;
 
-public class DoEvent : MonoBehaviour
+public class LoadScenesWithLoadingBar : MonoBehaviour
 {
-    [SerializeField] private UnityEvent _Event = null;
-    [SerializeField] private bool _OnStart = false;
-    [SerializeField] private bool _OnUpdate = false;
-    [SerializeField] private bool _OnButtonPressed = false;
+    [Header("Settings")]
+    [SerializeField] private TextMeshProUGUI _LoadingText;
+    [SerializeField] private RectTransform _LoadingBarRect;
 
+    private Vector2 _LoadingBarSize = Vector2.zero;
     private bool _AsyncLoading = false;
 
-    void Start()
+    private void Start()
     {
-        if (_OnStart)
-            DoEvents();
-    }
-
-    void Update()
-    {
-        if (_OnUpdate)
-            DoEvents();
-
-        if (_OnButtonPressed)
-            if (Input.anyKey)
-                DoEvents();
-    }
-
-    private void DoEvents()
-    {
-        _Event.Invoke();
-    }
-
-    //Set Object true/false
-    public void SetGameobject_InActive(GameObject targetobject)
-    {
-        targetobject.SetActive(false);
-    }
-    public void SetGameobject_Active(GameObject targetobject)
-    {
-        targetobject.SetActive(true);
-    }
-    public void SetGameObject_Negative(GameObject targetobject)
-    {
-        if (targetobject.activeSelf)
-            targetobject.SetActive(false);
-        else
-            targetobject.SetActive(true);
+        _LoadingBarSize = _LoadingBarRect.sizeDelta;
     }
 
     //Load/Reload Scenes
@@ -94,6 +61,8 @@ public class DoEvent : MonoBehaviour
 
         while (!asyncLoad.isDone)
         {
+            _LoadingText.text = (asyncLoad.progress * 100).ToString("0") + "%";
+            _LoadingBarRect.sizeDelta = new Vector2(asyncLoad.progress * _LoadingBarSize.x, _LoadingBarSize.y);
             yield return null;
         }
     }
@@ -103,12 +72,14 @@ public class DoEvent : MonoBehaviour
 
         while (!asyncLoad.isDone)
         {
+            _LoadingText.text = (asyncLoad.progress * 100).ToString("0") + "%";
+            _LoadingBarRect.sizeDelta = new Vector2(asyncLoad.progress * _LoadingBarSize.x, _LoadingBarSize.y);
             yield return null;
         }
     }
 
     //Quit
-    public void Quit()
+    public void QuitApplication()
     {
         Application.Quit();
     }
