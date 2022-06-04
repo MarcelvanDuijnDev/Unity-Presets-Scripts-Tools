@@ -19,6 +19,8 @@ public class AudioZone : MonoBehaviour
     [Header("3D Audio")]
     [SerializeField] private bool _Use3DAudio = true;
     [SerializeField] private bool _UseThisPos = true;
+    [SerializeField] private bool _SetParentToThis = true;
+    [SerializeField] private bool _UpdateToThisPos = false;
     [SerializeField] private bool _CreateNewAudioSource = true;
 
     // Check effector leaving bounds
@@ -42,6 +44,8 @@ public class AudioZone : MonoBehaviour
 
                 if (_UseThisPos)
                     AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrackName, transform.position);
+                if (_SetParentToThis)
+                    AudioHandler.AUDIO.ChangeAudioParent(_AudioTrackName, this.transform);
             }
 
             if (_ZoneEffector == null)
@@ -98,6 +102,9 @@ public class AudioZone : MonoBehaviour
                 _EffectorInBounds = false;
             }
         }
+
+        if(_UpdateToThisPos)
+            AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrackID, transform.position);
     }
 
     public void PlayTrack()

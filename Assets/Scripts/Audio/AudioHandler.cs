@@ -456,6 +456,22 @@ public class AudioHandler : MonoBehaviour
         if (audioid != -1)
             _Sound[audioid].Settings.AudioSource.transform.position = newpos;
     }
+    public void ChangeAudioPosition(int trackid, Vector3 newpos)
+    {
+        _Sound[trackid].Settings.AudioSource.transform.position = newpos;
+    }
+
+    /// <summary>Set AudioSource Parent.</summary>
+    public void ChangeAudioParent(string trackname, Transform newparent)
+    {
+        int audioid = Get_Track_ID(trackname);
+        if (audioid != -1)
+            _Sound[audioid].Settings.AudioSource.transform.parent = newparent;
+    }
+    public void ChangeAudioParent(int trackid, Transform newparent)
+    {
+        _Sound[trackid].Settings.AudioSource.transform.parent = newparent;
+    }
 }
 
 [System.Serializable]
