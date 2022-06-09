@@ -24,8 +24,23 @@ EditorBuildSettings:
     path: Assets/Scenes/ExampleScene_3D_TopDown.unity
     guid: 351f224ce4e69a245952fa2cbf30b902
   - enabled: 1
+    path: Assets/Scenes/ExampleScene_Animation.unity
+    guid: 0387f4a90075c5a4c838f762fb6c815a
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_Audio.unity
+    guid: 69c9e5ee1165c34439238813bbb64242
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_Dialog.unity
+    guid: 3ca68a2220c17b54abdcc9339ff35779
+  - enabled: 1
     path: Assets/Scenes/ExampleScene_Interaction.unity
     guid: baa4dfbc311db9749b80b86bfe0093b3
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_MiniGames.unity
+    guid: 06811ddbaae3b134a94e38a329ea9edd
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_Settings.unity
+    guid: 6a2f5ccd6e0486844a65a3cf7909b176
   - enabled: 1
     path: Assets/Scenes/ExampleScene_Vehicles.unity
     guid: 58a8e69117c60ab4297d66eb47f54e63
@@ -41,9 +56,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ExampleGames/SpaceSurvival/ExampleGame_SpaceShooter.unity
     guid: f7e64d22302f21e43b067befa74d4816
-  - enabled: 1
-    path: Assets/Scenes/ExampleScene_MiniGames.unity
-    guid: 06811ddbaae3b134a94e38a329ea9edd
   - enabled: 1
     path: Assets/Scenes/MiniGames/Minigame_Snake.unity
     guid: ef223c947db766c43a7cbfe463fedc8a
