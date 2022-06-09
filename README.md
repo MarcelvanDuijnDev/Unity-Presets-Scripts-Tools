@@ -107,6 +107,7 @@ Feel free to use/copy files from this project._
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
 # Practical
+- [CursorState.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/CursorState.cs)
 - [Disable.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Disable.cs)
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/DoEvent.cs)
 - [DontDestory.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/DontDestroy.cs)
@@ -119,6 +120,7 @@ Feel free to use/copy files from this project._
 - [Pendulum.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Pendulum.cs)
 - [PosToPos.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/PosToPos.cs)
 - [RandomEvent.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/RandomEvent.cs)
+- [RestartOnKey.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/RestartOnKey.cs)
 - [Rotation.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Rotation.cs)
 - [ScaleOnDistance.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/ScaleOnDistance.cs)
 - [SolarSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/SolarSystem.cs)
