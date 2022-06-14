@@ -52,7 +52,38 @@ public class Movement_Camera_CutScenes : MonoBehaviour
         if (_CutScenes[_Current_CutScene].CurrrentScene < _CutScenes[_Current_CutScene].CutScene_Scenes.Count)
             Movement_Camera.CAM.CutScene(true, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutScenePosition, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneTarget, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneRotation, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].FollowTarget);
         else
-            Movement_Camera.CAM.CutScene(false);
+        {
+            if (_CutScenes[_Current_CutScene].CutSceneOption == Movement_Camera_CutScene.CutSceneOptions.Stop)
+            {
+                _CutScenes[_Current_CutScene].CurrrentScene = _CutScenes[_Current_CutScene].CutScene_Scenes.Count - 1;
+                Movement_Camera.CAM.CutScene(false);
+            }
+            else
+            {
+                _CutScenes[_Current_CutScene].CurrrentScene = 0;
+                Movement_Camera.CAM.CutScene(true, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutScenePosition, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneTarget, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneRotation, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].FollowTarget);
+            }    
+        }
+    }
+
+    public void PreviousScene()
+    {
+        _CutScenes[_Current_CutScene].CurrrentScene--;
+        if (_CutScenes[_Current_CutScene].CurrrentScene >= 0)
+            Movement_Camera.CAM.CutScene(true, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutScenePosition, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneTarget, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneRotation, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].FollowTarget);
+        else
+        {
+            if (_CutScenes[_Current_CutScene].CutSceneOption == Movement_Camera_CutScene.CutSceneOptions.Stop)
+            {
+                _CutScenes[_Current_CutScene].CurrrentScene = 0;
+                Movement_Camera.CAM.CutScene(false);
+            }
+            else
+            {
+                _CutScenes[_Current_CutScene].CurrrentScene = _CutScenes[_Current_CutScene].CutScene_Scenes.Count -1;
+                Movement_Camera.CAM.CutScene(true, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutScenePosition, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneTarget, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].CutSceneRotation, _CutScenes[_Current_CutScene].CutScene_Scenes[_CutScenes[_Current_CutScene].CurrrentScene].FollowTarget);
+            }
+        }
     }
 
     //Set Cutscene
@@ -159,6 +190,10 @@ public class Movement_Camera_CutScene
     public bool OnTrigger;
     public Transform CutSceneTriggerPos;
     public Vector3 Size;
+
+    [Header("When Done")]
+    public CutSceneOptions CutSceneOption;
+    public enum CutSceneOptions { Stop, Loop }
 }
 
 [System.Serializable]

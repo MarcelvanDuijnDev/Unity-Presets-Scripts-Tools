@@ -59,4 +59,11 @@ public class LightEffects : MonoBehaviour
     {
         _LightEffectOption = options;
     }
+
+    public void ChangeLightIntensity(float amount)
+    {
+        _MinMaxIncrease.x += amount * Time.deltaTime;
+        if (_MinMaxIncrease.x < 0)
+            _MinMaxIncrease.x = 0;
+    }
 }

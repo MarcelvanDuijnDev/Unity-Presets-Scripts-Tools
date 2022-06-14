@@ -59,4 +59,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MiniGames/Minigame_Snake.unity
     guid: ef223c947db766c43a7cbfe463fedc8a
+  - enabled: 1
+    path: Assets/Scenes/ExampleScene_ParticleSystems.unity
+    guid: e52094a43a12a764db53f3e8347a29d3
   m_configObjects: {}
