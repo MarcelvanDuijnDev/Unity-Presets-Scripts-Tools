@@ -45,11 +45,11 @@ public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 if (_MouseOver)
                 {
                     if (transform.localScale.y < _MaximalSize)
-                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;
+                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;
                 }
                 else
                     if (transform.localScale.y > _OriginalSize.y)
-                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;
+                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;
                 else
                     transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);
                 break;
@@ -57,11 +57,11 @@ public class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 if (_MouseOver)
                 {
                     if (transform.localScale.y > _MinimalSize)
-                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;
+                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;
                 }
                 else
                    if (transform.localScale.y < _OriginalSize.y)
-                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;
+                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;
                 else
                     transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);
                 break;

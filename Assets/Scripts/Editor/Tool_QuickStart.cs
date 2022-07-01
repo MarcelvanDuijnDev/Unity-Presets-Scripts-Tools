@@ -10,12 +10,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Networking;
 
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.3.12";
-    string _UpdateDate = "14-jun-2022";
+    string _Version = "V1.3.13";
+    string _UpdateDate = "1-jul-2022";
 
     //Navigation Tool
     int _MenuID = 0;        // QuickStart/Scripts/QuickUI/Scene
@@ -104,7 +105,7 @@ public class Tool_QuickStart : EditorWindow
         //new Tool_QuickStart_Script("Tool_Math",                 "Tool_Math",                    "wip",            "",        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEditor;\n\npublic class Tool_Math : EditorWindow\n{\n    string _Search = \"\";\n\n    int _Selected = 0;\n    int _CheckSelected = 1;\n    string[] _Options = new string[]\n    {\n        \"sin\", \"cos\", \"tan\",\n    };\n    string[] _Results = new string[]\n    {\n        \"Mathf.Sin(float);\",\n        \"Mathf.Cos(float);\",\n        \"Mathf.Tan(float);\",\n    };\n\n    string _Result;\n    private Vector2 _ScrollPos = new Vector2();\n\n    [MenuItem(\"Tools/Tool_Math\")]\n    public static void ShowWindow()\n    {\n        EditorWindow.GetWindow(typeof(Tool_Math));\n    }\n\n    void OnGUI()\n    {\n        //Result\n        GUILayout.Label(\"Result:\");\n        EditorGUILayout.TextField(\"\", _Result);\n\n        //Check Selected\n        if (_Selected != _CheckSelected)\n        {\n            _Result = _Results[_Selected];\n            _CheckSelected = _Selected;\n        }\n\n        //Seach\n        GUILayout.Space(20);\n        GUILayout.Label(\"Search Formula:\");\n        _Search = EditorGUILayout.TextField(\"\", _Search);\n\n        //Search Results\n        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);\n        for (int i = 0; i < _Results.Length; i++)\n        {\n            if (_Options[i].Contains(_Search))\n                if (GUILayout.Button(_Options[i]))\n                    _Selected = i;\n        }\n        EditorGUILayout.EndScrollView();\n    }\n}\n"),
         new Tool_QuickStart_Script("Tool_ScriptToString",       "Tool_Editor",                  "stable",           "",        "using System.Collections;\nusing System.Collections.Generic;\nusing System.Linq;\nusing System.IO;\nusing UnityEditor;\nusing UnityEngine;\n\npublic class Tool_ScriptToString : EditorWindow\n{\n    MonoScript _InputScript;\n    string _ScriptOutput = \"\";\n\n    private Vector2 _ScrollPos = new Vector2();\n\n    [MenuItem(\"Tools/Convert Script to String\")]\n    public static void ShowWindow()\n    {\n        EditorWindow.GetWindow(typeof(Tool_ScriptToString));\n    }\n\n    void OnGUI()\n    {\n        if (GUILayout.Button(\"Convert\", GUILayout.Height(30)))\n            if(_InputScript != null)\n            _ScriptOutput = ConvertScriptToString();\n\n        _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);\n        Display_InputOutput();\n        Display_StringExample();\n        EditorGUILayout.EndScrollView();\n    }\n\n    private void Display_InputOutput()\n    {\n        GUILayout.Space(20);\n        //Input\n        GUILayout.Label(\"Input: \", EditorStyles.boldLabel);\n        _InputScript = EditorGUILayout.ObjectField(_InputScript, typeof(MonoScript), false) as MonoScript;\n\n        //Output\n        GUILayout.Label(\"Output: \", EditorStyles.boldLabel);\n        EditorGUILayout.TextField(\"\", _ScriptOutput);\n        GUILayout.Space(20);\n    }\n\n    private void Display_StringExample()\n    {\n        //Preview\n        List<string> output = new List<string>();\n        List<string> output2 = new List<string>();\n\n        for (int i = 0; i < _ScriptOutput.Length; i++)\n        {\n            output.Add(System.Convert.ToString(_ScriptOutput[i]));\n        }\n\n        int begincalc = 0;\n        int endcalc = 0;\n\n        for (int i = 0; i < output.Count; i++)\n        {\n            if (i + 1 < output.Count)\n            {\n                if (output[i] + output[i + 1] == \"\\\\n\")\n                {\n                    endcalc = i;\n                    string addstring = \"\";\n                    for (int j = 0; j < endcalc - begincalc; j++)\n                    {\n                        addstring += output[begincalc + j];\n                    }\n                    addstring += output[endcalc] + output[endcalc + 1];\n\n                    output2.Add(addstring);\n                    endcalc = endcalc + 1;\n                    begincalc = endcalc + 1;\n                }\n            }\n        }\n\n        for (int i = 0; i < output2.Count; i++)\n        {\n            GUILayout.BeginHorizontal();\n            if (output2[i].Contains(\"//\"))\n            {\n                EditorGUILayout.TextField(\"\", \"x\", GUILayout.MaxWidth(15));\n            }\n            else\n            {\n                EditorGUILayout.TextField(\"\", \"\", GUILayout.MaxWidth(15));\n            }\n\n            EditorGUILayout.TextField(\"\", output2[i]);\n            GUILayout.EndHorizontal();\n        }\n    }\n\n    private string ConvertScriptToString()\n    {\n        string newstring = \"\\\"\";\n        string path = GetPath();\n        string[] readText = File.ReadAllLines(path);\n\n        for (int i = 0; i < readText.Length; i++)\n        {\n            string newline = \"\";\n            for (int j = 0; j < readText[i].Length; j++)\n            {\n                if(System.Convert.ToString(readText[i][j]) == \"\\\"\")\n                    newline += \"\\\\\";\n                newline += System.Convert.ToString(readText[i][j]);\n            }\n            readText[i] = newline + \"\\\\n\";\n            newstring += readText[i];\n        }\n\n        newstring += \"\\\"\";\n\n        return newstring;\n    }\n\n    private string GetPath()\n    {\n        string[] filepaths = System.IO.Directory.GetFiles(\"Assets/\", \"*.cs\", System.IO.SearchOption.AllDirectories);\n        for (int i = 0; i < filepaths.Length; i++)\n        {\n            if (filepaths[i].Contains(_InputScript.name + \".cs\"))\n            {\n                return filepaths[i];\n            }\n        }\n        return \"\";\n    }\n}\n"),
         new Tool_QuickStart_Script("Turret",                    "Turret_Shooting",              "stable",           "",        "using System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\n\npublic class Turret : MonoBehaviour\n{\n    [Header(\"Settings\")]\n    [SerializeField] private Vector2 _MinMaxRange = Vector2.zero;\n    [SerializeField] private float _SecondsBetweenShots = 2;\n    [SerializeField] private float _Damage = 25;\n    [SerializeField] private GameObject _ShootPart = null;\n    [SerializeField] private string _Tag = \"Enemy\";\n    \n    private float _Timer;\n    private GameObject _Target;\n\n    void Update()\n    {\n        if (_Target != null)\n        {\n            _ShootPart.transform.LookAt(_Target.transform.position);\n            _Timer += 1 * Time.deltaTime;\n            if (_Timer >= _SecondsBetweenShots)\n            {\n                _Target.GetComponent<Health>().DoDamage(_Damage);\n                _Timer = 0;\n            }\n        }\n        else\n        {\n            _ShootPart.transform.rotation = Quaternion.Euler(90, 0, 0);\n        }\n\n        _Target = FindEnemy();\n    }\n\n    public GameObject FindEnemy()\n    {\n        GameObject[] m_Targets = GameObject.FindGameObjectsWithTag(_Tag);\n        GameObject closest = null;\n        float distance = Mathf.Infinity;\n        Vector3 position = transform.position;\n\n        _MinMaxRange.x = _MinMaxRange.x * _MinMaxRange.x;\n        _MinMaxRange.y = _MinMaxRange.y * _MinMaxRange.y;\n        foreach (GameObject target in m_Targets)\n        {\n            Vector3 diff = target.transform.position - position;\n            float curDistance = diff.sqrMagnitude;\n            if (curDistance < distance && curDistance >= _MinMaxRange.x && curDistance <= _MinMaxRange.y)\n            {\n                closest = target;\n                distance = curDistance;\n            }\n        }\n        return closest;\n    }\n}\n"),
-        new Tool_QuickStart_Script("UIEffects",                 "UI_Effect",                    "stable",           "",        "using UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [Header(\"Effects\")]\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n\n    [Header(\"Scaling Options\")]\n    [SerializeField] private bool _RelativeToOriginalSize = true;\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    [Header(\"Minimal Size:\")]\n    [SerializeField] private float _MinimalSize = 0.9f;\n\n    [Header(\"Maximal Size:\")]\n    [SerializeField] private float _MaximalSize = 1.1f;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void OnEnable()\n    {\n        _MouseOver = false;\n    }\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n\n        if (_RelativeToOriginalSize)\n        {\n            _MinimalSize = _OriginalSize.y * _MinimalSize;\n            _MaximalSize = _OriginalSize.y * _MaximalSize;\n            _IncreaseSpeed = _IncreaseSpeed * ((_OriginalSize.x + _OriginalSize.y + _OriginalSize.z) / 3);\n        }\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MaximalSize)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinimalSize)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.y)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.deltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n"
+        new Tool_QuickStart_Script("UIEffects",                 "UI_Effect",                    "stable",           "",        "using UnityEngine;\nusing UnityEngine.EventSystems;\n\npublic class UIEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler\n{\n    private enum UIEffectOptions { Grow, Shrink }\n    [Header(\"Effects\")]\n    [SerializeField] private UIEffectOptions _UIEffect = UIEffectOptions.Grow;\n\n    [Header(\"Scaling Options\")]\n    [SerializeField] private bool _RelativeToOriginalSize = true;\n    [SerializeField] private float _IncreaseSpeed = 1;\n\n    [Header(\"Minimal Size:\")]\n    [SerializeField] private float _MinimalSize = 0.9f;\n\n    [Header(\"Maximal Size:\")]\n    [SerializeField] private float _MaximalSize = 1.1f;\n\n    private Vector3 _OriginalSize;\n    private bool _MouseOver;\n\n    void OnEnable()\n    {\n        _MouseOver = false;\n    }\n\n    void Start()\n    {\n        _OriginalSize = transform.localScale;\n\n        if (_RelativeToOriginalSize)\n        {\n            _MinimalSize = _OriginalSize.y * _MinimalSize;\n            _MaximalSize = _OriginalSize.y * _MaximalSize;\n            _IncreaseSpeed = _IncreaseSpeed * ((_OriginalSize.x + _OriginalSize.y + _OriginalSize.z) / 3);\n        }\n    }\n\n    void Update()\n    {\n        switch (_UIEffect)\n        {\n            case UIEffectOptions.Grow:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y < _MaximalSize)\n                        transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;\n                }\n                else\n                    if (transform.localScale.y > _OriginalSize.y)\n                    transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n            case UIEffectOptions.Shrink:\n                if (_MouseOver)\n                {\n                    if (transform.localScale.y > _MinimalSize)\n                        transform.localScale -= new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;\n                }\n                else\n                   if (transform.localScale.y < _OriginalSize.y)\n                    transform.localScale += new Vector3(_IncreaseSpeed, _IncreaseSpeed, _IncreaseSpeed) * Time.unscaledDeltaTime;\n                else\n                    transform.localScale = new Vector3(_OriginalSize.x, _OriginalSize.y, _OriginalSize.z);\n                break;\n        }\n    }\n\n    public void OnPointerEnter(PointerEventData eventData)\n    {\n        _MouseOver = true;\n    }\n\n    public void OnPointerExit(PointerEventData eventData)\n    {\n        _MouseOver = false;\n    }\n}\n"
             )};
     bool[] _AddMultipleScripts = new bool[0];
     bool _AddMultipleScriptsActive = false;
@@ -3271,12 +3272,19 @@ public class Tool_QuickStart : EditorWindow
             Application.OpenURL("https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools");
         EditorGUILayout.EndHorizontal();
 
+        if(GUILayout.Button("Github Tool_QuickStart.cs"))
+            Application.OpenURL("https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs");
+
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
         _UpdateLogFoldout[1] = EditorGUILayout.Foldout(_UpdateLogFoldout[1], "2022");
         if (_UpdateLogFoldout[1])
         {
             GUILayout.Label(
+                "\n" +
+                "V1.3.13 (1-jul-2022)\n" +
+                "* Updated UIEffects.cs \n" +
+                "* Updated CompareScript Window \n" +
                 "\n" +
                 "V1.3.12 (14-jun-2022)\n" +
                 "* Added DoEventOnInput.cs \n" +
@@ -3571,11 +3579,11 @@ public class Tool_QuickStart_CompareScripts : EditorWindow
     int _CompareID = -1;
     string[] _Scripts_Unity;
     string[] _Scripts_Editor;
-    bool[] _Script_UnityDifference;
-    bool[] _Script_EditorDifference;
+
+    List<Tool_QuickStart_CompareScripts_Line> ScriptLines = new List<Tool_QuickStart_CompareScripts_Line>();
+    List<Tool_QuickStart_CompareScripts_Line> EditorLines = new List<Tool_QuickStart_CompareScripts_Line>();
 
     Vector2 _ScrollView = new Vector2();
-
     Vector2 _Scroll_Script = new Vector2();
     Vector2 _Scroll_Editor = new Vector2();
 
@@ -3586,60 +3594,70 @@ public class Tool_QuickStart_CompareScripts : EditorWindow
         if(_CompareID != _Tool_QuickStart._Search_CompareID)
         {
             _CompareID = _Tool_QuickStart._Search_CompareID;
+            ScriptLines.Clear();
+            EditorLines.Clear();
             UpdateScripts();
         }
 
         GUILayout.Label("Compare (wip)", EditorStyles.boldLabel);
-        GUILayout.BeginHorizontal();
+        GUILayout.BeginHorizontal("box");
 
-
-        GUILayout.BeginVertical("box");
-        GUILayout.Label("Script Unity");
-        _Scroll_Script = EditorGUILayout.BeginScrollView(_Scroll_Script);
-        for (int i = 0; i < _Scripts_Unity.Length; i++)
+        GUILayout.BeginVertical();
+        for (int i = 0; i < ScriptLines.Count; i++)
         {
-            if (_Script_UnityDifference[i])
+            if (i >= EditorLines.Count)
+                break;
+
+            if (ScriptLines[i].Diference)
+                GUI.backgroundColor = new Color(0, 0, 1);
+
+            GUILayout.BeginVertical("box");
+            GUILayout.BeginHorizontal(GUILayout.Width(70));
+
+            if (ScriptLines[i].Position != 0)
             {
-                GUI.backgroundColor = new Color(1, 0, 0);
-                GUILayout.BeginHorizontal("box");
+                GUILayout.Label((i + 1).ToString(), GUILayout.Width(30));
+                GUILayout.Label(ScriptLines[i].Position.ToString(), GUILayout.Width(30));
             }
             else
-                GUILayout.BeginHorizontal();
-
-            GUILayout.Label((i + 1).ToString(), GUILayout.Width(25));
-            GUILayout.Label(_Scripts_Unity[i]);
+            {
+                GUILayout.Label((i + 1).ToString() + " " + "", GUILayout.Width(30));
+                GUILayout.Label(" " + "", GUILayout.Width(30));
+            }
             GUILayout.EndHorizontal();
-
+            GUILayout.EndVertical();
             GUI.backgroundColor = Color.white;
         }
-        EditorGUILayout.EndScrollView();
         GUILayout.EndVertical();
 
-
-        GUILayout.BeginVertical("box");
-        GUILayout.Label("Script Editor");
-        _Scroll_Editor = EditorGUILayout.BeginScrollView(_Scroll_Editor);
-        for (int i = 0; i < _Scripts_Editor.Length; i++)
+        GUILayout.BeginVertical();
+        for (int i = 0; i < ScriptLines.Count; i++)
         {
-            if (_Script_EditorDifference[i])
+            if (ScriptLines[i].Diference)
             {
-                GUI.backgroundColor = new Color(1, 0, 0);
-                GUILayout.BeginHorizontal("box");
+                if (ScriptLines[i].Added)
+                    GUI.backgroundColor = new Color(0, 1, 0);
+                else
+                    GUI.backgroundColor = new Color(1, 0, 0);
             }
             else
-                GUILayout.BeginHorizontal();
-
-            GUILayout.Label((i + 1).ToString(), GUILayout.Width(25));
-            GUILayout.Label(_Scripts_Editor[i]);
-            GUILayout.EndHorizontal();
-            GUI.backgroundColor = Color.white;
+                GUI.backgroundColor = Color.white;
+            GUILayout.BeginVertical("box");
+            if (ScriptLines[i].Diference)
+            {
+                if (ScriptLines[i].Added)
+                    GUILayout.Label("+" + _Scripts_Unity[i]);
+                else
+                    GUILayout.Label("-" + _Scripts_Unity[i]);
+            }
+            else
+                GUILayout.Label(_Scripts_Unity[i]);
+            GUILayout.EndVertical();
         }
-        EditorGUILayout.EndScrollView();
         GUILayout.EndVertical();
-
+        GUI.backgroundColor = Color.white;
 
         GUILayout.EndHorizontal();
-
         EditorGUILayout.EndScrollView();
     }
 
@@ -3647,40 +3665,83 @@ public class Tool_QuickStart_CompareScripts : EditorWindow
     {
         //Get Scripts
         _Scripts_Unity = _Tool_QuickStart.ScriptUpToDate_Compare_Script();
-        _Script_UnityDifference = new bool[_Scripts_Unity.Length];
         _Scripts_Editor = _Tool_QuickStart.ScriptUpToDate_Compare_Editor();
-        _Script_EditorDifference = new bool[_Scripts_Editor.Length];
+
+
+        for (int i = 0; i < _Scripts_Unity.Length; i++)
+        {
+            Tool_QuickStart_CompareScripts_Line newline = new Tool_QuickStart_CompareScripts_Line();
+            newline.Text = _Scripts_Unity[i];
+            ScriptLines.Add(newline);
+        }
+
+        for (int i = 0; i < _Scripts_Editor.Length; i++)
+        {
+            Tool_QuickStart_CompareScripts_Line newline = new Tool_QuickStart_CompareScripts_Line();
+            newline.Text = _Scripts_Editor[i];
+            EditorLines.Add(newline);
+        }
 
         //Compare Scripts Unity
-        for (int i = 0; i < _Script_UnityDifference.Length; i++)
+        for (int i = 0; i < ScriptLines.Count; i++)
         {
-            if(_Scripts_Editor.Length > i)
+            ScriptLines[i].Position = i+1;
+            if(i < EditorLines.Count)
             {
-                if(_Scripts_Editor[i] != _Scripts_Unity[i])
+                if(ScriptLines[i].Text != EditorLines[i].Text)
                 {
-                    _Script_UnityDifference[i] = true;
+                    ScriptLines[i].Diference = true;
+
+                    int position = ScriptLines[i].Position;
+                    for (int j = i; j < EditorLines.Count; j++)
+                    {
+                        position++;
+                        if(ScriptLines[i].Text == EditorLines[j].Text)
+                        {
+                            ScriptLines[i].Diference = false;
+                            ScriptLines[i].Position = position;
+                            break;
+                        }
+                    }
+                    if (ScriptLines[i].Diference)
+                        ScriptLines[i].Position = 0;
                 }
-            }
-            else
-            {
-                _Script_UnityDifference[i] = true;
             }
         }
 
         //Compare Scripts Editor
-        for (int i = 0; i < _Script_EditorDifference.Length; i++)
+        for (int i = 0; i < EditorLines.Count; i++)
         {
-            if (_Scripts_Unity.Length > i)
+            EditorLines[i].Position = i + 1;
+            if (i < ScriptLines.Count)
             {
-                if (_Scripts_Editor[i] != _Scripts_Unity[i])
+                if (EditorLines[i].Text != ScriptLines[i].Text)
                 {
-                    _Script_EditorDifference[i] = true;
+                    EditorLines[i].Diference = true;
+
+                    int position = EditorLines[i].Position;
+                    for (int j = i; j < ScriptLines.Count; j++)
+                    {
+                        position++;
+                        if (EditorLines[i].Text == ScriptLines[j].Text)
+                        {
+                            EditorLines[i].Diference = false;
+                            EditorLines[i].Position = position;
+                            break;
+                        }
+                    }
+                    if (EditorLines[i].Diference)
+                        EditorLines[i].Position = 0;
                 }
-            }
-            else
-            {
-                _Script_EditorDifference[i] = true;
             }
         }
     }
+}
+
+public class Tool_QuickStart_CompareScripts_Line
+{
+    public string Text;
+    public int Position;
+    public bool Diference;
+    public bool Added;
 }
