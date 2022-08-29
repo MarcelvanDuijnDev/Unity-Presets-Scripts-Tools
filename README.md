@@ -143,7 +143,7 @@ tl;dr:
 Without restrictions / feel free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the scripts/content
 
-# Social Info / Donate
+# Social Info
 
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
@@ -156,5 +156,3 @@ Social Info:
 [GitHub](https://github.com/MarcelvanDuijnDev)
 
 First commit: Oct 8, 2020
-
-_Donate (Crypto): **0x7FaA4ACF568F7fBdB907A5862962C755ddc381A1**_
