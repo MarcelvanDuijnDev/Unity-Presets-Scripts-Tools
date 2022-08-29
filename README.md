@@ -107,6 +107,7 @@ Feel free to use/copy files from this project._
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
 # Practical
+- [Clock.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Clock.cs)
 - [CursorState.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/CursorState.cs)
 - [Disable.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Disable.cs)
 - [DoEvent.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/DoEvent.cs)
