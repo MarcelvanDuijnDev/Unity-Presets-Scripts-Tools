@@ -11,6 +11,7 @@ public class AudioZone : MonoBehaviour
 
     [Header("Settings - Zone")]
     [SerializeField] private string _AudioTrackName = "";
+    [SerializeField] private int _Categoryid = 0;
     [SerializeField] private float _Volume = 1;
     public float Range = 10;
     [Tooltip("1 = volume from 0 to max based on how close the effector is to the center.")]
@@ -40,24 +41,25 @@ public class AudioZone : MonoBehaviour
             if (_Use3DAudio)
             {
                 if (_CreateNewAudioSource)
-                    _AudioTrackName = AudioHandler.AUDIO.DuplicateAudioTrack(_AudioTrackName);
+                    _AudioTrackName = AudioHandler.AUDIO.DuplicateAudioTrack(_AudioTrackName, _Categoryid);
 
                 if (_UseThisPos)
-                    AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrackName, transform.position);
+                    AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrackName, transform.position, _Categoryid);
                 if (_SetParentToThis)
-                    AudioHandler.AUDIO.ChangeAudioParent(_AudioTrackName, this.transform);
+                    AudioHandler.AUDIO.ChangeAudioParent(_AudioTrackName, this.transform, _Categoryid);
             }
 
             if (_ZoneEffector == null)
             {
-                try { 
-                    _ZoneEffector = GameObject.FindObjectsOfType<AudioListener>()[0].gameObject.transform; 
+                try
+                {
+                    _ZoneEffector = GameObject.FindObjectsOfType<AudioListener>()[0].gameObject.transform;
                 }
                 catch { Debug.Log("No AudioListener Found In The Scene"); }
             }
 
             // Get TrackID
-            _AudioTrackID = AudioHandler.AUDIO.Get_Track_ID(_AudioTrackName);
+            _AudioTrackID = AudioHandler.AUDIO.Get_Track_ID(_AudioTrackName, _Categoryid);
             if (_AudioTrackID == -1)
                 Debug.Log("AudioZone: Track(" + _AudioTrackName + ") Does not Exist");
 
@@ -75,17 +77,17 @@ public class AudioZone : MonoBehaviour
     {
         if (_AudioTrackID == -1)
             return;
-        if (Vector3.Distance(transform.position,_ZoneEffector.position) <= _MaxDistance)
+        if (Vector3.Distance(transform.position, _ZoneEffector.position) <= _MaxDistance)
         {
             switch (_Option)
             {
                 case Options.SetVolume:
-                    AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, _Volume, true);
+                    AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, _Volume, true, _Categoryid);
                     break;
                 case Options.VolumeOnDistance:
                     float distance = Vector3.Distance(transform.position, _ZoneEffector.position);
                     float newvolume = (1 - (distance / _MaxDistance)) * _Volume * _IncreaseMultiplier;
-                    AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, newvolume, true);
+                    AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, newvolume, true, _Categoryid);
                     break;
             }
 
@@ -98,26 +100,26 @@ public class AudioZone : MonoBehaviour
             // Effector OnExit
             if (_EffectorInBounds)
             {
-                AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, 0, true);
+                AudioHandler.AUDIO.SetTrackVolume(_AudioTrackID, 0, true, _Categoryid);
                 _EffectorInBounds = false;
             }
         }
 
-        if(_UpdateToThisPos)
-            AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrackID, transform.position);
+        if (_UpdateToThisPos)
+            AudioHandler.AUDIO.ChangeAudioPosition(_AudioTrackID, transform.position, _Categoryid);
     }
 
     public void PlayTrack()
     {
-        AudioHandler.AUDIO.PlayTrack(_AudioTrackName);
+        AudioHandler.AUDIO.PlayTrack(_AudioTrackName, _Categoryid);
     }
     public void StartTrack()
     {
-        AudioHandler.AUDIO.StartTrack(_AudioTrackName);
+        AudioHandler.AUDIO.StartTrack(_AudioTrackName, _Categoryid);
     }
     public void StopTrack()
     {
-        AudioHandler.AUDIO.StopTrack(_AudioTrackName);
+        AudioHandler.AUDIO.StopTrack(_AudioTrackName, _Categoryid);
     }
 
     private void OnDrawGizmosSelected()

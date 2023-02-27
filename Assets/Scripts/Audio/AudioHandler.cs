@@ -12,10 +12,11 @@ public class AudioHandler : MonoBehaviour
 
     [Header("AudioMixer/Audio")]
     [SerializeField] private AudioMixerGroup _AudioMixer = null;
-    [SerializeField] private List<AudioHandler_Sound> _Sound = new List<AudioHandler_Sound>();
+
+    [Header("Audio Categorys")]
+    public List<AudioHandler_Category> Category = new List<AudioHandler_Category>();
 
     private string _CurrentScene;
-    private bool _HasFade;
 
     //You can call AudioHandler.AUDIO from every script as long as you have the script in the scene.
     public static AudioHandler AUDIO;
@@ -25,136 +26,129 @@ public class AudioHandler : MonoBehaviour
         AUDIO = this;
 
         //PlayOnStart
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            //AudioSource
-            if (_Sound[i].Settings.CreateAudioSource)
-            {
-                //3D Space
-                if (_Sound[i].Audio3D.Enable3DAudio)
-                {
-                    //Create new object
-                    GameObject audiopos = new GameObject("Audio_" + _Sound[i].AudioTrackName);
 
-                    //Set audiopos position
-                    if (_Sound[i].Audio3D.SpatialTransform != null)
-                        audiopos.transform.position = _Sound[i].Audio3D.SpatialTransform.position;
+        for (int cat = 0; cat < Category.Count; cat++)
+        {
+            for (int i = 0; i < Category[cat].Sounds.Count; i++)
+            {
+                //AudioSource
+                if (Category[cat].Sounds[i].Settings.CreateAudioSource)
+                {
+                    //3D Space
+                    if (Category[cat].Sounds[i].Audio3D.Enable3DAudio)
+                    {
+                        //Create new object
+                        GameObject audiopos = new GameObject("Audio_" + Category[cat].Sounds[i].AudioTrackName);
+
+                        //Set audiopos position
+                        if (Category[cat].Sounds[i].Audio3D.SpatialTransform != null)
+                            audiopos.transform.position = Category[cat].Sounds[i].Audio3D.SpatialTransform.position;
+                        else
+                            audiopos.transform.position = Category[cat].Sounds[i].Audio3D.SpatialPosition;
+                        audiopos.transform.parent = this.gameObject.transform;
+
+                        //Add AudioSource to audioposition
+                        Category[cat].Sounds[i].Settings.AudioSource = audiopos.AddComponent<AudioSource>();
+                    }
                     else
-                        audiopos.transform.position = _Sound[i].Audio3D.SpatialPosition;
-                    audiopos.transform.parent = this.gameObject.transform;
+                        Category[cat].Sounds[i].Settings.AudioSource = this.gameObject.AddComponent<AudioSource>();
 
-                    //Add AudioSource to audioposition
-                    _Sound[i].Settings.AudioSource = audiopos.AddComponent<AudioSource>();
+                    //SetVolume
+                    Category[cat].Sounds[i].Settings.AudioSource.volume = Category[cat].Sounds[i].AudioSettings.Volume;
+
+                    //AudioMixer
+                    Category[cat].Sounds[i].Settings.AudioSource.outputAudioMixerGroup = _AudioMixer;
+
+                    //AudioGroup
+                    if (Category[cat].Sounds[i].Settings.AudioGroup != null)
+                        Category[cat].Sounds[i].Settings.AudioSource.outputAudioMixerGroup = Category[cat].Sounds[i].Settings.AudioGroup;
                 }
-                else
-                    _Sound[i].Settings.AudioSource = this.gameObject.AddComponent<AudioSource>();
 
-                //SetVolume
-                _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
-
-                //AudioMixer
-                _Sound[i].Settings.AudioSource.outputAudioMixerGroup = _AudioMixer;
-
-                //AudioGroup
-                if (_Sound[i].Settings.AudioGroup != null)
-                    _Sound[i].Settings.AudioSource.outputAudioMixerGroup = _Sound[i].Settings.AudioGroup;
-            }
-
-            //3D Space Settings
-            if (_Sound[i].Audio3D.Enable3DAudio)
-            {
-                _Sound[i].Settings.AudioSource.spatialBlend = 1;
-            }
-
-            //AudioClip
-            _Sound[i].Settings.AudioSource.clip = _Sound[i].Settings.AudioClip;
-
-            //Settings
-            if (!_Sound[i].AudioSettings.PlayOnStart_DiplicateOnly)
-            {
-                if (_Sound[i].AudioSettings.PlayOnStart)
+                //3D Space Settings
+                if (Category[cat].Sounds[i].Audio3D.Enable3DAudio)
                 {
-                    _Sound[i].Settings.AudioSource.playOnAwake = _Sound[i].AudioSettings.PlayOnStart;
-                    _Sound[i].Settings.AudioSource.Play();
+                    Category[cat].Sounds[i].Settings.AudioSource.spatialBlend = 1;
                 }
-                if (_Sound[i].AudioEffects.FadeIn)
+
+                //AudioClip
+                if (Category[cat].Sounds[i].Settings.CreateAudioSource)
+                    Category[cat].Sounds[i].Settings.AudioSource.clip = Category[cat].Sounds[i].Settings.AudioClip;
+
+                //Settings
+                if (!Category[cat].Sounds[i].AudioSettings.PlayOnStart_DiplicateOnly)
                 {
-                    _Sound[i].Settings.AudioSource.volume = 0;
-                    _Sound[i].AudioEffects.FadeInSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeInDuration;
-                    _Sound[i].AudioEffects.FadingIn = true;
-                }
-                if (_Sound[i].AudioEffects.FadeOut)
-                {
-                    _Sound[i].AudioEffects.FadeOutSpeed = _Sound[i].AudioSettings.Volume / _Sound[i].AudioEffects.FadeOutDuration;
+                    if (Category[cat].Sounds[i].AudioSettings.PlayOnStart)
+                    {
+                        Category[cat].Sounds[i].Settings.AudioSource.playOnAwake = Category[cat].Sounds[i].AudioSettings.PlayOnStart;
+                        Category[cat].Sounds[i].Settings.AudioSource.Play();
+                    }
+                    if (Category[cat].Sounds[i].AudioEffects.FadeIn)
+                    {
+                        Category[cat].Sounds[i].Settings.AudioSource.volume = 1;
+                        Category[cat].Sounds[i].AudioEffects.FadeInSpeed = Category[cat].Sounds[i].AudioSettings.Volume / Category[cat].Sounds[i].AudioEffects.FadeInDuration;
+                    }
+                    if (Category[cat].Sounds[i].AudioEffects.FadeOut)
+                    {
+                        Category[cat].Sounds[i].AudioEffects.FadeOutSpeed = Category[cat].Sounds[i].AudioSettings.Volume / Category[cat].Sounds[i].AudioEffects.FadeOutDuration;
+                    }
                 }
             }
         }
 
-        RefreshSettings();
-    }
 
-    private void Start()
-    {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioEffects.FadeIn || _Sound[i].AudioEffects.FadeOut)
-            {
-                _HasFade = true;
-                break;
-            }
-        }
+        RefreshSettings_AllCategories();
     }
 
     void Update()
     {
-        //Check if scene has changed
         CheckNewScene();
 
-        //Mostly for debug reasons (impacts performance)
         if (_RefreshSettingsOnUpdate)
-            RefreshSettings();
+            RefreshSettings_AllCategories();
 
-        //If fadein or fadeout is used
-        if (_HasFade)
+        for (int cat = 0; cat < Category.Count; cat++)
         {
-            for (int i = 0; i < _Sound.Count; i++)
+            if (!Category[cat]._CallOnly)
             {
-                //FadeIn
-                if (_Sound[i].AudioEffects.FadingIn)
+                for (int i = 0; i < Category[cat].Sounds.Count; i++)
                 {
-                    if (_Sound[i].AudioEffects.FadeIn && !_Sound[i].AudioEffects.FadeInDone)
+                    //FadeIn
+                    if (Category[cat].Sounds[i].AudioEffects.FadingIn)
                     {
-                        if (_Sound[i].Settings.AudioSource.volume < _Sound[i].AudioSettings.Volume)
+                        if (Category[cat].Sounds[i].AudioEffects.FadeIn && !Category[cat].Sounds[i].AudioEffects.FadeInDone)
                         {
-                            _Sound[i].Settings.AudioSource.volume += _Sound[i].AudioEffects.FadeInSpeed * Time.deltaTime;
-                        }
-                        else
-                        {
-                            _Sound[i].AudioEffects.FadeInDone = true;
-                            _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
-                        }
-                    }
-                }
-                //FadeOut
-                if (_Sound[i].AudioEffects.FadingOut)
-                {
-                    if (_Sound[i].AudioEffects.FadeOutAfterTime > -0.1f)
-                    {
-                        _Sound[i].AudioEffects.FadeOutAfterTime -= 1 * Time.deltaTime;
-                    }
-                    else
-                    {
-                        if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadeOutDone)
-                        {
-                            if (_Sound[i].Settings.AudioSource.volume > 0)
+                            if (Category[cat].Sounds[i].Settings.AudioSource.volume < Category[cat].Sounds[i].AudioSettings.Volume)
                             {
-                                _Sound[i].Settings.AudioSource.volume -= _Sound[i].AudioEffects.FadeOutSpeed * Time.deltaTime;
+                                Category[cat].Sounds[i].Settings.AudioSource.volume += Category[cat].Sounds[i].AudioEffects.FadeInSpeed * Time.deltaTime;
                             }
                             else
                             {
-                                _Sound[i].AudioEffects.FadeOutDone = true;
-                                _Sound[i].Settings.AudioSource.volume = 0;
-                                _Sound[i].Settings.AudioSource.Stop();
+                                Category[cat].Sounds[i].AudioEffects.FadeInDone = true;
+                                Category[cat].Sounds[i].Settings.AudioSource.volume = Category[cat].Sounds[i].AudioSettings.Volume;
+                            }
+                        }
+                    }
+                    //FadeOut
+                    if (Category[cat].Sounds[i].AudioEffects.FadingOut)
+                    {
+                        if (Category[cat].Sounds[i].AudioEffects.FadeOutAfterTime > -0.1f)
+                        {
+                            Category[cat].Sounds[i].AudioEffects.FadeOutAfterTime -= 1 * Time.deltaTime;
+                        }
+                        else
+                        {
+                            if (Category[cat].Sounds[i].AudioEffects.FadeOut && !Category[cat].Sounds[i].AudioEffects.FadeOutDone)
+                            {
+                                if (Category[cat].Sounds[i].Settings.AudioSource.volume > 0)
+                                {
+                                    Category[cat].Sounds[i].Settings.AudioSource.volume -= Category[cat].Sounds[i].AudioEffects.FadeOutSpeed * Time.deltaTime;
+                                }
+                                else
+                                {
+                                    Category[cat].Sounds[i].AudioEffects.FadeOutDone = true;
+                                    Category[cat].Sounds[i].Settings.AudioSource.volume = 0;
+                                    Category[cat].Sounds[i].Settings.AudioSource.Stop();
+                                }
                             }
                         }
                     }
@@ -168,255 +162,263 @@ public class AudioHandler : MonoBehaviour
         if (_CurrentScene != SceneManager.GetActiveScene().name)
         {
             _CurrentScene = SceneManager.GetActiveScene().name;
-            for (int i = 0; i < _Sound.Count; i++)
+            for (int cat = 0; cat < Category.Count; cat++)
             {
-                //Stop NextScene
-                if (_Sound[i].AudioControl.StopOnNextScene)
+                if (!Category[cat]._CallOnly)
                 {
-                    //FadeOut
-                    if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadingOut)
+                    for (int i = 0; i < Category[cat].Sounds.Count; i++)
                     {
-                        _Sound[i].AudioEffects.FadingIn = false;
-                        _Sound[i].AudioEffects.FadeOutDone = false;
-                        _Sound[i].AudioEffects.FadingOut = true;
-                    }
-                    else
-                        _Sound[i].Settings.AudioSource.Stop();
-                }
-
-                //Start AudioOnScene
-                for (int o = 0; o < _Sound[i].AudioControl.StartAudioOnScene.Count; o++)
-                {
-                    if (_Sound[i].AudioControl.StartAudioOnScene[o] == _CurrentScene)
-                    {
-                        //FadeIn
-                        if (_Sound[i].AudioEffects.FadeIn)
+                        //Stop NextScene
+                        if (Category[cat].Sounds[i].AudioControl.StopOnNextScene)
                         {
-                            _Sound[i].AudioEffects.FadingOut = false;
-                            _Sound[i].AudioEffects.FadeInDone = false;
-                            _Sound[i].AudioEffects.FadingIn = true;
+                            //FadeOut
+                            if (Category[cat].Sounds[i].AudioEffects.FadeOut && !Category[cat].Sounds[i].AudioEffects.FadingOut)
+                            {
+                                Category[cat].Sounds[i].AudioEffects.FadingIn = false;
+                                Category[cat].Sounds[i].AudioEffects.FadeOutDone = false;
+                                Category[cat].Sounds[i].AudioEffects.FadingOut = true;
+                            }
+                            else
+                                Category[cat].Sounds[i].Settings.AudioSource.Stop();
                         }
-                        _Sound[i].Settings.AudioSource.Play();
-                    }
-                }
 
-                //Stop AudioOnScene
-                for (int o = 0; o < _Sound[i].AudioControl.StopAudioOnScene.Count; o++)
-                {
-                    if (_Sound[i].AudioControl.StopAudioOnScene[o] == _CurrentScene)
-                    {
-                        //FadeOut
-                        if (_Sound[i].AudioEffects.FadeOut && !_Sound[i].AudioEffects.FadingOut)
+                        //Start AudioOnScene
+                        for (int o = 0; o < Category[cat].Sounds[i].AudioControl.StartAudioOnScene.Count; o++)
                         {
-                            _Sound[i].AudioEffects.FadingIn = false;
-                            _Sound[i].AudioEffects.FadeOutDone = false;
-                            _Sound[i].AudioEffects.FadingOut = true;
+                            if (Category[cat].Sounds[i].AudioControl.StartAudioOnScene[o] == _CurrentScene)
+                            {
+                                //FadeIn
+                                if (Category[cat].Sounds[i].AudioEffects.FadeIn)
+                                {
+                                    Category[cat].Sounds[i].AudioEffects.FadingOut = false;
+                                    Category[cat].Sounds[i].AudioEffects.FadeInDone = false;
+                                    Category[cat].Sounds[i].AudioEffects.FadingIn = true;
+                                }
+                                Category[cat].Sounds[i].Settings.AudioSource.Play();
+                            }
                         }
-                        else
-                            _Sound[i].Settings.AudioSource.Stop();
+
+                        //Stop AudioOnScene
+                        for (int o = 0; o < Category[cat].Sounds[i].AudioControl.StopAudioOnScene.Count; o++)
+                        {
+                            if (Category[cat].Sounds[i].AudioControl.StopAudioOnScene[o] == _CurrentScene)
+                            {
+                                //FadeOut
+                                if (Category[cat].Sounds[i].AudioEffects.FadeOut && !Category[cat].Sounds[i].AudioEffects.FadingOut)
+                                {
+                                    Category[cat].Sounds[i].AudioEffects.FadingIn = false;
+                                    Category[cat].Sounds[i].AudioEffects.FadeOutDone = false;
+                                    Category[cat].Sounds[i].AudioEffects.FadingOut = true;
+                                }
+                                else
+                                    Category[cat].Sounds[i].Settings.AudioSource.Stop();
+                            }
+                        }
                     }
                 }
             }
         }
     }
-    private void AudioHandler_PlayTrack(int trackid)
+    //Always returns positive number to prevent errors
+    private int AudioHandler_GetTrackID_Safe(string trackname, int categoryid)
     {
-        _Sound[trackid].Settings.AudioSource.Play();
+        for (int i = 0; i < Category[categoryid].Sounds.Count; i++)
+            if (Category[categoryid].Sounds[i].AudioTrackName == trackname)
+                return i;
+        Debug.Log($"<color=#215EFF>AudioTrack:</color> {trackname} is not found in category: {Category[categoryid].CategoryName}, returned 0");
+        return 0;
+    }
+    //Return negative when audiotrack is not found (used for functions that check if trackname exists)
+    private int AudioHandler_GetTrackID_Unsafe(string trackname, int categoryid)
+    {
+        for (int i = 0; i < Category[categoryid].Sounds.Count; i++)
+            if (Category[categoryid].Sounds[i].AudioTrackName == trackname)
+                return i;
+        Debug.Log($"<color=#215EFF>AudioTrack:</color> {trackname} is not found in category: {Category[categoryid].CategoryName},{categoryid}, returned 0");
+        return 0;
+    }
+    private void AudioHandler_PlayTrack(int trackid, int categoryid = 0)
+    {
+        Category[categoryid].Sounds[trackid].Settings.AudioSource.Play();
     }
 
     /// <summary>Plays the audiotrack.</summary>
-    public void PlayTrack(string trackname)
+    public void PlayTrack(int trackid, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-            {
-                AudioHandler_PlayTrack(i);
-                break;
-            }
-        }
+        AudioHandler_PlayTrack(trackid, categoryid);
     }
-    public void PlayTrack(int trackid)
+    public void PlayTrack(string trackname, int categoryid = 0)
     {
-        AudioHandler_PlayTrack(trackid);
+        AudioHandler_PlayTrack(AudioHandler_GetTrackID_Safe(trackname, categoryid), categoryid);
     }
 
     /// <summary>Plays the audiotrack if it's not playing yet.</summary>
-    public void StartTrack(string trackname)
+    public void StartTrack(string trackname, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-            {
-                if (!_Sound[i].Settings.AudioSource.isPlaying)
-                    AudioHandler_PlayTrack(i);
-                break;
-            }
-        }
+        int trackid = AudioHandler_GetTrackID_Safe(trackname, categoryid);
+        if (Category[categoryid].Sounds[trackid].Settings.AudioSource.isPlaying)
+            AudioHandler_PlayTrack(trackid, categoryid);
     }
-    public void StartTrack(int trackid)
+    public void StartTrack(int trackid, int categoryid = 0)
     {
-        if (!_Sound[trackid].Settings.AudioSource.isPlaying)
-            AudioHandler_PlayTrack(trackid);
+        if (!Category[categoryid].Sounds[trackid].Settings.AudioSource.isPlaying)
+            AudioHandler_PlayTrack(trackid, categoryid);
     }
 
     /// <summary>Stops the audiotrack.</summary>
-    public void StopTrack(string trackname)
+    public void StopTrack(string trackname, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-            {
-                _Sound[i].Settings.AudioSource.Stop();
-                break;
-            }
-        }
+        Category[categoryid].Sounds[AudioHandler_GetTrackID_Safe(trackname, categoryid)].Settings.AudioSource.Stop();
     }
-    public void StopTrack(int trackid)
+    public void StopTrack(int trackid, int categoryid = 0)
     {
-        _Sound[trackid].Settings.AudioSource.Stop();
+        Category[categoryid].Sounds[trackid].Settings.AudioSource.Stop();
     }
 
     /// <summary>Returns audio file name.</summary>
-    public string Get_Track_AudioFileName(string trackname)
+    public string Get_Track_AudioFileName(string trackname, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-                return _Sound[i].Settings.AudioClip.name;
-        }
-        return "No AudioClip detected";
+        int trackid = AudioHandler_GetTrackID_Unsafe(trackname, categoryid);
+        if (trackid >= 0)
+            return Category[categoryid].Sounds[trackid].Settings.AudioClip.name;
+        else
+            return "No AudioClip detected";
     }
-    public string Get_Track_AudioFileName(int trackid)
+    public string Get_Track_AudioFileName(int trackid, int categoryid = 0)
     {
-        return _Sound[trackid].Settings.AudioClip.name;
+        return Category[categoryid].Sounds[trackid].Settings.AudioClip.name;
+    }
+
+    /// <summary>Returns audio source.</summary>
+    public AudioSource Get_AudioSource(string trackname, int categoryid = 0)
+    {
+        int trackid = AudioHandler_GetTrackID_Unsafe(trackname, categoryid);
+        if (trackid >= 0)
+            return Category[categoryid].Sounds[trackid].Settings.AudioSource;
+        else
+            return null;
+    }
+    public AudioSource Get_AudioSource(int trackid, int categoryid = 0)
+    {
+        return Category[categoryid].Sounds[trackid].Settings.AudioSource;
     }
 
     /// <summary>Set audiosource.</summary>
-    public void SetAudioSource(string trackname, AudioSource audiosource)
+    public void SetAudioSource(string trackname, AudioSource audiosource, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-            {
-                _Sound[i].Settings.AudioSource = audiosource;
-                break;
-            }
-        }
+        Category[categoryid].Sounds[AudioHandler_GetTrackID_Safe(trackname, categoryid)].Settings.AudioSource = audiosource;
     }
-    public void SetAudioSource(int trackid, AudioSource audiosource)
+    public void SetAudioSource(int trackid, AudioSource audiosource, int categoryid = 0)
     {
-        _Sound[trackid].Settings.AudioSource = audiosource;
+        Category[categoryid].Sounds[trackid].Settings.AudioSource = audiosource;
     }
 
     /// <summary>Set track volume.</summary>
-    public void SetTrackVolume(string trackname, float volume, bool checkmaxvolume)
+    public void SetTrackVolume(string trackname, float volume, bool checkmaxvolume, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
+        for (int i = 0; i < Category[categoryid].Sounds.Count; i++)
         {
-            if (_Sound[i].AudioTrackName == trackname)
-            {
-                if (!checkmaxvolume)
-                    _Sound[i].AudioSettings.Volume = volume;
-                else
-                    if (volume >= _Sound[i].AudioSettings.MaxVolume)
-                    _Sound[i].AudioSettings.Volume = _Sound[i].AudioSettings.MaxVolume;
-                else
-                    _Sound[i].AudioSettings.Volume = volume;
-                break;
-            }
+            int trackid = AudioHandler_GetTrackID_Safe(trackname, categoryid);
+            if (!checkmaxvolume)
+                Category[categoryid].Sounds[i].AudioSettings.Volume = volume;
+            else
+                    if (volume >= Category[categoryid].Sounds[i].AudioSettings.MaxVolume)
+                Category[categoryid].Sounds[i].AudioSettings.Volume = Category[categoryid].Sounds[i].AudioSettings.MaxVolume;
+            else
+                Category[categoryid].Sounds[i].AudioSettings.Volume = volume;
+            break;
         }
     }
-    public void SetTrackVolume(int trackid, float volume, bool checkmaxvolume)
+    public void SetTrackVolume(int trackid, float volume, bool checkmaxvolume, int categoryid = 0)
     {
         if (!checkmaxvolume)
-            _Sound[trackid].AudioSettings.Volume = volume;
-        else if (volume >= _Sound[trackid].AudioSettings.MaxVolume)
-            _Sound[trackid].AudioSettings.Volume = _Sound[trackid].AudioSettings.MaxVolume;
+            Category[categoryid].Sounds[trackid].AudioSettings.Volume = volume;
+        else if (volume >= Category[categoryid].Sounds[trackid].AudioSettings.MaxVolume)
+            Category[categoryid].Sounds[trackid].AudioSettings.Volume = Category[categoryid].Sounds[trackid].AudioSettings.MaxVolume;
         else
-            _Sound[trackid].AudioSettings.Volume = volume;
+            Category[categoryid].Sounds[trackid].AudioSettings.Volume = volume;
     }
 
     /// <summary>Returns track id.</summary>
-    public int Get_Track_ID(string trackname)
+    public int Get_Track_ID(string trackname, int categoryid = 0)
     {
-        for (int i = 0; i < _Sound.Count; i++)
-        {
-            if (_Sound[i].AudioTrackName == trackname)
-                return i;
-        }
-        return -1;
+        return AudioHandler_GetTrackID_Unsafe(trackname, categoryid);
     }
 
     /// <summary>Refresh settings.</summary>
-    public void RefreshSettings()
+    public void RefreshSettings_AllCategories()
     {
-        for (int i = 0; i < _Sound.Count; i++)
+        for (int i = 0; i < Category.Count; i++)
         {
-            //SetClip
-            if (_Sound[i].Settings.AudioSource.clip != _Sound[i].Settings.AudioClip)
-                _Sound[i].Settings.AudioSource.clip = _Sound[i].Settings.AudioClip;
-            //SetEffects
-            if (!_Sound[i].AudioEffects.FadeIn || _Sound[i].AudioEffects.FadeIn && _Sound[i].AudioEffects.FadeInDone)
-                _Sound[i].Settings.AudioSource.volume = _Sound[i].AudioSettings.Volume;
-            _Sound[i].Settings.AudioSource.loop = _Sound[i].AudioSettings.Loop;
+            for (int j = 0; j < Category[i].Sounds.Count; j++)
+            {
+                if (Category[i].Sounds[j].Settings.CreateAudioSource)
+                {
+                    if (Category[i].Sounds[j].Settings.AudioSource.clip != Category[i].Sounds[j].Settings.AudioClip)
+                        Category[i].Sounds[j].Settings.AudioSource.clip = Category[i].Sounds[j].Settings.AudioClip;
+                    //SetEffects
+                    if (!Category[i].Sounds[j].AudioEffects.FadeIn || Category[i].Sounds[j].AudioEffects.FadeIn && Category[i].Sounds[j].AudioEffects.FadeInDone)
+                        Category[i].Sounds[j].Settings.AudioSource.volume = Category[i].Sounds[j].AudioSettings.Volume;
+                    Category[i].Sounds[j].Settings.AudioSource.loop = Category[i].Sounds[j].AudioSettings.Loop;
+                }
+            }
         }
     }
 
     /// <summary>Duplicate AudioTrack.</summary>
-    public string DuplicateAudioTrack(string trackname)
+    public string DuplicateAudioTrack(string trackname, int categoryid = 0)
     {
-        int audioid = Get_Track_ID(trackname);
+        int audioid = Get_Track_ID(trackname, categoryid);
         if (audioid == -1)
             return null;
 
         AudioHandler_Sound newsound = new AudioHandler_Sound();
         GameObject newaudiopos = new GameObject();
 
-        newsound.AudioTrackName = "Audio_" + _Sound[audioid].AudioTrackName;
+        newsound.AudioTrackName = "Audio_" + Category[categoryid].Sounds[audioid].AudioTrackName;
 
         //Settings
         newsound.Settings = new AudioHandler_Settings();
-        newsound.Settings.AudioClip = _Sound[audioid].Settings.AudioClip;
-        newsound.Settings.AudioGroup = _Sound[audioid].Settings.AudioGroup;
+        newsound.Settings.AudioClip = Category[categoryid].Sounds[audioid].Settings.AudioClip;
+        newsound.Settings.AudioGroup = Category[categoryid].Sounds[audioid].Settings.AudioGroup;
         newsound.Settings.AudioSource = newaudiopos.AddComponent<AudioSource>();
-        newsound.Settings.CreateAudioSource = _Sound[audioid].Settings.CreateAudioSource;
+        newsound.Settings.CreateAudioSource = Category[categoryid].Sounds[audioid].Settings.CreateAudioSource;
 
         //Control
         newsound.AudioControl = new AudioHandler_Control();
-        newsound.AudioControl.SceneEnabled = _Sound[audioid].AudioControl.SceneEnabled;
-        newsound.AudioControl.StartAudioOnScene = _Sound[audioid].AudioControl.StartAudioOnScene;
-        newsound.AudioControl.StopAudioOnScene = _Sound[audioid].AudioControl.StopAudioOnScene;
-        newsound.AudioControl.StopOnNextScene = _Sound[audioid].AudioControl.StopOnNextScene;
+        newsound.AudioControl.SceneEnabled = Category[categoryid].Sounds[audioid].AudioControl.SceneEnabled;
+        newsound.AudioControl.StartAudioOnScene = Category[categoryid].Sounds[audioid].AudioControl.StartAudioOnScene;
+        newsound.AudioControl.StopAudioOnScene = Category[categoryid].Sounds[audioid].AudioControl.StopAudioOnScene;
+        newsound.AudioControl.StopOnNextScene = Category[categoryid].Sounds[audioid].AudioControl.StopOnNextScene;
 
         //Audio3D
         newsound.Audio3D = new AudioHandler_3DAudio();
-        newsound.Audio3D.Enable3DAudio = _Sound[audioid].Audio3D.Enable3DAudio;
-        newsound.Audio3D.SpatialPosition = _Sound[audioid].Audio3D.SpatialPosition;
-        newsound.Audio3D.SpatialTransform = _Sound[audioid].Audio3D.SpatialTransform;
+        newsound.Audio3D.Enable3DAudio = Category[categoryid].Sounds[audioid].Audio3D.Enable3DAudio;
+        newsound.Audio3D.SpatialPosition = Category[categoryid].Sounds[audioid].Audio3D.SpatialPosition;
+        newsound.Audio3D.SpatialTransform = Category[categoryid].Sounds[audioid].Audio3D.SpatialTransform;
 
         //AudioSettings
         newsound.AudioSettings = new AudioHandler_AudioSettings();
-        newsound.AudioSettings.Loop = _Sound[audioid].AudioSettings.Loop;
-        newsound.AudioSettings.MaxVolume = _Sound[audioid].AudioSettings.MaxVolume;
-        newsound.AudioSettings.PlayOnStart = _Sound[audioid].AudioSettings.PlayOnStart;
-        newsound.AudioSettings.Volume = _Sound[audioid].AudioSettings.Volume;
+        newsound.AudioSettings.Loop = Category[categoryid].Sounds[audioid].AudioSettings.Loop;
+        newsound.AudioSettings.MaxVolume = Category[categoryid].Sounds[audioid].AudioSettings.MaxVolume;
+        newsound.AudioSettings.PlayOnStart = Category[categoryid].Sounds[audioid].AudioSettings.PlayOnStart;
+        newsound.AudioSettings.Volume = Category[categoryid].Sounds[audioid].AudioSettings.Volume;
 
         //AudioEffect
         newsound.AudioEffects = new AudioHandler_Effects();
-        newsound.AudioEffects.FadeIn = _Sound[audioid].AudioEffects.FadeIn;
-        newsound.AudioEffects.FadeInDone = _Sound[audioid].AudioEffects.FadeInDone;
-        newsound.AudioEffects.FadeInDuration = _Sound[audioid].AudioEffects.FadeInDuration;
-        newsound.AudioEffects.FadeInSpeed = _Sound[audioid].AudioEffects.FadeInSpeed;
-        newsound.AudioEffects.FadeOut = _Sound[audioid].AudioEffects.FadeOut;
-        newsound.AudioEffects.FadeOutAfterTime = _Sound[audioid].AudioEffects.FadeOutAfterTime;
-        newsound.AudioEffects.FadeOutDone = _Sound[audioid].AudioEffects.FadeOutDone;
-        newsound.AudioEffects.FadeOutDuration = _Sound[audioid].AudioEffects.FadeOutDuration;
-        newsound.AudioEffects.FadeOutSpeed = _Sound[audioid].AudioEffects.FadeOutSpeed;
-        newsound.AudioEffects.FadingIn = _Sound[audioid].AudioEffects.FadingIn;
-        newsound.AudioEffects.FadingOut = _Sound[audioid].AudioEffects.FadingOut;
+        newsound.AudioEffects.FadeIn = Category[categoryid].Sounds[audioid].AudioEffects.FadeIn;
+        newsound.AudioEffects.FadeInDone = Category[categoryid].Sounds[audioid].AudioEffects.FadeInDone;
+        newsound.AudioEffects.FadeInDuration = Category[categoryid].Sounds[audioid].AudioEffects.FadeInDuration;
+        newsound.AudioEffects.FadeInSpeed = Category[categoryid].Sounds[audioid].AudioEffects.FadeInSpeed;
+        newsound.AudioEffects.FadeOut = Category[categoryid].Sounds[audioid].AudioEffects.FadeOut;
+        newsound.AudioEffects.FadeOutAfterTime = Category[categoryid].Sounds[audioid].AudioEffects.FadeOutAfterTime;
+        newsound.AudioEffects.FadeOutDone = Category[categoryid].Sounds[audioid].AudioEffects.FadeOutDone;
+        newsound.AudioEffects.FadeOutDuration = Category[categoryid].Sounds[audioid].AudioEffects.FadeOutDuration;
+        newsound.AudioEffects.FadeOutSpeed = Category[categoryid].Sounds[audioid].AudioEffects.FadeOutSpeed;
+        newsound.AudioEffects.FadingIn = Category[categoryid].Sounds[audioid].AudioEffects.FadingIn;
+        newsound.AudioEffects.FadingOut = Category[categoryid].Sounds[audioid].AudioEffects.FadingOut;
 
-        newsound.AudioTrackName += "_" + _Sound.Count.ToString();
+        newsound.AudioTrackName += "_" + Category[categoryid].Sounds.Count.ToString();
 
         //Activate Settings
         newsound.Settings.AudioSource.loop = newsound.AudioSettings.Loop;
@@ -433,45 +435,85 @@ public class AudioHandler : MonoBehaviour
         newsound.Settings.AudioSource.clip = newsound.Settings.AudioClip;
         newsound.Settings.AudioSource.outputAudioMixerGroup = newsound.Settings.AudioGroup;
 
+        //Apply
+        newaudiopos.transform.parent = this.transform;
+        Category[categoryid].Sounds.Add(newsound);
+
         //Position
         if (newsound.Audio3D.SpatialTransform != null)
-            ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialTransform.position);
+            ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialTransform.position, categoryid);
         else
-            ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialPosition);
+            ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialPosition, categoryid);
 
         //PlayOnStart
         if (newsound.AudioSettings.PlayOnStart)
             newsound.Settings.AudioSource.Play();
-
-        //Apply
-        newaudiopos.transform.parent = this.transform;
-        _Sound.Add(newsound);
         return newsound.AudioTrackName;
     }
 
     /// <summary>Change AudioSource Position.</summary>
-    public void ChangeAudioPosition(string trackname, Vector3 newpos)
+    public void ChangeAudioPosition(string trackname, Vector3 newpos, int categoryid = 0)
     {
-        int audioid = Get_Track_ID(trackname);
+        int audioid = Get_Track_ID(trackname, categoryid);
         if (audioid != -1)
-            _Sound[audioid].Settings.AudioSource.transform.position = newpos;
+            Category[categoryid].Sounds[audioid].Settings.AudioSource.transform.position = newpos;
     }
-    public void ChangeAudioPosition(int trackid, Vector3 newpos)
+    public void ChangeAudioPosition(int trackid, Vector3 newpos, int categoryid = 0)
     {
-        _Sound[trackid].Settings.AudioSource.transform.position = newpos;
+        Category[categoryid].Sounds[trackid].Settings.AudioSource.transform.position = newpos;
     }
 
     /// <summary>Set AudioSource Parent.</summary>
-    public void ChangeAudioParent(string trackname, Transform newparent)
+    public void ChangeAudioParent(string trackname, Transform newparent, int categoryid = 0)
     {
         int audioid = Get_Track_ID(trackname);
         if (audioid != -1)
-            _Sound[audioid].Settings.AudioSource.transform.parent = newparent;
+            Category[categoryid].Sounds[audioid].Settings.AudioSource.transform.parent = newparent;
     }
-    public void ChangeAudioParent(int trackid, Transform newparent)
+    public void ChangeAudioParent(int trackid, Transform newparent, int categoryid = 0)
     {
-        _Sound[trackid].Settings.AudioSource.transform.parent = newparent;
+        Category[categoryid].Sounds[trackid].Settings.AudioSource.transform.parent = newparent;
     }
+
+    /// <summary>Returns clip names
+    public string GetTracksActive()
+    {
+        string searchtracksactive = "";
+        for (int cat = 0; cat < Category.Count; cat++)
+        {
+            for (int i = 0; i < Category[cat].Sounds.Count; i++)
+            {
+                if (Category[cat].Sounds[i].Settings.CreateAudioSource)
+                    if (Category[cat].Sounds[i].Settings.AudioSource.isPlaying)
+                        searchtracksactive += Category[cat].Sounds[i].Settings.AudioClip.name + "\n";
+            }
+        }
+        return searchtracksactive;
+    }
+    public int GetTracksActiveAmount()
+    {
+        int searchtracksactive = 0;
+        for (int cat = 0; cat < Category.Count; cat++)
+        {
+            for (int i = 0; i < Category[cat].Sounds.Count; i++)
+            {
+                if (Category[cat].Sounds[i].Settings.CreateAudioSource)
+                    if (Category[cat].Sounds[i].Settings.AudioSource.isPlaying)
+                        searchtracksactive++;
+            }
+        }
+        return searchtracksactive;
+    }
+}
+
+[System.Serializable]
+public class AudioHandler_Category
+{
+    public string CategoryName;
+    public List<AudioHandler_Sound> Sounds;
+
+    [Header("Performance")]
+    public bool _CallOnly;
 }
 
 [System.Serializable]
