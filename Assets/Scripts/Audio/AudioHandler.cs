@@ -316,18 +316,14 @@ public class AudioHandler : MonoBehaviour
     /// <summary>Set track volume.</summary>
     public void SetTrackVolume(string trackname, float volume, bool checkmaxvolume, int categoryid = 0)
     {
-        for (int i = 0; i < Category[categoryid].Sounds.Count; i++)
-        {
-            int trackid = AudioHandler_GetTrackID_Safe(trackname, categoryid);
-            if (!checkmaxvolume)
-                Category[categoryid].Sounds[i].AudioSettings.Volume = volume;
-            else
-                    if (volume >= Category[categoryid].Sounds[i].AudioSettings.MaxVolume)
-                Category[categoryid].Sounds[i].AudioSettings.Volume = Category[categoryid].Sounds[i].AudioSettings.MaxVolume;
-            else
-                Category[categoryid].Sounds[i].AudioSettings.Volume = volume;
-            break;
-        }
+        int trackid = AudioHandler_GetTrackID_Safe(trackname, categoryid);
+        if (!checkmaxvolume)
+            Category[categoryid].Sounds[trackid].AudioSettings.Volume = volume;
+        else
+                if (volume >= Category[categoryid].Sounds[trackid].AudioSettings.MaxVolume)
+            Category[categoryid].Sounds[trackid].AudioSettings.Volume = Category[categoryid].Sounds[trackid].AudioSettings.MaxVolume;
+        else
+            Category[categoryid].Sounds[trackid].AudioSettings.Volume = volume;
     }
     public void SetTrackVolume(int trackid, float volume, bool checkmaxvolume, int categoryid = 0)
     {
