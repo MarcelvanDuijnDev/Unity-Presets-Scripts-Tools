@@ -462,7 +462,7 @@ public class AudioHandler : MonoBehaviour
     /// <summary>Set AudioSource Parent.</summary>
     public void ChangeAudioParent(string trackname, Transform newparent, int categoryid = 0)
     {
-        int audioid = Get_Track_ID(trackname);
+        int audioid = Get_Track_ID(trackname, categoryid);
         if (audioid != -1)
             Category[categoryid].Sounds[audioid].Settings.AudioSource.transform.parent = newparent;
     }
