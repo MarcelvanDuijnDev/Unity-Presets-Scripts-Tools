@@ -11,7 +11,8 @@ Feel free to use/copy files from this project._
 <!-- [Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki) -->
 #### HighLights: 
 * [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs) < _Multi purpose Unity tool_
-* [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs) < _Easy to use Audio Handler_
+* [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs) < _Easy to use Audio Handler_ 
+* [AudioZone.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZone.cs) < _Works with AudioHandler.cs_
 
 ### Content (Scripts):
 * [Movement](#movement)
@@ -29,7 +30,6 @@ Feel free to use/copy files from this project._
 * [Other](#other)
 ### Other:
 * [License & Copyright](#license--copyright)
-* [Social Info / Donate](#social-info--donate)
   
 # Movement 
 - [Movement_2D_Platformer.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_2D_Platformer.cs)
