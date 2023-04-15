@@ -4,14 +4,14 @@
 <img align="center" src="https://raw.githubusercontent.com/MarcelvanDuijnDev/MarcelvanDuijnDev/main/Images/Project_Header_UnityPresets.png">
 </a>
 
-_This project contains scripts/art/prefabs that can be used for unity projects.
-The files are made by me and do not contain copyrighted material.
-Feel free to use/copy files from this project._
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repo-brightgreen)](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools)
+
+This project contains a collection of scripts, art, and prefabs that can be used in Unity projects. The files are created by me and do not contain any copyrighted material. Feel free to use and copy files from this project.
 
 <!-- [Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki) -->
 #### HighLights: 
-* [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs) < _Multi purpose Unity tool_
-* [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs) < _Easy to use Audio Handler_ 
+* [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs) < _A multi-purpose Unity tool_
+* [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs) < _An easy-to-use audio handler_ 
 * [AudioZone.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZone.cs) < _Works with AudioHandler.cs_
 
 ### Content (Scripts):
@@ -30,8 +30,9 @@ Feel free to use/copy files from this project._
 * [Other](#other)
 ### Other:
 * [License & Copyright](#license--copyright)
+* [Issues](#issues)
   
-# Movement 
+## Movement 
 - [Movement_2D_Platformer.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_2D_Platformer.cs)
 - [Movement_2D_TopDown.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_2D_TopDown.cs)
 - [Movement_Camera.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_Camera.cs)
@@ -42,19 +43,19 @@ Feel free to use/copy files from this project._
 - [Movement_RB_FirstPerson.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_RB_FirstPerson.cs)
 - [Movement_FreeCamera.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Movement/Movement_FreeCamera.cs)
 
-# Vehicles
+## Vehicles
 - [CarRealistic.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Vehicle/CarRealistic.cs)
 - [CarArcade.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Vehicle/CarArcade.cs)
 
-# AI
+## AI
 - [BasicNavMeshAI.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/AI/BasicNavMeshAI.cs)
 
-# Weapons / Shooting
+## Weapons / Shooting
 - [Bullet.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Weapons/Bullet.cs)
 - [Shooting.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Weapons/Shooting.cs)
 - [ShootingRayCast.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Weapons/ShootingRayCast.cs)
 
-# Editor
+## Editor
 - [AudioZoneEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/AudioZoneEditor.cs)
 - [DialogSystemEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/DialogSystemEditor.cs)
 - [EditorWindowExample.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/EditorWindowExample.cs)
@@ -65,23 +66,23 @@ Feel free to use/copy files from this project._
 - [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs)
 - [Tool_ScriptToString.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_ScriptToString.cs)
 
-# Saving / Loading Data
+## Saving / Loading Data
 - [Load_External_AudioFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/SavingAndLoadingData/Load_External_AudioFile.cs)
 - [Load_External_Image.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/SavingAndLoadingData/Load_External_Image.cs)
 - [ReadWrite_TextFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/SavingAndLoadingData/ReadWrite_TextFile.cs)
 - [SaveLoad_JSON.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/SavingAndLoadingData/SaveLoad_JSON.cs)
 - [SaveLoad_XML.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/SavingAndLoadingData/SaveLoad_XML.cs)
 
-# Networking
+## Networking
 - [ReadTwitchChat.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Networking/ReadTwitchChat.cs)
 
-# Audio
+## Audio
 - [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs)
 - [AudioZone.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZone.cs)
 - [AudioZoneEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/AudioZoneEditor.cs)
 - [ReadAudioFile.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/ReadAudioFile.cs)
 
-# Useful
+## Useful
 - [AnimatorOverrider.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/AnimatorOverrider.cs)
 - [DialogSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/DialogSystem.cs)
 - [DialogSystemEditor.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/DialogSystemEditor.cs)
@@ -101,12 +102,12 @@ Feel free to use/copy files from this project._
 - [SettingsHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/SettingsHandler.cs)
 - [Turret.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/Turret.cs)
 
-# Examples
+## Examples
 - [EditorWindowExample.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Editor/EditorWindowExample.cs)
 - [ScriptebleGameObject.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/RandomExamples/ScriptebleGameObject.cs)
 - [StringFormats.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/RandomExamples/StringFormats.cs)
 
-# Practical
+## Practical
 - [Clock.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Clock.cs)
 - [CursorState.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/CursorState.cs)
 - [Disable.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/Disable.cs)
@@ -128,24 +129,22 @@ Feel free to use/copy files from this project._
 - [SolarSystem.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Practical/SolarSystem.cs)
 - [UIEffects.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Useful/UIEffects.cs)
 
-# MathAndAlgorithms
+## MathAndAlgorithms
 - [Flocking](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/tree/main/Assets/Scripts/MathAndAlgorithms/Flocking)
 - [LangtonsAnt](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/tree/main/Assets/Scripts/MathAndAlgorithms/LangtonsAnt)
 - [LSytem](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/tree/main/Assets/Scripts/MathAndAlgorithms/L-System)
 
-# Other
+## Other
 - [MVD_Namespace.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Other/MVD_Namespace.cs)
 - [3D Models](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/tree/main/Assets/Art/Models)
 
-# License & Copyright
-Licensed under the [MIT License](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/LICENSE)
+## License & Copyright
+The UnityPresets project is open-source and available under the [MIT License](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/LICENSE). The scripts, art, and prefabs in this repository are created by Marcel van Duijn and do not contain copyrighted material. You are free to use and copy files from this project in your Unity projects.
 
-tl;dr:
-Without restrictions / feel free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the scripts/content
+## Issues
+If you encounter any issues or bugs with the scripts/art/prefabs in this repository, please open an issue on the [GitHub repository](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/issues) page
 
-# Social Info
-
+## Social Info
 Social Info: 
 [Portfolio](https://www.marcelvanduijn.com/)
 [Twitter](https://twitter.com/MarcelvanDuijn_)
