@@ -27,7 +27,7 @@ public class AudioZone : MonoBehaviour
     // Check effector leaving bounds
     private bool _EffectorInBounds;
 
-    // Optimization (This way the AudioHandler doesn't have too loop trough the available audiotracks)
+    // Optimization (This way the AudioHandler doesn't have to loop trough the available audiotracks)
     private int _AudioTrackID;
 
     // Max distance
