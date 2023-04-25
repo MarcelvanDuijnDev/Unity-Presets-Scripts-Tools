@@ -10,7 +10,7 @@ This project contains a collection of scripts, art, and prefabs that can be used
 
 <!-- [Wiki](https://github.com/MarcelvanDuijnDev/UnityPresets/wiki) -->
 #### HighLights: 
-* [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs) < _A multi-purpose Unity tool_
+* [Tool_QuickStart.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs) < _A multi-purpose Unity tool (all scripts from this repo are included and can be loaded in with the editor [examples](https://marcelvanduijndev.github.io/Website/Project_Unity_Tools.html))_
 * [AudioHandler.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioHandler.cs) < _An easy-to-use audio handler_ 
 * [AudioZone.cs](https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Audio/AudioZone.cs) < _Works with AudioHandler.cs_
 
