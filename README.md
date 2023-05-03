@@ -146,7 +146,7 @@ If you encounter any issues or bugs with the scripts/art/prefabs in this reposit
 
 ## Social Info
 Social Info: 
-[Portfolio](https://www.marcelvanduijn.com/)
+[Website](https://marcelvanduijndev.github.io/Website/index.html)
 [Twitter](https://twitter.com/MarcelvanDuijn_)
 [LinkedIn](https://www.linkedin.com/in/marcel-van-duijn/)
 [Sketchfab](https://sketchfab.com/MarcelvanDuijn)
