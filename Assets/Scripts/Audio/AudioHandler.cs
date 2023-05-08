@@ -256,7 +256,7 @@ public class AudioHandler : MonoBehaviour
     public void StartTrack(string trackname, int categoryid = 0)
     {
         int trackid = AudioHandler_GetTrackID_Safe(trackname, categoryid);
-        if (Category[categoryid].Sounds[trackid].Settings.AudioSource.isPlaying)
+        if (!Category[categoryid].Sounds[trackid].Settings.AudioSource.isPlaying)
             AudioHandler_PlayTrack(trackid, categoryid);
     }
     public void StartTrack(int trackid, int categoryid = 0)
