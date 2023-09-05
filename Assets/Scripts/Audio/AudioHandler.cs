@@ -225,7 +225,7 @@ public class AudioHandler : MonoBehaviour
         for (int i = 0; i < Category[categoryid].Sounds.Count; i++)
             if (Category[categoryid].Sounds[i].AudioTrackName == trackname)
                 return i;
-        Debug.Log($"<color=#215EFF>AudioTrack:</color> {trackname} is not found in category: {Category[categoryid].CategoryName}, returned 0");
+        Debug.Log($"<color=#FF0000>AudioTrack:</color> {trackname} is not found in category: {Category[categoryid].CategoryName}, returned 0");
         return 0;
     }
     //Return negative when audiotrack is not found (used for functions that check if trackname exists)
@@ -250,6 +250,16 @@ public class AudioHandler : MonoBehaviour
     public void PlayTrack(string trackname, int categoryid = 0)
     {
         AudioHandler_PlayTrack(AudioHandler_GetTrackID_Safe(trackname, categoryid), categoryid);
+    }
+
+    //For EventSystem
+    public void PlayTrack_ForEventSystem(string trackname)
+    {
+        AudioHandler_PlayTrack(AudioHandler_GetTrackID_Safe(trackname, 0), 0);
+    }
+    public void StopTrack_ForEventSystem(string trackname)
+    {
+        Category[0].Sounds[AudioHandler_GetTrackID_Safe(trackname, 0)].Settings.AudioSource.Stop();
     }
 
     /// <summary>Plays the audiotrack if it's not playing yet.</summary>
@@ -442,8 +452,12 @@ public class AudioHandler : MonoBehaviour
             ChangeAudioPosition(newsound.AudioTrackName, newsound.Audio3D.SpatialPosition, categoryid);
 
         //PlayOnStart
-        if (newsound.AudioSettings.PlayOnStart)
+        newsound.AudioSettings.PlayOnStart_DiplicateOnly = Category[categoryid].Sounds[audioid].AudioSettings.PlayOnStart_DiplicateOnly;
+        if (newsound.AudioSettings.PlayOnStart_DiplicateOnly)
+        {
+            newsound.Settings.AudioSource.playOnAwake = true;
             newsound.Settings.AudioSource.Play();
+        }
         return newsound.AudioTrackName;
     }
 

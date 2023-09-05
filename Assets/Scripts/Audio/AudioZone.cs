@@ -24,6 +24,12 @@ public class AudioZone : MonoBehaviour
     [SerializeField] private bool _UpdateToThisPos = false;
     [SerializeField] private bool _CreateNewAudioSource = true;
 
+    [SerializeField] private AudioSource _AudioSource;
+
+    [Header("CustomCurve")]
+    [SerializeField] private bool _SetCustomCurve;
+    [SerializeField] private AnimationCurve _CustomCurve;
+
     // Check effector leaving bounds
     private bool _EffectorInBounds;
 
@@ -65,6 +71,14 @@ public class AudioZone : MonoBehaviour
 
             // Set max distance
             _MaxDistance = Range;
+            _AudioSource = AudioHandler.AUDIO.Get_AudioSource(_AudioTrackID, _Categoryid);
+            _AudioSource.maxDistance = Range;
+            _AudioSource.rolloffMode = AudioRolloffMode.Custom;
+            if (_SetCustomCurve)
+                _AudioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, _CustomCurve);
+            else
+                _AudioSource.rolloffMode = AudioRolloffMode.Linear;
+            _AudioSource.volume = _Volume;
         }
         else
         {
@@ -120,6 +134,17 @@ public class AudioZone : MonoBehaviour
     public void StopTrack()
     {
         AudioHandler.AUDIO.StopTrack(_AudioTrackName, _Categoryid);
+    }
+
+    public string GetTrackName()
+    {
+        return _AudioTrackName;
+    }
+
+    public void Set_Volume(float newvolume)
+    {
+        _Volume = newvolume;
+        _AudioSource.volume = newvolume;
     }
 
     private void OnDrawGizmosSelected()
