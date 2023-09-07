@@ -152,7 +152,7 @@ public class SettingsHandler : MonoBehaviour
     //TextureQuality
     public void Set_TextureQuality(int textureid)
     {
-        QualitySettings.masterTextureLimit = textureid;
+        QualitySettings.globalTextureMipmapLimit = textureid;
         _Dropdown_Quality.value = 6;
     }
 
