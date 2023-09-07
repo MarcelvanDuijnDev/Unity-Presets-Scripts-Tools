@@ -7,7 +7,7 @@ using TMPro;
 public class InteractionHandler : MonoBehaviour
 {
     [Header("Range")]
-    [SerializeField] private float _Range = 0;
+    [SerializeField] private float _Range = 3;
 
     [Header("Refs")]
     [SerializeField] private Image _Cursor = null;
