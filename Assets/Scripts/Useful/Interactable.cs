@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class Interactable : MonoBehaviour
 {
-    public enum InteractableType { Move, Door, SetLight, SetLightNegative, Lever, Button, Item, UIButton }
+    public enum InteractableType { Move, Door, SetLight, SetLightNegative, Lever, Button, Item, UIButton, Trigger }
     public InteractableType _Type;
 
     private enum AxisOptions { x, y, z }
@@ -73,6 +73,11 @@ public class Interactable : MonoBehaviour
             if (transform.localPosition == _DefaultLocalPosition)
                 _MovingBack = false;
         }
+    }
+
+    public void TriggerEvent()
+    {
+        _OnTrigger.Invoke();
     }
 
     public InteractableType Type()

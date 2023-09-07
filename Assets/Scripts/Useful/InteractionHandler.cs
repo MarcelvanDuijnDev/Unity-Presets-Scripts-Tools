@@ -6,16 +6,27 @@ using TMPro;
 
 public class InteractionHandler : MonoBehaviour
 {
+    [Header("Range")]
+    [SerializeField] private float _Range = 0;
+
+    [Header("Refs")]
     [SerializeField] private Image _Cursor = null;
     [SerializeField] private LayerMask _LayerMask = 0;
     [SerializeField] private Transform _Head = null;
+
     [Header("Pickup")]
     [SerializeField] private GameObject _PickupPoint = null;
     [SerializeField] private Vector2 _PickupMinMaxRange = Vector2.zero;
-    [SerializeField] private float _Range = 0;
+
     [Header("Item")]
     [SerializeField] private Transform _ItemPreviewPoint = null;
     [SerializeField] private TextMeshProUGUI _ItemInfoText = null;
+
+    [Header("Visual Settings")]
+    [SerializeField] private Color _Cursor_DefaultColor = new Vector4(0.3f,0.3f,0.3f,0.4f);
+    [SerializeField] private Color _Cursor_InteractColor = new Vector4(1f, 1f, 1f, 1f);
+    [SerializeField] private float _Cursor_Increase = 1.5f;
+    [SerializeField] private float _Cursor_Increase_ChangeSpeed = 20;
 
     private string _ItemInfo;
 
@@ -30,12 +41,17 @@ public class InteractionHandler : MonoBehaviour
     private bool _Interacting;
     private bool _Previewing;
 
+
+    private float _DefaultSize;
+
     private Movement_CC_FirstPerson _CCS; //Script that handles rotation
 
     void Start()
     {
         _CCS = GetComponent<Movement_CC_FirstPerson>();
         _PickupPointPosition.z = _PickupMinMaxRange.x;
+
+        _DefaultSize = _Cursor.transform.localScale.x;
     }
 
     void Update()
@@ -50,15 +66,23 @@ public class InteractionHandler : MonoBehaviour
 
                 _ActiveObject = hit.transform.gameObject;
 
-                _Cursor.color = Color.white;
+                _Cursor.color = _Cursor_InteractColor;
+
+                _Cursor.transform.localScale = Vector3.Lerp(_Cursor.transform.localScale, new Vector3(_DefaultSize * _Cursor_Increase,
+                    _DefaultSize * _Cursor_Increase,
+                    _DefaultSize * _Cursor_Increase), _Cursor_Increase_ChangeSpeed * Time.deltaTime);
             }
             else
             {
                 Debug.DrawRay(_Head.position, _Head.TransformDirection(Vector3.forward) * _Range, Color.white);
-                _Cursor.color = Color.red;
+                _Cursor.color = _Cursor_DefaultColor;
 
                 _ActiveObject = null;
                 _CheckObject = null;
+
+                _Cursor.transform.localScale = Vector3.Lerp(_Cursor.transform.localScale, new Vector3(_DefaultSize,
+                    _DefaultSize,
+                    _DefaultSize), _Cursor_Increase_ChangeSpeed * Time.deltaTime);
             }
 
             if (_ActiveObject != _CheckObject)
@@ -68,7 +92,7 @@ public class InteractionHandler : MonoBehaviour
             }
         }
 
-        if(_ActiveObject != null && _Interactable != null)
+        if (_ActiveObject != null && _Interactable != null)
         {
             if (_Interactable._Type != Interactable.InteractableType.Item)
             {
@@ -173,6 +197,9 @@ public class InteractionHandler : MonoBehaviour
             case Interactable.InteractableType.UIButton:
                 _Interactable.PressUIButton();
                 break;
+            case Interactable.InteractableType.Trigger:
+                _Interactable.TriggerEvent();
+                break;
         }
     }
     private void OnActive()
@@ -185,7 +212,7 @@ public class InteractionHandler : MonoBehaviour
                 if (_PickupPointPosition.z > _PickupMinMaxRange.x && Input.mouseScrollDelta.y < 0)
                     _PickupPointPosition.z += Input.mouseScrollDelta.y * 0.5f;
 
-                if(Input.GetMouseButtonDown(1))
+                if (Input.GetMouseButtonDown(1))
                 {
                     _Interactable.TrowObject(_Head.transform);
                     OnUp();
