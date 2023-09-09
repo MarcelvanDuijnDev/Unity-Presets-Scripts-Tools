@@ -26,10 +26,15 @@ public class Tool_FileFinder : EditorWindow
     //Scene
     string _Scene_Search = "";
     bool _Scene_InsceneInfo = true;
+    int _Scene_InSceneInfoAmount = 500;
 
     //Scene > Results
     bool[] _Scene_Objects_Toggle = new bool[0];
+    bool[] _Scene_Objects_Lock = new bool[0];
     GameObject[] _Scene_Objects = new GameObject[0];
+    bool _Scene_LockOptionActive = true;
+    bool _Scene_SceneInfo_Foldout = false;
+    bool _Scene_ResultInfo_Foldout = false;
 
     //GetWindow
     [MenuItem("Tools/Tool_FileFinder")]
@@ -51,16 +56,38 @@ public class Tool_FileFinder : EditorWindow
         else
         {
             FileFinder_SceneSearch();
-            _Scene_InsceneInfo = EditorGUILayout.Toggle("InScene Info", _Scene_InsceneInfo);
+
+            _Scene_SceneInfo_Foldout = EditorGUILayout.Foldout(_Scene_SceneInfo_Foldout, "Scene Info Options");
+            if (_Scene_SceneInfo_Foldout)
+            {
+                GUILayout.BeginVertical("Box");
+                _Scene_InsceneInfo = EditorGUILayout.Toggle("InScene Info", _Scene_InsceneInfo);
+                GUILayout.BeginHorizontal();
+                _Scene_InSceneInfoAmount = EditorGUILayout.IntField("Info Amount:", _Scene_InSceneInfoAmount);
+                if (GUILayout.Button("Max", GUILayout.Width(50)))
+                {
+                    _Scene_InSceneInfoAmount = _Scene_Objects.Length;
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.EndVertical();
+            }
+
+            _Scene_ResultInfo_Foldout = EditorGUILayout.Foldout(_Scene_ResultInfo_Foldout, "Scene Info Options");
+            if (_Scene_ResultInfo_Foldout)
+            {
+                GUILayout.BeginVertical("Box");
+                _Scene_LockOptionActive = EditorGUILayout.Toggle("Lock Option Active", _Scene_LockOptionActive);
+                GUILayout.EndVertical();
+            }
             FileFinder_Scene();
         }
 
         //stop focus when switching
-        if(_ToolStateCheck != _ToolState)
+        if (_ToolStateCheck != _ToolState)
         {
             EditorGUI.FocusTextInControl("searchproject");
             _ToolStateCheck = _ToolState;
-        } 
+        }
     }
 
     //Project
@@ -89,7 +116,7 @@ public class Tool_FileFinder : EditorWindow
         {
             if (_SearchResults[i].ToLower().Contains(_Project_Search.ToLower()))
             {
-                if(_Project_ExcludeMeta)
+                if (_Project_ExcludeMeta)
                 {
                     if (!_SearchResults[i].ToLower().Contains(".meta"))
                         FileFinder_SearchProject_Results(i);
@@ -131,6 +158,7 @@ public class Tool_FileFinder : EditorWindow
         {
             _Scene_Objects = FindObjectsOfType<GameObject>();
             _Scene_Objects_Toggle = new bool[_Scene_Objects.Length];
+            _Scene_Objects_Lock = new bool[_Scene_Objects.Length];
         }
     }
     void FileFinder_Scene()
@@ -140,12 +168,14 @@ public class Tool_FileFinder : EditorWindow
         {
             for (int i = 0; i < _Scene_Objects.Length; i++)
             {
-                if (_Scene_Objects[i].name.ToLower().Contains(_Scene_Search.ToLower()))
+                if (_Scene_Objects[i].name.ToLower().Contains(_Scene_Search.ToLower()) || _Scene_Objects_Toggle[i] || _Scene_Objects_Lock[i] && _Scene_LockOptionActive)
                 {
-                    GUILayout.BeginHorizontal("Box");
-                    _Scene_Objects_Toggle[i] = EditorGUILayout.Foldout(_Scene_Objects_Toggle[i], "");
+                    GUILayout.BeginVertical("Box");
+                    GUILayout.BeginHorizontal();
+                    if (_Scene_LockOptionActive)
+                        _Scene_Objects_Lock[i] = EditorGUILayout.Toggle("", _Scene_Objects_Lock[i], GUILayout.Width(15));
+                    _Scene_Objects_Toggle[i] = EditorGUILayout.Foldout(_Scene_Objects_Toggle[i], _Scene_Objects[i].name);
 
-                    GUILayout.Label(_Scene_Objects[i].name, GUILayout.Width(Screen.width - 80));
                     if (GUILayout.Button("Select", GUILayout.Width(50)))
                     {
                         Selection.activeObject = _Scene_Objects[i];
@@ -154,15 +184,18 @@ public class Tool_FileFinder : EditorWindow
                     if (_Scene_Objects_Toggle[i])
                     {
                         GUILayout.EndHorizontal();
-                        GUILayout.BeginVertical("box");
+                        GUILayout.BeginVertical();
                         _Scene_Objects[i].name = EditorGUILayout.TextField("Name:", _Scene_Objects[i].name);
-                        _Scene_Objects[i].transform.position = EditorGUILayout.Vector3Field("Position:", _Scene_Objects[i].transform.position);
-                        _Scene_Objects[i].transform.eulerAngles = EditorGUILayout.Vector3Field("Rotation:", _Scene_Objects[i].transform.eulerAngles);
+                        //_Scene_Objects[i].transform.position = EditorGUILayout.Vector3Field("Position:", _Scene_Objects[i].transform.position);
+                        //_Scene_Objects[i].transform.eulerAngles = EditorGUILayout.Vector3Field("Rotation:", _Scene_Objects[i].transform.eulerAngles);
+                        GUILayout.Label("Position: " + _Scene_Objects[i].transform.position.ToString());
+                        GUILayout.Label("Rotation: " + _Scene_Objects[i].transform.eulerAngles.ToString());
                         GUILayout.EndVertical();
                         GUILayout.BeginHorizontal();
                     }
 
                     GUILayout.EndHorizontal();
+                    GUILayout.EndVertical();
                     _Project_Results++;
                 }
                 _Project_Total++;
@@ -224,11 +257,15 @@ public class Tool_FileFinder : EditorWindow
         {
             if (_Scene_InsceneInfo)
             {
+                int resultsfound = 0;
                 Handles.color = new Color(0, 1, 0, 0.1f);
                 for (int i = 0; i < _Scene_Objects.Length; i++)
                 {
-                    if (_Scene_Objects[i].name.ToLower().Contains(_Scene_Search.ToLower()))
+                    if (resultsfound > _Scene_InSceneInfoAmount - 1)
+                        return;
+                    if (_Scene_Objects[i].name.ToLower().Contains(_Scene_Search.ToLower()) || _Scene_Objects_Toggle[i] || _Scene_Objects_Lock[i])
                     {
+                        resultsfound++;
                         Handles.SphereHandleCap(1, _Scene_Objects[i].transform.position, Quaternion.identity, 3f, EventType.Repaint);
                         Handles.Label(_Scene_Objects[i].transform.position, _Scene_Objects[i].name);
                     }
