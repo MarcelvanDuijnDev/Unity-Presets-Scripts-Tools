@@ -33,8 +33,7 @@ public class Tool_FileFinder : EditorWindow
     bool[] _Scene_Objects_Lock = new bool[0];
     GameObject[] _Scene_Objects = new GameObject[0];
     bool _Scene_LockOptionActive = true;
-    bool _Scene_SceneInfo_Foldout = false;
-    bool _Scene_ResultInfo_Foldout = false;
+    bool _Scene_ExtraOptions_Foldout = false;
 
     //GetWindow
     [MenuItem("Tools/Tool_FileFinder")]
@@ -57,10 +56,11 @@ public class Tool_FileFinder : EditorWindow
         {
             FileFinder_SceneSearch();
 
-            _Scene_SceneInfo_Foldout = EditorGUILayout.Foldout(_Scene_SceneInfo_Foldout, "Scene Info Options");
-            if (_Scene_SceneInfo_Foldout)
+            _Scene_ExtraOptions_Foldout = EditorGUILayout.Foldout(_Scene_ExtraOptions_Foldout, "Extra Options");
+            if (_Scene_ExtraOptions_Foldout)
             {
                 GUILayout.BeginVertical("Box");
+                GUILayout.Label("In Scene Editor:");
                 _Scene_InsceneInfo = EditorGUILayout.Toggle("InScene Info", _Scene_InsceneInfo);
                 GUILayout.BeginHorizontal();
                 _Scene_InSceneInfoAmount = EditorGUILayout.IntField("Info Amount:", _Scene_InSceneInfoAmount);
@@ -70,12 +70,9 @@ public class Tool_FileFinder : EditorWindow
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
-            }
 
-            _Scene_ResultInfo_Foldout = EditorGUILayout.Foldout(_Scene_ResultInfo_Foldout, "Scene Info Options");
-            if (_Scene_ResultInfo_Foldout)
-            {
                 GUILayout.BeginVertical("Box");
+                GUILayout.Label("List:");
                 _Scene_LockOptionActive = EditorGUILayout.Toggle("Lock Option Active", _Scene_LockOptionActive);
                 GUILayout.EndVertical();
             }
