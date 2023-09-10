@@ -15,8 +15,8 @@ using UnityEngine.Networking;
 public class Tool_QuickStart : EditorWindow
 {
     //Version
-    string _Version = "V1.4.2";
-    string _UpdateDate = "8-sep-2023";
+    string _Version = "V1.4.3";
+    string _UpdateDate = "11-sep-2023";
 
     //Navigation Tool
     int _MenuID = 0;                // QuickStart/Scripts/QuickUI/Scene
@@ -27,7 +27,7 @@ public class Tool_QuickStart : EditorWindow
 
     //Navigation Tool Windows
     int _WindowID = 0;      // Default/UpdateLog/FileFinder/ScriptToString/MapEditor
-    string[] _WindowNames = new string[] {"Home","Update Log","FileFinder","ScriptToString","MapEditor" };
+    string[] _WindowNames = new string[] { "Home", "Update Log", "FileFinder", "ScriptToString", "MapEditor" };
 
     //Scripts
     Tool_QuickStart_Script[] QuickStart_Scripts = new Tool_QuickStart_Script[] {
@@ -148,10 +148,6 @@ public class Tool_QuickStart : EditorWindow
     GameObject _MainCanvas;
     bool _SearchOnStartup = false;
 
-    //Tool Mode
-    int _ToolState = 0;
-    int _ToolStateCheck = 1;
-
     //Scene Window
     List<Tool_QuickStart_SceneOrganizer_GameObjectProfile_All> _Scene_AllObjects = new List<Tool_QuickStart_SceneOrganizer_GameObjectProfile_All>();
     List<Tool_QuickStart_SceneOrganizer> _Scene_Snapshot = new List<Tool_QuickStart_SceneOrganizer>();
@@ -181,10 +177,18 @@ public class Tool_QuickStart : EditorWindow
     string _FF_SearchCheck = "a";
     int _FF_Results = 0;
     int _FF_Total = 0;
+    int _FF_State = 0;
+    int _FF_StateCheck = 1;
+    bool _FF_LockOptionActive = true;
+    bool _FF_ExcludeMeta = true;
 
     //Scene
     string _FF_Scene_Search = "";
-    bool _FF_Scene_InsceneInfo = false;
+    bool _FF_Scene_InsceneInfo = true;
+    bool _FF_ExtraOptions_Foldout = false;
+    int _FF_InSceneInfoAmount = 500;
+    bool[] _FF_Scene_Objects_Toggle = new bool[0];
+    bool[] _FF_Scene_Objects_Lock = new bool[0];
     GameObject[] _FF_Scene_Objects = new GameObject[0];
 
     //Results
@@ -232,7 +236,7 @@ public class Tool_QuickStart : EditorWindow
     //Rotation/Size
     float _ME_Rotation, _ME_Size = 1;
     bool _ME_RandomRot = false;
-    Vector2 _ME_PrevMousePos = new Vector3(0,0,0);
+    Vector2 _ME_PrevMousePos = new Vector3(0, 0, 0);
 
     //Check Buttons Event
     bool _ME_MouseDown, _ME_ShiftDown, _ME_CtrlDown, _ME_ClickMenu;
@@ -336,7 +340,7 @@ public class Tool_QuickStart : EditorWindow
     void Menu_QuickStart()
     {
         //FirstSearch
-        if(!_SearchOnStartup)
+        if (!_SearchOnStartup)
         {
             SearchScripts();
             _SearchOnStartup = true;
@@ -498,7 +502,7 @@ public class Tool_QuickStart : EditorWindow
             Camera cam = cameraObj.GetComponent<Camera>();
             cam.orthographic = true;
 
-            switch(_Type2DID)
+            switch (_Type2DID)
             {
                 case 0: //Platformer
                     CreateObjects_2D_Platformer(player, groundCube, cameraObj);
@@ -718,10 +722,10 @@ public class Tool_QuickStart : EditorWindow
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Check UpToDate: ", GUILayout.Width(150));
             _Search_UpToDate_Toggle = EditorGUILayout.Toggle(_Search_UpToDate_Toggle);
-            
+
             if (_Search_UpToDate_Toggle)
             {
-                
+
                 if (GUILayout.Button("Check All", GUILayout.Width(100)))
                     ScriptUpToDateAll();
             }
@@ -766,7 +770,7 @@ public class Tool_QuickStart : EditorWindow
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("Show Descriptions: ", GUILayout.Width(150));
             _ScriptDescriptionEnable = EditorGUILayout.Toggle(_ScriptDescriptionEnable);
-            if(_Scripts_AddMultiple_Active)
+            if (_Scripts_AddMultiple_Active)
                 EditorGUILayout.LabelField("*Not supported with Multi Sellect");
             EditorGUILayout.EndHorizontal();
         }
@@ -779,7 +783,7 @@ public class Tool_QuickStart : EditorWindow
 
         //Quickstart Scripts
         string togglestring = "QuickStart" + "     ||     Results(" + _Search_Results.ToString() + "/" + QuickStart_Scripts.Length.ToString() + ")   ||   In Project: " + _Search_InProject_Results.ToString();
-        if(_Search_UpToDate_Toggle)
+        if (_Search_UpToDate_Toggle)
             togglestring += "   ||   UpToDate: (" + _Search_UpToDate_Amount.ToString() + "/" + _Search_UpToDate_Total.ToString() + ")";
         if (_Scripts_AddMultiple_Active)
             togglestring += "   ||   Selected: " + _Scripts_AddMultiple_Amount.ToString();
@@ -811,7 +815,7 @@ public class Tool_QuickStart : EditorWindow
                             if (_Scripts_AddMultiple_Active)
                             {
                                 if (_Scripts_AddMultiple[i])
-                                    GUI.backgroundColor = new Color(0.5f,0.7f,0);
+                                    GUI.backgroundColor = new Color(0.5f, 0.7f, 0);
                                 else
                                     GUI.backgroundColor = new Color(1, 0, 0);
                             }
@@ -882,9 +886,9 @@ public class Tool_QuickStart : EditorWindow
                             EditorGUILayout.LabelField(QuickStart_Scripts[i].ScriptState, EditorStyles.miniLabel, GUILayout.Width(50));
 
                         //Check if Uptodate
-                        if(QuickStart_Scripts[i].Exist && _Search_UpToDate_HasChecked && _Search_UpToDate_Toggle)
+                        if (QuickStart_Scripts[i].Exist && _Search_UpToDate_HasChecked && _Search_UpToDate_Toggle)
                         {
-                            if(!QuickStart_Scripts[i].UpToDate)
+                            if (!QuickStart_Scripts[i].UpToDate)
                             {
                                 if (_Search_Compare_Toggle)
                                 {
@@ -935,7 +939,7 @@ public class Tool_QuickStart : EditorWindow
 
                         //Description
                         if (!_Scripts_AddMultiple_Active && _Scripts_ShowDescription == i)
-                        { 
+                        {
                             GUI.backgroundColor = Color.white;
                             if (QuickStart_Scripts[i].ScriptDescription != "")
                                 GUILayout.Label(QuickStart_Scripts[i].ScriptDescription, EditorStyles.helpBox);
@@ -999,9 +1003,9 @@ public class Tool_QuickStart : EditorWindow
         if (scriptid != 999)
         {
             if (QuickStart_Scripts[scriptid].Exist)
-            { 
-                GUI.backgroundColor = new Color(0, 1, 0); 
-                
+            {
+                GUI.backgroundColor = new Color(0, 1, 0);
+
             }
             else
                 GUI.backgroundColor = new Color(1, 0, 0);
@@ -1042,7 +1046,7 @@ public class Tool_QuickStart : EditorWindow
                 string[] scriptpathsplit = search_results[o].Split(new Char[] { '/', '\\' },
                                  StringSplitOptions.RemoveEmptyEntries);
 
-                if (scriptpathsplit[scriptpathsplit.Length-1].ToLower() == QuickStart_Scripts[i].ScriptName.ToLower() + ".cs")
+                if (scriptpathsplit[scriptpathsplit.Length - 1].ToLower() == QuickStart_Scripts[i].ScriptName.ToLower() + ".cs")
                 {
                     checkexist[i] = true;
                     QuickStart_Scripts[i].ScriptPath = search_results[o];
@@ -1182,7 +1186,7 @@ public class Tool_QuickStart : EditorWindow
         }
         else
         {
-            if(GUILayout.Button("DeSelect"))
+            if (GUILayout.Button("DeSelect"))
             {
                 _HUD_Tab.Clear();
                 _CheckMainCanvasRectSize = Vector2.zero;
@@ -1214,7 +1218,7 @@ public class Tool_QuickStart : EditorWindow
         HUD_Editor_Tabs();
 
         //HUD Settings
-        _HUD_EnableLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate",_HUD_EnableLiveEdit);
+        _HUD_EnableLiveEdit = EditorGUILayout.Toggle("Enable LiveUpdate", _HUD_EnableLiveEdit);
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
         HUD_Editor_Obj();
         HUD_Editor_CanvasOptions();
@@ -1351,7 +1355,7 @@ public class Tool_QuickStart : EditorWindow
     {
         for (int i = 0; i < _HUD_Tab[_HUD_TabID].HUD_TabOjects.Count; i++)
         {
-            if(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Object != null)
+            if (_HUD_Tab[_HUD_TabID].HUD_TabOjects[i].HUD_Object != null)
             {
                 //Update HUD
                 HUD_Change_Position(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i]);
@@ -1363,7 +1367,7 @@ public class Tool_QuickStart : EditorWindow
                 HUD_TextSize(_HUD_Tab[_HUD_TabID].HUD_TabOjects[i]);
 
                 //Update canvas size / tab size
-                if(_MainCanvasRect == null)
+                if (_MainCanvasRect == null)
                     _MainCanvasRect = _MainCanvas.GetComponent<RectTransform>();
 
                 if (_CheckMainCanvasRectSize != _MainCanvasRect.sizeDelta)
@@ -1378,7 +1382,7 @@ public class Tool_QuickStart : EditorWindow
                 //Update text size
                 for (int j = 0; j < _HUD_Tab[_HUD_TabID].HUD_TabOjects.Count; j++)
                 {
-                    if(_HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Type == Tool_QuickStartUI_Object.HUD_Types.Button)
+                    if (_HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Type == Tool_QuickStartUI_Object.HUD_Types.Button)
                     {
                         for (int o = 0; o < _HUD_Tab[_HUD_TabID].HUD_TabOjects[j].HUD_Text.Count; o++)
                         {
@@ -1455,7 +1459,7 @@ public class Tool_QuickStart : EditorWindow
     void HUD_Change_Type(Tool_QuickStartUI_Object obj)
     {
         //Change Type
-        switch(obj.HUD_Type)
+        switch (obj.HUD_Type)
         {
             case Tool_QuickStartUI_Object.HUD_Types.Text:
                 obj.HUD_Object = HUD_Create_Text();
@@ -1480,7 +1484,7 @@ public class Tool_QuickStart : EditorWindow
                 break;
         }
 
-        if(obj.HUD_Type != Tool_QuickStartUI_Object.HUD_Types.Slider && obj.HUD_CheckType == Tool_QuickStartUI_Object.HUD_Types.Slider)
+        if (obj.HUD_Type != Tool_QuickStartUI_Object.HUD_Types.Slider && obj.HUD_CheckType == Tool_QuickStartUI_Object.HUD_Types.Slider)
             obj.HUD_Size = new Vector2(obj.HUD_Size.x, obj.HUD_Size.y * 3);
 
         if (obj.HUD_Name == "" || obj.HUD_Name == null || obj.HUD_Name == "New Text" || obj.HUD_Name == "New Button" || obj.HUD_Name == "New Dropdown" || obj.HUD_Name == "New Slider" || obj.HUD_Name == "New Bar")
@@ -1529,7 +1533,7 @@ public class Tool_QuickStart : EditorWindow
 
         GameObject buttontextemplate = new GameObject();
         RectTransform buttontextrect = buttontextemplate.AddComponent<RectTransform>();
-        buttontextrect.anchoredPosition = new Vector3(5,0,0);
+        buttontextrect.anchoredPosition = new Vector3(5, 0, 0);
 
         TextMeshProUGUI buttontexttmpro = buttontextemplate.AddComponent<TextMeshProUGUI>();
         buttontexttmpro.text = "New Button";
@@ -1680,7 +1684,7 @@ public class Tool_QuickStart : EditorWindow
         dropdown_itemrect.anchorMin = new Vector2(0, 0.5f);
         dropdown_itemrect.anchorMax = new Vector2(1, 0.5f);
         dropdown_itemrect.pivot = new Vector2(0.5f, 0.5f);
-        dropdown_itemrect.sizeDelta = new Vector2(0,28);
+        dropdown_itemrect.sizeDelta = new Vector2(0, 28);
         dropdown_itemrect.anchoredPosition = new Vector4(0, -15); //NotDy
 
         //Set Rect Item Background
@@ -2089,7 +2093,7 @@ public class Tool_QuickStart : EditorWindow
         tab_display_resolution.HUD_Name = "Dropdown_Resolution";
         tab_display_resolution.HUD_Type = Tool_QuickStartUI_Object.HUD_Types.Dropdown;
         tab_display_resolution.HUD_Location = Tool_QuickStartUI_Object.HUD_Locations.BottomLeft;
-        tab_display_resolution.HUD_Size = new Vector2(500,60);
+        tab_display_resolution.HUD_Size = new Vector2(500, 60);
         tab_display_resolution.HUD_Offset = new Vector3(800, 700, 0);
         Tool_QuickStartUI_Object tab_display_resolution_text = new Tool_QuickStartUI_Object();
         tab_display_resolution_text.HUD_Name = "Text_Resolution";
@@ -2172,7 +2176,7 @@ public class Tool_QuickStart : EditorWindow
 
             for (int i = 0; i < dropdowns.Length; i++)
             {
-                if(dropdowns[i].name == "Dropdown_Resolution")
+                if (dropdowns[i].name == "Dropdown_Resolution")
                 {
                     settingshandlerobj.GetComponent(UnityType).SendMessage("SetDropDown_Resolution", dropdowns[i]);
                 }
@@ -2369,7 +2373,7 @@ public class Tool_QuickStart : EditorWindow
     void Menu_Scene_ObjectFiltered()
     {
         //Scan Scene
-        if(GUILayout.Button("Scan Scene"))
+        if (GUILayout.Button("Scan Scene"))
         {
             _Scene_AllObjects.Clear();
             GameObject[] allobjects = GameObject.FindObjectsOfType<GameObject>(true);
@@ -2382,7 +2386,7 @@ public class Tool_QuickStart : EditorWindow
                 //Get Script Names
                 MonoBehaviour[] scripts = allobjects[i].GetComponents<MonoBehaviour>();
                 List<String> scriptnames = new List<string>();
-                foreach(MonoBehaviour mb in scripts)
+                foreach (MonoBehaviour mb in scripts)
                 {
                     scriptnames.Add(mb.GetType().Name);
                 }
@@ -2494,12 +2498,13 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
+
     //FileFinder
     void FileFinder()
     {
-        _ToolState = GUILayout.Toolbar(_ToolState, new string[] { "Assets", "Scene" });
+        _FF_State = GUILayout.Toolbar(_FF_State, new string[] { "Assets", "Scene" });
 
-        if (_ToolState == 0)
+        if (_FF_State == 0)
         {
             FileFinder_Search();
             FileFinder_SearchAssets();
@@ -2507,21 +2512,44 @@ public class Tool_QuickStart : EditorWindow
         else
         {
             FileFinder_SceneSearch();
-            _FF_Scene_InsceneInfo = EditorGUILayout.Toggle("InScene Info", _FF_Scene_InsceneInfo);
+
+            //Extra Options
+            _FF_ExtraOptions_Foldout = EditorGUILayout.Foldout(_FF_ExtraOptions_Foldout, "Extra Options");
+            if (_FF_ExtraOptions_Foldout)
+            {
+                GUILayout.BeginVertical("Box");
+                GUILayout.Label("In Scene Editor:");
+                _FF_Scene_InsceneInfo = EditorGUILayout.Toggle("InScene Info", _FF_Scene_InsceneInfo);
+                GUILayout.BeginHorizontal();
+                _FF_InSceneInfoAmount = EditorGUILayout.IntField("Info Amount:", _FF_InSceneInfoAmount);
+                if (GUILayout.Button("Max", GUILayout.Width(50)))
+                {
+                    _FF_InSceneInfoAmount = _FF_Scene_Objects.Length;
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.EndVertical();
+
+                GUILayout.BeginVertical("Box");
+                GUILayout.Label("List:");
+                _FF_LockOptionActive = EditorGUILayout.Toggle("Lock Option Active", _FF_LockOptionActive);
+                GUILayout.EndVertical();
+            }
+
             FileFinder_Scene();
         }
 
         //stop focus when switching
-        if (_ToolStateCheck != _ToolState)
+        if (_FF_StateCheck != _FF_State)
         {
             EditorGUI.FocusTextInControl("searchproject");
-            _ToolStateCheck = _ToolState;
+            _FF_StateCheck = _FF_State;
         }
     }
     void FileFinder_Search()
     {
         _FF_Search = EditorGUILayout.TextField("Search:", _FF_Search);
         _FF_Type = EditorGUILayout.TextField("Type:", _FF_Type);
+        _FF_ExcludeMeta = EditorGUILayout.Toggle("Exclude Meta:", _FF_ExcludeMeta);
         GUILayout.Label("(" + _FF_Results + "/" + _FF_Total + ")");
 
         _FF_Results = 0;
@@ -2541,14 +2569,13 @@ public class Tool_QuickStart : EditorWindow
         {
             if (_FF_SearchResults[i].ToLower().Contains(_FF_Search.ToLower()))
             {
-                GUILayout.BeginHorizontal("Box");
-                GUILayout.Label(_FF_SearchResults[i], GUILayout.Width(Screen.width - 80));
-                if (GUILayout.Button("Select", GUILayout.Width(50)))
+                if(_FF_ExcludeMeta)
                 {
-                    Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(_FF_SearchResults[i]);
+                    if (_FF_SearchResults[i].ToLower().Contains(".meta"))
+                        FileFinder_SearchProject_Results(i);
                 }
-                GUILayout.EndHorizontal();
-                _FF_Results++;
+                else
+                    FileFinder_SearchProject_Results(i);
             }
             _FF_Total++;
         }
@@ -2559,31 +2586,77 @@ public class Tool_QuickStart : EditorWindow
         _FF_Scene_Search = EditorGUILayout.TextField("Search:", _FF_Scene_Search);
         GUILayout.Label("(" + _FF_Results + "/" + _FF_Total + ")");
 
+        if (GUILayout.Button("Refresh"))
+        {
+            _FF_Scene_Objects = new GameObject[0];
+        }
+
         _FF_Results = 0;
         _FF_Total = 0;
 
         if (_FF_Scene_Objects.Length == 0)
+        {
             _FF_Scene_Objects = FindObjectsOfType<GameObject>();
+            _FF_Scene_Objects_Toggle = new bool[_FF_Scene_Objects.Length];
+            _FF_Scene_Objects_Lock = new bool[_FF_Scene_Objects.Length];
+        }
     }
     void FileFinder_Scene()
     {
         _ScrollPos = EditorGUILayout.BeginScrollView(_ScrollPos);
-        for (int i = 0; i < _FF_Scene_Objects.Length; i++)
+        try
         {
-            if (_FF_Scene_Objects[i].name.ToLower().Contains(_FF_Scene_Search.ToLower()))
+            for (int i = 0; i < _FF_Scene_Objects.Length; i++)
             {
-                GUILayout.BeginHorizontal("Box");
-                GUILayout.Label(_FF_Scene_Objects[i].name, GUILayout.Width(Screen.width - 80));
-                if (GUILayout.Button("Select", GUILayout.Width(50)))
+                if (_FF_Scene_Objects[i].name.ToLower().Contains(_FF_Scene_Search.ToLower()) || _FF_Scene_Objects_Toggle[i] || _FF_Scene_Objects_Lock[i] && _FF_LockOptionActive)
                 {
-                    Selection.activeObject = _FF_Scene_Objects[i];
+                    GUILayout.BeginVertical("Box");
+                    GUILayout.BeginHorizontal();
+                    if (_FF_LockOptionActive)
+                        _FF_Scene_Objects_Lock[i] = EditorGUILayout.Toggle("", _FF_Scene_Objects_Lock[i], GUILayout.Width(15));
+                    _FF_Scene_Objects_Toggle[i] = EditorGUILayout.Foldout(_FF_Scene_Objects_Toggle[i], _FF_Scene_Objects[i].name);
+
+                    if (GUILayout.Button("Select", GUILayout.Width(50)))
+                    {
+                        Selection.activeObject = _FF_Scene_Objects[i];
+                    }
+
+                    if (_FF_Scene_Objects_Toggle[i])
+                    {
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginVertical();
+                        _FF_Scene_Objects[i].name = EditorGUILayout.TextField("Name:", _FF_Scene_Objects[i].name);
+                        //_Scene_Objects[i].transform.position = EditorGUILayout.Vector3Field("Position:", _Scene_Objects[i].transform.position);
+                        //_Scene_Objects[i].transform.eulerAngles = EditorGUILayout.Vector3Field("Rotation:", _Scene_Objects[i].transform.eulerAngles);
+                        GUILayout.Label("Position: " + _FF_Scene_Objects[i].transform.position.ToString());
+                        GUILayout.Label("Rotation: " + _FF_Scene_Objects[i].transform.eulerAngles.ToString());
+                        GUILayout.EndVertical();
+                        GUILayout.BeginHorizontal();
+                    }
+
+                    GUILayout.EndHorizontal();
+                    GUILayout.EndVertical();
+                    _FF_Results++;
                 }
-                GUILayout.EndHorizontal();
-                _FF_Results++;
+                _FF_Total++;
             }
-            _FF_Total++;
+        }
+        catch
+        {
+            _FF_Scene_Objects = new GameObject[0];
         }
         EditorGUILayout.EndScrollView();
+    }
+    void FileFinder_SearchProject_Results(int id)
+    {
+        GUILayout.BeginHorizontal("Box");
+        GUILayout.Label(_FF_SearchResults[id], GUILayout.Width(Screen.width - 80));
+        if (GUILayout.Button("Select", GUILayout.Width(50)))
+        {
+            Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(_FF_SearchResults[id]);
+        }
+        GUILayout.EndHorizontal();
+        _FF_Results++;
     }
 
 
@@ -2949,6 +3022,7 @@ public class Tool_QuickStart : EditorWindow
         }
     }
 
+
     //Enable/Disable
     void OnEnable()
     {
@@ -3247,15 +3321,18 @@ public class Tool_QuickStart : EditorWindow
             Application.OpenURL("https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools");
         EditorGUILayout.EndHorizontal();
 
-        if(GUILayout.Button("Github Tool_QuickStart.cs"))
+        if (GUILayout.Button("Github Tool_QuickStart.cs"))
             Application.OpenURL("https://github.com/MarcelvanDuijnDev/Unity-Presets-Scripts-Tools/blob/main/Assets/Scripts/Editor/Tool_QuickStart.cs");
 
         GUILayout.Label("Update Log", EditorStyles.boldLabel);
 
         _UpdateLogFoldout[2] = EditorGUILayout.Foldout(_UpdateLogFoldout[2], "2023");
-        if(_UpdateLogFoldout[2])
+        if (_UpdateLogFoldout[2])
         {
             GUILayout.Label(
+                "V1.4.3 (11-sep-2023)\n" +
+                "* Updated FileFinder(FF)\n" +
+                "\n" +
                 "V1.4.2 (8-sep-2023)\n" +
                 "* Added EffectsHandler.cs\n" +
                 "* Added LookAtTarget.cs\n" +
@@ -3514,18 +3591,18 @@ public class Tool_QuickStartUI_Object
     //Settings
     public string HUD_Name;
     public Vector3 HUD_Offset;
-    public Vector2 HUD_Size = new Vector2(100,25);
-    public Vector3 HUD_Scale = new Vector3(1,1,1);
+    public Vector2 HUD_Size = new Vector2(100, 25);
+    public Vector3 HUD_Scale = new Vector3(1, 1, 1);
     public float HUD_TextFontSize = 16;
 
     //Other
     public bool HUD_FoldOut;
 
     //DropDown
-    public enum HUD_Types {Text , Slider, Dropdown, Bar, Button }
+    public enum HUD_Types { Text, Slider, Dropdown, Bar, Button }
     public HUD_Types HUD_Type;
     public HUD_Types HUD_CheckType;
-    public enum HUD_Locations {TopLeft,TopMiddle,TopRight,LeftMiddle,RightMiddle,BottomLeft,BottomMiddle,BottomRight,Middle }
+    public enum HUD_Locations { TopLeft, TopMiddle, TopRight, LeftMiddle, RightMiddle, BottomLeft, BottomMiddle, BottomRight, Middle }
     public HUD_Locations HUD_Location;
 
     //Info
