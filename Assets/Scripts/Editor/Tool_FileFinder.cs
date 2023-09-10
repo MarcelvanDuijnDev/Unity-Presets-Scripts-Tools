@@ -56,6 +56,7 @@ public class Tool_FileFinder : EditorWindow
         {
             FileFinder_SceneSearch();
 
+            //Extra Options
             _Scene_ExtraOptions_Foldout = EditorGUILayout.Foldout(_Scene_ExtraOptions_Foldout, "Extra Options");
             if (_Scene_ExtraOptions_Foldout)
             {
@@ -76,6 +77,7 @@ public class Tool_FileFinder : EditorWindow
                 _Scene_LockOptionActive = EditorGUILayout.Toggle("Lock Option Active", _Scene_LockOptionActive);
                 GUILayout.EndVertical();
             }
+
             FileFinder_Scene();
         }
 
